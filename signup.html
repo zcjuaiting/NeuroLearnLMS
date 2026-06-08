@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroLearn - Sign Up</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- =================== SIGNUP SCREEN =================== -->
+<div id="login-screen" class="screen active">
+    <div style="display:flex;flex-direction:column;align-items:center;width:100%;">
+        <div class="brand">
+            <h1>NeuroLearn</h1>
+            <p>Smart learning for every young mind 🧠</p>
+        </div>
+
+        <!-- Register Form -->
+        <div class="auth-card" id="register-form">
+            <h2>Hello!</h2>
+            <p class="subtitle">Create your account</p>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" placeholder="Enter your email" id="signup-email"/>
+            </div>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" placeholder="Choose a username" id="signup-username"/>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" placeholder="Create a password" id="signup-password"/>
+            </div>
+            <div class="role-selector">
+                <button class="role-btn active" onclick="selectRole(this)">As student</button>
+                <button class="role-btn" onclick="selectRole(this)">As admin</button>
+                <button class="role-btn" onclick="selectRole(this)">As parent</button>
+            </div>
+            <button class="btn-primary" onclick="goToDashboard()">Create Account</button>
+            <p class="auth-switch">Already have an account? <a href="index.html">Login here!</a></p>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
