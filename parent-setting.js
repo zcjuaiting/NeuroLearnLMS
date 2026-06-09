@@ -5,44 +5,40 @@ const adjustBtn = document.querySelector('.btn-adjust');
 const screenContainer = document.querySelector('.screen-container');
 
 function applySettings() {
-    const savedFontSize = localStorage.getItem('parent-fontSize') || 'medium';
-    const savedColorMode = localStorage.getItem('parent-colorMode') || 'normal';
+    const savedFontSize = localStorage.getItem('parent-fontSize') || 'Medium';
+    const savedColorMode = localStorage.getItem('parent-colorMode') || 'Normal';
     const savedTTS = localStorage.getItem('parent-tts') === 'true';
 
-    fontSizeSelect.value = savedFontSize;
-    colorModeSelect.value = savedColorMode;
-    ttsToggle.checked = savedTTS;
+    if (fontSizeSelect) fontSizeSelect.value = savedFontSize;
+    if (colorModeSelect) colorModeSelect.value = savedColorMode;
+    if (ttsToggle) ttsToggle.checked = savedTTS;
 
+    applyLocalStyles(savedFontSize, savedColorMode);
+}
+
+function applyLocalStyles(fontSize, colorMode) {
     const textElements = document.querySelectorAll('.welcome-text, .user-name, .info-row, .divider, .pref-label, .pref-select, .learner-text, .btn-adjust');
 
-    if (savedFontSize === 'large') {
-        textElements.forEach(el => {
-            el.style.fontSize = '1.25rem';
-        });
-        document.querySelector('.welcome-text span').style.fontSize = '1.6rem';
-    } else if (savedFontSize === 'small') {
-        textElements.forEach(el => {
-            el.style.fontSize = '0.75rem';
-        });
-        document.querySelector('.welcome-text span').style.fontSize = '1.1rem';
+    if (fontSize === 'Large') {
+        textElements.forEach(el => el.style.fontSize = '1.25rem');
+    } else if (fontSize === 'Small') {
+        textElements.forEach(el => el.style.fontSize = '0.75rem');
     } else {
-        textElements.forEach(el => {
-            el.style.fontSize = '';
-        });
-        document.querySelector('.welcome-text span').style.fontSize = '';
+        textElements.forEach(el => el.style.fontSize = '');
     }
 
-    if (savedColorMode === 'dark') {
-        screenContainer.style.background = '#222222';
+    if (colorMode === 'Dark Mode') {
+        screenContainer.style.background = '#121212';
         document.querySelectorAll('.profile-card, .learner-profile-card').forEach(card => {
-            card.style.backgroundColor = 'rgba(50, 50, 50, 0.9)';
+            card.style.backgroundColor = '#1e1e1e';
+            card.style.border = '1px solid #333';
             card.style.color = '#ffffff';
         });
         document.querySelectorAll('.info-label, .info-value, .pref-label, .learner-text, .divider').forEach(el => {
             el.style.color = '#ffffff';
         });
-    } else if (savedColorMode === 'contrast') {
-        screenContainer.style.background = '#ffffff';
+    } else if (colorMode === 'High Contrast') {
+        screenContainer.style.background = '#000000';
         document.querySelectorAll('.profile-card, .learner-profile-card').forEach(card => {
             card.style.backgroundColor = '#000000';
             card.style.border = '3px solid #ffff00';
@@ -65,15 +61,35 @@ function applySettings() {
     }
 }
 
-adjustBtn.addEventListener('click', async () => {
-    const { data, error } = await supabase
-        .from('adaptive_settings')
-        .update({ 
-            font_type: fontSizeSelect.value, 
-            color_contrast: colorModeSelect.value,
-            text_to_speech: ttsToggle.checked
-        })
-        .eq('learner_profile_id', 1);
-});
+if (adjustBtn) {
+    adjustBtn.addEventListener('click', async () => {
+        const fontSize = fontSizeSelect.value;
+        const colorMode = colorModeSelect.value;
+        const ttsEnabled = ttsToggle.checked;
 
-window.addEventListener('DOMContentLoaded', applySettings);
+        applyLocalStyles(fontSize, colorMode);
+
+        localStorage.setItem('parent-fontSize', fontSize);
+        localStorage.setItem('parent-colorMode', colorMode);
+        localStorage.setItem('parent-tts', ttsEnabled);
+
+        const { data, error } = await supabase
+            .from('adaptive_settings')
+            .insert([
+                { 
+                    learner_profile_id: 1, 
+                    font_type: fontSize, 
+                    color_contrast: colorMode,
+                    text_to_speech: ttsEnabled
+                }
+            ]);
+
+        if (error) {
+            alert("Error saving parent adjustments to cloud: " + error.message);
+        } else {
+            alert("Parent configurations successfully stored in the Supabase database!");
+        }
+    });
+}
+
+applySettings();
