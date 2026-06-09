@@ -9,47 +9,37 @@ function applySettings() {
     const savedColorMode = localStorage.getItem('student-colorMode') || 'Normal';
     const savedTTS = localStorage.getItem('student-tts') === 'true';
 
-    fontSizeSelect.value = savedFontSize;
-    colorModeSelect.value = savedColorMode;
-    ttsToggle.checked = savedTTS;
+    if (fontSizeSelect) fontSizeSelect.value = savedFontSize;
+    if (colorModeSelect) colorModeSelect.value = savedColorMode;
+    if (ttsToggle) ttsToggle.checked = savedTTS;
 
+    applyLocalStyles(savedFontSize, savedColorMode);
+}
+
+function applyLocalStyles(fontSize, colorMode) {
     const textElements = document.querySelectorAll('.welcome-text, .user-name, .info-row, .divider, .pref-label, .pref-select, .parent-text, .btn-adjust');
 
-    if (savedFontSize === 'Large') {
-        textElements.forEach(el => {
-            el.style.fontSize = '1.25rem';
-        });
-        document.querySelector('.welcome-text span').style.fontSize = '1.6rem';
-    } else if (savedFontSize === 'Small') {
-        textElements.forEach(el => {
-            el.style.fontSize = '0.75rem';
-        });
-        document.querySelector('.welcome-text span').style.fontSize = '1.1rem';
+    if (fontSize === 'Large') {
+        textElements.forEach(el => el.style.fontSize = '1.25rem');
+    } else if (fontSize === 'Small') {
+        textElements.forEach(el => el.style.fontSize = '0.75rem');
     } else {
-        textElements.forEach(el => {
-            el.style.fontSize = '';
-        });
-        document.querySelector('.welcome-text span').style.fontSize = '';
+        textElements.forEach(el => el.style.fontSize = '');
     }
 
-    if (savedColorMode === 'Dark Mode') {
-        screenContainer.style.background = '#222222';
+    if (colorMode === 'Dark Mode') {
+        screenContainer.style.background = '#121212';
         document.querySelectorAll('.profile-card, .parent-profile-card').forEach(card => {
-            card.style.backgroundColor = 'rgba(50, 50, 50, 0.9)';
+            card.style.backgroundColor = '#1e1e1e';
+            card.style.border = '1px solid #333';
             card.style.color = '#ffffff';
         });
-        document.querySelectorAll('.info-label, .info-value, .pref-label, .parent-text, .divider').forEach(el => {
-            el.style.color = '#ffffff';
-        });
-    } else if (savedColorMode === 'High Contrast') {
-        screenContainer.style.background = '#ffffff';
+    } else if (colorMode === 'High Contrast') {
+        screenContainer.style.background = '#000000';
         document.querySelectorAll('.profile-card, .parent-profile-card').forEach(card => {
             card.style.backgroundColor = '#000000';
             card.style.border = '3px solid #ffff00';
             card.style.color = '#ffff00';
-        });
-        document.querySelectorAll('.info-label, .info-value, .pref-label, .parent-text, .divider').forEach(el => {
-            el.style.color = '#ffff00';
         });
     } else {
         screenContainer.style.background = 'linear-gradient(to bottom, #aae3f0, #e0f7fa 40%, #a3e6a3 75%, #62c370)';
@@ -58,36 +48,38 @@ function applySettings() {
             card.style.border = '1px solid rgba(255, 255, 255, 0.6)';
             card.style.color = '';
         });
-        document.querySelectorAll('.info-label').forEach(el => el.style.color = '#4a777a');
-        document.querySelectorAll('.info-value, .pref-label').forEach(el => el.style.color = '#2a4d50');
-        document.querySelectorAll('.parent-text').forEach(el => el.style.color = '#3e6164');
-        document.querySelectorAll('.divider').forEach(el => el.style.color = '#639da1');
     }
 }
 
-adjustBtn.addEventListener('click', async () => {
-    const fontSize = fontSizeSelect.value;
-    const colorMode = colorModeSelect.value;
-    const ttsEnabled = ttsToggle.checked;
+if (adjustBtn) {
+    adjustBtn.addEventListener('click', async () => {
+        const fontSize = fontSizeSelect.value;
+        const colorMode = colorModeSelect.value;
+        const ttsEnabled = ttsToggle.checked;
 
-    applyLocalStyles(fontSize, colorMode, ttsEnabled); 
+        applyLocalStyles(fontSize, colorMode);
 
-    const { data, error } = await supabase
-        .from('adaptive_settings')
-        .insert([
-            { 
-                learner_profile_id: 1,
-                font_type: fontSize, 
-                color_contrast: colorMode,
-                text_to_speech: ttsEnabled
-            }
-        ]);
+        localStorage.setItem('student-fontSize', fontSize);
+        localStorage.setItem('student-colorMode', colorMode);
+        localStorage.setItem('student-tts', ttsEnabled);
 
-    if (error) {
-        console.error("Error saving preferences:", error.message);
-    } else {
-        alert("Preferences saved to live Supabase DB!");
-    }
-});
+        const { data, error } = await supabase
+            .from('adaptive_settings')
+            .insert([
+                { 
+                    learner_profile_id: 1, 
+                    font_type: fontSize, 
+                    color_contrast: colorMode,
+                    text_to_speech: ttsEnabled
+                }
+            ]);
 
-window.addEventListener('DOMContentLoaded', applySettings);
+        if (error) {
+            alert("Error saving settings to cloud: " + error.message);
+        } else {
+            alert("Preferences successfully updated on screen and saved in Supabase!");
+        }
+    });
+}
+
+applySettings();
