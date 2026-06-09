@@ -71,11 +71,46 @@ function updateScoreboardDisplay() {
 
 function advanceToNextQuestion() {
     currentQuestionIndex++;
+    
     if (currentQuestionIndex >= questionPool.length) {
+        console.log("🎯 Lesson completed! Sending score to Supabase...");
+        
+        saveAssessmentToDatabase();
+        
         currentQuestionIndex = 0;
+        
+        alert(`Great job completing the quiz! Your score: ${score} points.`);
     }
+    
     loadQuestion();
 }
+
+async function saveAssessmentToDatabase() {
+    console.log("Saving final results to database...");
+    
+    const { data, error } = await supabase
+        .from('assessment')
+        .insert([
+            {
+                learner_profile_id: 1,
+                lesson_id: 1,          
+                score: score,          
+                feedback: score >= 100 ? "Excellent mastery!" : "Keep practicing!"
+            }
+        ]);
+
+    if (error) {
+        console.error("Failed to post assessment metrics:", error.message);
+    } else {
+        console.log("Quiz scores synchronized successfully with Supabase.");
+    }
+}
+
+optionButtons.forEach(button => {
+    button.addEventListener('click', handleAnswerSelection);
+});
+
+loadQuestion();
 
 optionButtons.forEach(button => {
     button.addEventListener('click', handleAnswerSelection);
