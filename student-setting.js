@@ -1,5 +1,5 @@
-const fontSizeSelect = document.querySelectorAll('.pref-select')[0];
-const colorModeSelect = document.querySelectorAll('.pref-select')[1];
+const fontSizeSelect = document.getElementById('fontSizeSelect');
+const colorModeSelect = document.getElementById('colorModeSelect');
 const ttsToggle = document.querySelector('.switch input');
 const adjustBtn = document.querySelector('.btn-adjust');
 const screenContainer = document.querySelector('.screen-container');
@@ -65,12 +65,29 @@ function applySettings() {
     }
 }
 
-adjustBtn.addEventListener('click', () => {
-    localStorage.setItem('student-fontSize', fontSizeSelect.value);
-    localStorage.setItem('student-colorMode', colorModeSelect.value);
-    localStorage.setItem('student-tts', ttsToggle.checked);
-    applySettings();
-    alert('Learning preferences updated successfully!');
+adjustBtn.addEventListener('click', async () => {
+    const fontSize = fontSizeSelect.value;
+    const colorMode = colorModeSelect.value;
+    const ttsEnabled = ttsToggle.checked;
+
+    applyLocalStyles(fontSize, colorMode, ttsEnabled); 
+
+    const { data, error } = await supabase
+        .from('adaptive_settings')
+        .insert([
+            { 
+                learner_profile_id: 1,
+                font_type: fontSize, 
+                color_contrast: colorMode,
+                text_to_speech: ttsEnabled
+            }
+        ]);
+
+    if (error) {
+        console.error("Error saving preferences:", error.message);
+    } else {
+        alert("Preferences saved to live Supabase DB!");
+    }
 });
 
 window.addEventListener('DOMContentLoaded', applySettings);
