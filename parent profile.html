@@ -1,95 +1,93 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parent Profile Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+const fontSizeSelect = document.getElementById('fontSizeSelect');
+const colorModeSelect = document.getElementById('colorModeSelect');
+const ttsToggle = document.querySelector('.switch input');
+const adjustBtn = document.querySelector('.btn-adjust');
+const screenContainer = document.querySelector('.screen-container');
 
-    <div class="screen-container">
-        <div class="header">
-            <div class="welcome-group">
-                <div class="avatar-circle">
-                    <div class="parent-avatar-icon"></div>
-                </div>
-                <h1 class="welcome-text">
-                    Welcome, 
-                    <span id="displayParentGreeting">Parent!</span>
-                </h1>
-            </div>
-            <div class="settings-btn">⚙️</div>
-        </div>
+function applySettings() {
+    const savedFontSize = localStorage.getItem('student-fontSize') || 'Medium';
+    const savedColorMode = localStorage.getItem('student-colorMode') || 'Normal';
+    const savedTTS = localStorage.getItem('student-tts') === 'true';
 
-        <div class="profile-card">
-            <div class="info-row">
-                <span class="info-label">NAME:</span>
-                <span class="info-value" id="displayParentName">Paula J. Johnson</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">BIRTHDAY:</span>
-                <span class="info-value" id="displayParentBirthday">01/01/1989</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">RELATIONSHIP:</span>
-                <span class="info-value" id="displayRelationship">Mother</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">SKILL LEVEL:</span>
-                <span class="info-value" id="displaySkillLevel">------</span>
-            </div>
+    fontSizeSelect.value = savedFontSize;
+    colorModeSelect.value = savedColorMode;
+    ttsToggle.checked = savedTTS;
 
-            <div class="divider">PREFERENCES</div>
+    const textElements = document.querySelectorAll('.welcome-text, .user-name, .info-row, .divider, .pref-label, .pref-select, .parent-text, .btn-adjust');
 
-            <div class="pref-row">
-                <span class="pref-label">Font size</span>
-                <select class="pref-select" id="fontSizeSelect">
-                    <option value="large">Large</option>
-                    <option value="medium">Medium</option>
-                    <option value="small">Small</option>
-                </select>
-            </div>
+    if (savedFontSize === 'Large') {
+        textElements.forEach(el => {
+            el.style.fontSize = '1.25rem';
+        });
+        document.querySelector('.welcome-text span').style.fontSize = '1.6rem';
+    } else if (savedFontSize === 'Small') {
+        textElements.forEach(el => {
+            el.style.fontSize = '0.75rem';
+        });
+        document.querySelector('.welcome-text span').style.fontSize = '1.1rem';
+    } else {
+        textElements.forEach(el => {
+            el.style.fontSize = '';
+        });
+        document.querySelector('.welcome-text span').style.fontSize = '';
+    }
 
-            <div class="pref-row">
-                <span class="pref-label">Color Mode</span>
-                <select class="pref-select" id="colorModeSelect">
-                    <option value="contrast">High Contrast</option>
-                    <option value="normal">Normal</option>
-                    <option value="dark">Dark Mode</option>
-                </select>
-            </div>
+    if (savedColorMode === 'Dark Mode') {
+        screenContainer.style.background = '#222222';
+        document.querySelectorAll('.profile-card, .parent-profile-card').forEach(card => {
+            card.style.backgroundColor = 'rgba(50, 50, 50, 0.9)';
+            card.style.color = '#ffffff';
+        });
+        document.querySelectorAll('.info-label, .info-value, .pref-label, .parent-text, .divider').forEach(el => {
+            el.style.color = '#ffffff';
+        });
+    } else if (savedColorMode === 'High Contrast') {
+        screenContainer.style.background = '#ffffff';
+        document.querySelectorAll('.profile-card, .parent-profile-card').forEach(card => {
+            card.style.backgroundColor = '#000000';
+            card.style.border = '3px solid #ffff00';
+            card.style.color = '#ffff00';
+        });
+        document.querySelectorAll('.info-label, .info-value, .pref-label, .parent-text, .divider').forEach(el => {
+            el.style.color = '#ffff00';
+        });
+    } else {
+        screenContainer.style.background = 'linear-gradient(to bottom, #aae3f0, #e0f7fa 40%, #a3e6a3 75%, #62c370)';
+        document.querySelectorAll('.profile-card, .parent-profile-card').forEach(card => {
+            card.style.backgroundColor = 'rgba(255, 255, 255, 0.85)';
+            card.style.border = '1px solid rgba(255, 255, 255, 0.6)';
+            card.style.color = '';
+        });
+        document.querySelectorAll('.info-label').forEach(el => el.style.color = '#4a777a');
+        document.querySelectorAll('.info-value, .pref-label').forEach(el => el.style.color = '#2a4d50');
+        document.querySelectorAll('.parent-text').forEach(el => el.style.color = '#3e6164');
+        document.querySelectorAll('.divider').forEach(el => el.style.color = '#639da1');
+    }
+}
 
-            <div class="pref-row">
-                <span class="pref-label">Text-to-Speech</span>
-                <div class="toggle-container">
-                    <span>off</span>
-                    <label class="switch">
-                        <input type="checkbox" id="ttsToggle" checked>
-                        <span class="slider"></span>
-                    </label>
-                    <span>on</span>
-                </div>
-            </div>
+adjustBtn.addEventListener('click', async () => {
+    const fontSize = fontSizeSelect.value;
+    const colorMode = colorModeSelect.value;
+    const ttsEnabled = ttsToggle.checked;
 
-            <button class="btn-adjust">Adjust Learning Preference</button>
-        </div>
+    applyLocalStyles(fontSize, colorMode, ttsEnabled); 
 
-        <div>
-            <a href="student.html" style="text-decoration: none;">
-                <div class="learner-profile-card">
-                    <div class="learner-avatar"></div>
-                    <div class="learner-text">
-                        Learner
-                        <span>Profile</span>
-                    </div>
-                </div>
-            </a>
-        </div>
+    const { data, error } = await supabase
+        .from('adaptive_settings')
+        .insert([
+            { 
+                learner_profile_id: 1,
+                font_type: fontSize, 
+                color_contrast: colorMode,
+                text_to_speech: ttsEnabled
+            }
+        ]);
 
-        <div class="bottom-illustration"></div>
-    </div>
+    if (error) {
+        console.error("Error saving preferences:", error.message);
+    } else {
+        alert("Preferences saved to live Supabase DB!");
+    }
+});
 
-    <script src="parent-setting.js"></script>
-</body>
-</html>
+window.addEventListener('DOMContentLoaded', applySettings);
