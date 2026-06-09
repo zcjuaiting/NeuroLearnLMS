@@ -65,12 +65,15 @@ function applySettings() {
     }
 }
 
-adjustBtn.addEventListener('click', () => {
-    localStorage.setItem('parent-fontSize', fontSizeSelect.value);
-    localStorage.setItem('parent-colorMode', colorModeSelect.value);
-    localStorage.setItem('parent-tts', ttsToggle.checked);
-    applySettings();
-    alert('Parent preferences updated successfully!');
+adjustBtn.addEventListener('click', async () => {
+    const { data, error } = await supabase
+        .from('adaptive_settings')
+        .update({ 
+            font_type: fontSizeSelect.value, 
+            color_contrast: colorModeSelect.value,
+            text_to_speech: ttsToggle.checked
+        })
+        .eq('learner_profile_id', 1);
 });
 
 window.addEventListener('DOMContentLoaded', applySettings);
