@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroLearn – Student Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .profile-layout {
+            position: relative; z-index: 1;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 24px;
+            padding: 32px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .profile-left { display: flex; flex-direction: column; gap: 20px; }
+        .profile-right { display: flex; flex-direction: column; gap: 20px; }
+        .hero-card { text-align: center; padding: 32px 24px; }
+        .hero-card .avatar-wrap { position: relative; display: inline-block; margin-bottom: 16px; }
+        .hero-card .edit-avatar {
+            position: absolute; bottom: 2px; right: 2px;
+            width: 28px; height: 28px; border-radius: 50%;
+            background: var(--teal); color: white;
+            font-size: 0.75rem;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border: 2px solid white;
+            transition: transform 0.2s;
+        }
+        .hero-card .edit-avatar:hover { transform: scale(1.15); }
+        .hero-card h2 { font-family: 'Baloo 2', cursive; font-size: 1.4rem; color: var(--teal); }
+        .xp-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: linear-gradient(135deg, var(--yellow), var(--orange));
+            color: white; padding: 4px 14px; border-radius: 20px;
+            font-size: 0.8rem; font-weight: 800; margin-top: 10px;
+        }
+        .profile-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+        .profile-tab {
+            padding: 8px 20px; border-radius: 30px;
+            border: 2px solid transparent;
+            font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.88rem;
+            cursor: pointer; transition: all 0.2s;
+            background: var(--card-bg); color: var(--text-mid);
+            box-shadow: 0 2px 10px rgba(30,58,76,0.08);
+        }
+        .profile-tab.active {
+            background: linear-gradient(135deg, var(--teal), var(--sky-dark));
+            color: white; box-shadow: 0 4px 14px rgba(46,140,140,0.3);
+        }
+        .profile-tab:hover:not(.active) { border-color: var(--sky); color: var(--teal); }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+        .subject-progress-list { display: flex; flex-direction: column; gap: 14px; }
+        .subject-row {
+            display: flex; align-items: center; gap: 14px;
+            padding: 16px;
+            background: rgba(110,198,245,0.08);
+            border-radius: var(--radius-sm);
+            border: 1.5px solid rgba(110,198,245,0.2);
+        }
+        .subject-row .s-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; flex-shrink: 0;
+        }
+        .subject-row .s-icon.math { background: linear-gradient(135deg,#B3E5FC,#81D4FA); }
+        .subject-row .s-icon.science { background: linear-gradient(135deg,#C8E6C9,#A5D6A7); }
+        .subject-row .s-icon.reading { background: linear-gradient(135deg,#FFE0B2,#FFCC80); }
+        .subject-row .s-icon.history { background: linear-gradient(135deg,#E1BEE7,#CE93D8); }
+        .subject-row .s-info { flex: 1; }
+        .subject-row .s-info h4 { font-weight: 800; font-size: 0.92rem; color: var(--text-dark); }
+        .activity-list { display: flex; flex-direction: column; gap: 12px; }
+        .activity-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 16px;
+            background: rgba(110,198,245,0.08);
+            border-radius: var(--radius-sm);
+            border: 1.5px solid rgba(110,198,245,0.18);
+        }
+        .activity-icon {
+            width: 40px; height: 40px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; flex-shrink: 0;
+        }
+        .activity-info { flex: 1; }
+        .activity-info h4 { font-size: 0.88rem; font-weight: 800; color: var(--text-dark); }
+        .activity-score { font-family: 'Baloo 2', cursive; font-size: 1rem; color: var(--teal); font-weight: 700; }
+        .profile-avatar-lg {
+            width: 90px; height: 90px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.8rem;
+            border: 3px solid white;
+            box-shadow: 0 4px 16px rgba(110,198,245,0.4);
+            flex-shrink: 0;
+            background: linear-gradient(135deg, var(--sky-light), var(--green-light));
+        }
+    </style>
+</head>
+<body>
+
+<nav class="topnav">
+    <a class="nav-logo" href="dashboard.html">NeuroLearn</a>
+    <div class="nav-center">
+        <a class="nav-tab" href="dashboard.html">🏠 Dashboard</a>
+        <a class="nav-tab" href="lesson.html">📐 Lesson</a>
+        <a class="nav-tab active" href="student-profile.html">👤 Student Profile</a>
+        <a class="nav-tab" href="parent-profile.html">👩 Parent Profile</a>
+        <a class="nav-tab" href="report.html">📋 Report</a>
+    </div>
+    <div class="nav-right">
+        <button class="icon-btn" title="Notifications" onclick="showToast('Notifications coming soon!')">🔔</button>
+        <div class="avatar-btn" onclick="showToast('Profile settings coming soon!')">
+            <div class="avatar-circle">🧒</div>
+            <span id="profile-username">Jake</span>
+        </div>
+    </div>
+</nav>
+
+<div class="profile-layout">
+    <aside class="profile-left">
+        <div class="card hero-card">
+            <div class="avatar-wrap">
+                <div class="profile-avatar-lg student">🧒</div>
+                <div class="edit-avatar" onclick="showToast('Avatar editor coming soon!')">✏️</div>
+            </div>
+            <h2 id="student-name">Jake J. Johnson</h2>
+            <p>Student · Grade 3</p>
+            <div class="xp-badge">⭐ Level 5 · 1,240 XP</div>
+            <div class="level-bar-wrap mt-12">
+                <div class="progress-bar-label"><span>Progress to Level 6</span><span>1240 / 1500</span></div>
+                <div class="progress-bar"><div class="progress-fill blue" data-width="83%" style="width:0%"></div></div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="icon">ℹ️</span> Student Info</div>
+            <table class="info-table">
+                <tr><td>Full Name</td><td id="info-name">Jake J. Johnson</td></tr>
+                <tr><td>Birthday</td><td>01/01/2018</td></tr>
+                <tr><td>Grade</td><td>Grade 3</td></tr>
+                <tr><td>Joined</td><td>Sep 2024</td></tr>
+            </table>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="icon">📊</span> This Week</div>
+            <div class="flex gap-12" style="flex-wrap:wrap;">
+                <div class="stat-pill"><div class="val">12</div><div class="lbl">Lessons</div></div>
+                <div class="stat-pill"><div class="val">84%</div><div class="lbl">Avg Score</div></div>
+                <div class="stat-pill"><div class="val">🔥5</div><div class="lbl">Streak</div></div>
+            </div>
+        </div>
+        <a class="btn btn-ghost" href="parent-profile.html" style="justify-content:center;text-align:center;">👨‍👩‍👦 Parent Profile →</a>
+    </aside>
+
+    <div class="profile-right">
+        <div class="card" style="padding:20px 24px;">
+            <div class="profile-tabs">
+                <button class="profile-tab active" onclick="switchTab('progress', this)">📈 Progress</button>
+                <button class="profile-tab" onclick="switchTab('activity', this)">🕐 Activity</button>
+                <button class="profile-tab" onclick="switchTab('achievements', this)">🏆 Achievements</button>
+            </div>
+        </div>
+
+        <div id="tab-progress" class="tab-panel active card">
+            <div class="card-title"><span class="icon">📈</span> Subject Progress</div>
+            <div class="subject-progress-list">
+                <div class="subject-row"><div class="s-icon math">📐</div><div class="s-info"><h4>Mathematics</h4><p>8 of 12 lessons completed</p></div><div class="br-score">88%</div></div>
+                <div class="subject-row"><div class="s-icon science">🔬</div><div class="s-info"><h4>Science</h4><p>4 of 10 lessons completed</p></div><div class="br-score">80%</div></div>
+                <div class="subject-row"><div class="s-icon reading">📖</div><div class="s-info"><h4>Reading</h4><p>3 of 8 lessons completed</p></div><div class="br-score">72%</div></div>
+                <div class="subject-row"><div class="s-icon history">🏛️</div><div class="s-info"><h4>History</h4><p>1 of 6 lessons completed</p></div><div class="br-score">60%</div></div>
+            </div>
+        </div>
+
+        <div id="tab-activity" class="tab-panel card">
+            <div class="card-title"><span class="icon">🕐</span> Recent Activity</div>
+            <div class="activity-list">
+                <div class="activity-item"><div class="activity-icon" style="background:linear-gradient(135deg,#B3E5FC,#81D4FA)">➖</div><div class="activity-info"><h4>Subtraction – Intermediate</h4><p>Today · 15 min session</p></div><div class="activity-score">50/50</div></div>
+                <div class="activity-item"><div class="activity-icon" style="background:linear-gradient(135deg,#C8E6C9,#A5D6A7)">🌱</div><div class="activity-info"><h4>Plant Life Cycle – Beginner</h4><p>Yesterday · 12 min session</p></div><div class="activity-score">45/50</div></div>
+                <div class="activity-item"><div class="activity-icon" style="background:linear-gradient(135deg,#FFE0B2,#FFCC80)">📖</div><div class="activity-info"><h4>Story Comprehension – Beginner</h4><p>2 days ago · 20 min session</p></div><div class="activity-score">38/50</div></div>
+            </div>
+        </div>
+
+        <div id="tab-achievements" class="tab-panel card">
+            <div class="card-title"><span class="icon">🏆</span> Achievements</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div style="background:rgba(255,217,61,0.1);border-radius:16px;padding:16px;text-align:center;"><div style="font-size:2rem;">🥇</div><div style="font-weight:800;">Math Wizard</div><div style="font-size:0.75rem;">+50 XP · Earned</div></div>
+                <div style="background:rgba(110,198,245,0.1);border-radius:16px;padding:16px;text-align:center;"><div style="font-size:2rem;">🔥</div><div style="font-weight:800;">5-Day Streak</div><div style="font-size:0.75rem;">+30 XP · Earned</div></div>
+                <div style="background:rgba(76,175,125,0.1);border-radius:16px;padding:16px;text-align:center;"><div style="font-size:2rem;">⚡</div><div style="font-weight:800;">Quick Learner</div><div style="font-size:0.75rem;">+20 XP · Earned</div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="script.js"></script>
+<script>
+    function switchTab(name, btn) {
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.profile-tab').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + name).classList.add('active');
+        btn.classList.add('active');
+    }
+</script>
+</body>
+</html>
