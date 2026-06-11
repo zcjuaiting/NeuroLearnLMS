@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroLearn – Progress Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .report-layout {
+            position: relative; z-index: 1;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 24px;
+            padding: 32px 40px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+        .report-main { display: flex; flex-direction: column; gap: 22px; }
+        .report-aside { display: flex; flex-direction: column; gap: 20px; }
+        .report-header-card {
+            display: flex; align-items: center; gap: 24px;
+            padding: 28px 32px;
+        }
+        .report-header-card .rh-avatar {
+            width: 72px; height: 72px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--sky-light), var(--green-light));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.2rem; border: 3px solid white;
+            flex-shrink: 0;
+        }
+        .report-header-card .rh-info h2 { font-family: 'Baloo 2', cursive; font-size: 1.4rem; color: var(--text-dark); }
+        .rh-meta { margin-left: auto; text-align: right; }
+        .summary-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+        .subject-breakdown { display: flex; flex-direction: column; gap: 14px; }
+        .breakdown-row {
+            display: flex; align-items: center; gap: 14px;
+            padding: 16px 18px;
+            background: rgba(110,198,245,0.07);
+            border: 1.5px solid rgba(110,198,245,0.18);
+            border-radius: var(--radius-sm);
+        }
+        .br-icon {
+            width: 46px; height: 46px; border-radius: 13px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; flex-shrink: 0;
+               }
+        .br-icon.math { background: linear-gradient(135deg,#B3E5FC,#81D4FA); }
+        .br-icon.science { background: linear-gradient(135deg,#C8E6C9,#A5D6A7); }
+        .br-icon.reading { background: linear-gradient(135deg,#FFE0B2,#FFCC80); }
+        .br-icon.history { background: linear-gradient(135deg,#E1BEE7,#CE93D8); }
+        .br-info { flex: 1; }
+        .br-info h4 { font-weight: 800; font-size: 0.92rem; color: var(--text-dark); }
+        .br-stats { display: flex; gap: 12px; align-items: center; }
+        .br-score { font-family: 'Baloo 2', cursive; font-size: 1.15rem; color: var(--teal); font-weight: 700; }
+        .br-trend.up { background: rgba(76,175,125,0.15); color: var(--green-dark); padding: 3px 9px; border-radius: 10px; font-size: 0.78rem; font-weight: 800; }
+        .narrative-block { padding: 24px 28px; }
+        .narrative-block h3 { font-family: 'Baloo 2', cursive; font-size: 1.05rem; color: var(--teal); margin-bottom: 10px; }
+        .narrative-para { font-size: 0.92rem; color: var(--text-dark); line-height: 1.7; font-weight: 600; }
+        .highlight-span { background: linear-gradient(135deg, rgba(110,198,245,0.2), rgba(76,175,125,0.15)); padding: 1px 6px; border-radius: 6px; font-weight: 800; color: var(--teal); }
+        .mini-ring { display: flex; flex-direction: column; align-items: center; padding: 24px 20px; }
+        .mini-ring svg { transform: rotate(-90deg); }
+        .rec-list { display: flex; flex-direction: column; gap: 10px; }
+        .rec-item {
+            display: flex; align-items: flex-start; gap: 10px;
+            padding: 12px; border-radius: 12px;
+            background: rgba(110,198,245,0.08);
+            border: 1.5px solid rgba(110,198,245,0.18);
+        }
+        .rec-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+        .rec-dot.green { background: var(--green); }
+        .rec-dot.orange { background: var(--orange); }
+        .rec-dot.blue { background: var(--sky-dark); }
+        .rec-info h4 { font-size: 0.85rem; font-weight: 800; color: var(--text-dark); }
+        .period-toggle {
+            display: flex; gap: 6px; background: rgba(110,198,245,0.15);
+            padding: 5px; border-radius: 12px; border: 1.5px solid rgba(110,198,245,0.25);
+        }
+        .period-btn {
+            padding: 6px 16px; border-radius: 9px;
+            border: none; font-family: 'Nunito',sans-serif; font-weight: 700; font-size: 0.82rem;
+            cursor: pointer; color: var(--text-mid); background: transparent; transition: all 0.2s;
+        }
+        .period-btn.active { background: var(--teal); color: white; box-shadow: 0 2px 8px rgba(46,140,140,0.3); }
+        .bar-chart { display: flex; align-items: flex-end; gap: 10px; height: 120px; margin-top: 20px; }
+        .bar-col { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+        .bar-fill { width: 100%; border-radius: 10px 10px 0 0; transition: height 0.8s ease; min-height: 4px; }
+    </style>
+</head>
+<body>
+
+<nav class="topnav">
+    <a class="nav-logo" href="dashboard.html">NeuroLearn</a>
+    <div class="nav-center">
+        <a class="nav-tab" href="dashboard.html">🏠 Dashboard</a>
+        <a class="nav-tab" href="lesson.html">📐 Lesson</a>
+        <a class="nav-tab" href="student-profile.html">👤 Student Profile</a>
+        <a class="nav-tab" href="parent-profile.html">👩 Parent Profile</a>
+        <a class="nav-tab active" href="report.html">📋 Report</a>
+    </div>
+    <div class="nav-right">
+        <button class="icon-btn" title="Notifications" onclick="showToast('Notifications coming soon!')">🔔</button>
+        <div class="avatar-btn" onclick="showToast('Profile settings coming soon!')">
+            <div class="avatar-circle parent">👩</div>
+            <span>Paula</span>
+        </div>
+    </div>
+</nav>
+
+<div class="report-layout">
+    <div class="report-main">
+        <div class="card report-header-card">
+            <div class="rh-avatar">🧒</div>
+            <div class="rh-info">
+                <h2 id="report-name">Jake P. Johnson</h2>
+                <p>Grade 3 · Intermediate · NeuroLearn Progress Report</p>
+                <div class="flex gap-8 mt-8">
+                    <span class="badge teal">📐 Math</span>
+                    <span class="badge green">🔬 Science</span>
+                    <span class="badge blue">📖 Reading</span>
+                </div>
+            </div>
+            <div class="rh-meta">
+                <div class="period">Reporting Period</div>
+                <div class="date">June 1–11, 2026</div>
+                <button class="btn btn-ghost btn-sm mt-8" onclick="window.print()">🖨️ Print Report</button>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-between">
+            <h2 style="font-family:'Baloo 2',cursive;font-size:1.4rem;color:var(--text-dark);">📊 Progress Overview</h2>
+            <div class="period-toggle">
+                <button class="period-btn" onclick="setPeriod(this, 'week')">Week</button>
+                <button class="period-btn active" onclick="setPeriod(this, 'month')">Month</button>
+                <button class="period-btn" onclick="setPeriod(this, 'all')">All Time</button>
+            </div>
+        </div>
+
+        <div class="summary-row">
+            <div class="stat-pill"><div class="val">12</div><div class="lbl">Lessons Done</div></div>
+            <div class="stat-pill"><div class="val">84%</div><div class="lbl">Avg Score</div></div>
+            <div class="stat-pill"><div class="val">3h</div><div class="lbl">Total Time</div></div>
+            <div class="stat-pill"><div class="val">🔥5</div><div class="lbl">Day Streak</div></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📅 Daily Activity (This Week)</div>
+            <div class="bar-chart" id="bar-chart"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📚 Subject Breakdown</div>
+            <div class="subject-breakdown">
+                <div class="breakdown-row">
+                    <div class="br-icon math">📐</div>
+                    <div class="br-info"><h4>Mathematics</h4><p>8 lessons · 90 min total</p></div>
+                    <div class="br-stats"><div class="br-score">88%</div><div class="br-trend up">↑ +7%</div></div>
+                </div>
+                <div class="breakdown-row">
+                    <div class="br-icon science">🔬</div>
+                    <div class="br-info"><h4>Science</h4><p>4 lessons · 48 min total</p></div>
+                    <div class="br-stats"><div class="br-score">80%</div><div class="br-trend up">↑ +5%</div></div>
+                </div>
+                <div class="breakdown-row">
+                    <div class="br-icon reading">📖</div>
+                    <div class="br-info"><h4>Reading</h4><p>3 lessons · 36 min total</p></div>
+                    <div class="br-stats"><div class="br-score">72%</div><div class="br-trend up">→ 0%</div></div>
+                </div>
+                <div class="breakdown-row">
+                    <div class="br-icon history">🏛️</div>
+                    <div class="br-info"><h4>History</h4><p>1 lesson · 18 min total</p></div>
+                    <div class="br-stats"><div class="br-score">60%</div><div class="br-trend up">↓ -2%</div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card narrative-block">
+            <h3>📝 Teacher's Note to Parents</h3>
+            <p class="narrative-para">
+                Jake has made <span class="highlight-span">significant progress</span> during this reporting period.
+                He has completed <span class="highlight-span">12 lessons</span> across Math, Science, Reading, and History.
+                His overall average score is <span class="highlight-span">84%</span>, showing a
+                <span class="highlight-span">7% improvement</span> from the previous period.
+            </p>
+            <p class="narrative-para mt-12">
+                Jake particularly excels in <span class="highlight-span">Mathematics</span>, where he scored 88% and is ready to advance to multiplication.
+                We recommend continuing the current schedule and celebrating his recent achievements to keep motivation high.
+            </p>
+        </div>
+    </div>
+
+    <aside class="report-aside">
+        <div class="card mini-ring">
+            <div class="card-title">🎯 Overall Score</div>
+            <svg width="130" height="130" viewBox="0 0 130 130">
+                <circle cx="65" cy="65" r="54" fill="none" stroke="rgba(110,198,245,0.2)" stroke-width="13"/>
+                <circle id="overall-ring" cx="65" cy="65" r="54" fill="none" stroke="url(#rg)" stroke-width="13" stroke-dasharray="339" stroke-dashoffset="339" stroke-linecap="round"/>
+                <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#2E8C8C"/><stop offset="100%" style="stop-color:#6EC6F5"/></linearGradient></defs>
+            </svg>
+            <div class="ring-label" style="font-family:'Baloo 2',cursive;font-size:1.5rem;color:var(--teal);text-align:center;margin-top:-8px;">84%<small style="display:block;font-size:0.75rem;">Average Score</small></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🧒 Learner Quick View</div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+                <div style="width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,var(--sky-light),var(--green-light));display:flex;align-items:center;justify-content:center;font-size:1.5rem;border:2px solid white;">🧒</div>
+                <div><div style="font-weight:800;font-size:0.9rem;color:var(--text-dark);">Jake P. Johnson</div><div style="font-size:0.78rem;color:var(--text-light);font-weight:600;">Grade 3 · Level 5</div></div>
+            </div>
+            <table class="info-table">
+                <tr><td>Avg Session</td><td>18 min</td></tr>
+                <tr><td>Lessons / Week</td><td>12</td></tr>
+                <tr><td>Best Subject</td><td>Math</td></tr>
+                <tr><td>Pacing</td><td><span class="badge green">Normal</span></td></tr>
+            </table>
+            <a class="btn btn-ghost btn-sm mt-12" href="student-profile.html" style="width:100%;justify-content:center;">View Full Profile →</a>
+        </div>
+
+        <div class="card">
+            <div class="card-title">💡 Recommendations</div>
+            <div class="rec-list">
+                <div class="rec-item"><div class="rec-dot green"></div><div class="rec-info"><h4>Start Multiplication</h4><p>Jake is ready to advance in Math.</p></div></div>
+                <div class="rec-item"><div class="rec-dot orange"></div><div class="rec-info"><h4>Extra Reading Practice</h4><p>Short stories at home 2×/week.</p></div></div>
+                <div class="rec-item"><div class="rec-dot blue"></div><div class="rec-info"><h4>Maintain Streak</h4><p>Keep the 5-day streak going strong!</p></div></div>
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-12">
+            <a class="btn btn-teal" href="parent-profile.html" style="justify-content:center;">⚙️ Adjust Preferences</a>
+            <button class="btn btn-orange" onclick="showToast('Report emailed to paula@email.com 📧')" style="justify-content:center;">📧 Email Report</button>
+        </div>
+    </aside>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="script.js"></script>
+<script>
+    const chartData = [
+        { day: 'Mon', score: 90, color: '#4CAF7D' },
+        { day: 'Tue', score: 75, color: '#3A9ED6' },
+        { day: 'Wed', score: 88, color: '#4CAF7D' },
+        { day: 'Thu', score: 95, color: '#4CAF7D' },
+        { day: 'Fri', score: 80, color: '#FF8C42' }
+    ];
+    function buildBarChart() {
+        const el = document.getElementById('bar-chart');
+        if (!el) return;
+        el.innerHTML = '';
+        chartData.forEach(d => {
+            const col = document.createElement('div');
+            col.className = 'bar-col';
+            const h = d.score > 0 ? Math.max(8, d.score * 1.1) : 8;
+            col.innerHTML = `<div class="b-val">${d.score}%</div><div class="bar-fill" style="height:0px;background:${d.color};border-radius:10px 10px 0 0;"></div><div class="b-label" style="font-size:0.72rem;font-weight:700;color:var(--text-light);">${d.day}</div>`;
+            el.appendChild(col);
+            setTimeout(() => { col.querySelector('.bar-fill').style.height = h + 'px'; }, 200);
+        });
+    }
+    buildBarChart();
+    setTimeout(() => {
+        const ring = document.getElementById('overall-ring');
+        if (ring) ring.style.strokeDashoffset = 339 - (339 * 0.84);
+    }, 400);
+    function setPeriod(btn, period) {
+        document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        showToast(`Showing ${period} data 📊`);
+    }
+</script>
+</body>
+</html>
