@@ -75,6 +75,7 @@
         .notif-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
         .notif-dot.green { background: var(--green); }
         .notif-dot.orange { background: var(--orange); }
+        .notif-dot.blue { background: var(--sky-dark); }
         .notif-info { flex: 1; }
         .notif-info h4 { font-size: 0.88rem; font-weight: 800; color: var(--text-dark); }
         .profile-avatar-lg {
@@ -86,6 +87,19 @@
             box-shadow: 0 4px 16px rgba(110,198,245,0.4);
             flex-shrink: 0;
             background: linear-gradient(135deg, #FFE0B2, #FFCC80);
+        }
+        .edit-avatar {
+            position: absolute; bottom: 2px; right: 2px;
+            width: 28px; height: 28px; border-radius: 50%;
+            background: var(--orange); color: white;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border: 2px solid white;
+            transition: transform 0.2s;
+        }
+        .edit-avatar:hover { transform: scale(1.15); }
+        .saving {
+            opacity: 0.5;
+            pointer-events: none;
         }
     </style>
 </head>
@@ -104,7 +118,7 @@
         <button class="icon-btn" title="Notifications" onclick="showToast('Notifications coming soon!')">🔔</button>
         <div class="avatar-btn" onclick="showToast('Profile settings coming soon!')">
             <div class="avatar-circle parent">👩</div>
-            <span>Paula</span>
+            <span id="parent-name-display">Paula</span>
         </div>
     </div>
 </nav>
@@ -114,26 +128,29 @@
         <div class="card hero-card">
             <div class="avatar-wrap">
                 <div class="profile-avatar-lg parent">👩</div>
-                <div class="edit-avatar" style="position:absolute;bottom:2px;right:2px;width:28px;height:28px;border-radius:50%;background:var(--orange);color:white;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid white;" onclick="showToast('Avatar editor coming soon!')">✏️</div>
+                <div class="edit-avatar" onclick="showToast('Avatar editor coming soon!')">✏️</div>
             </div>
-            <h2>Paula J. Johnson</h2>
+            <h2 id="parent-full-name">Paula J. Johnson</h2>
             <p>Parent · Linked Account</p>
             <div class="parent-badge">👨‍👩‍👦 Parent Account</div>
         </div>
         <div class="card">
             <div class="card-title"><span class="icon">ℹ️</span> Parent Info</div>
             <table class="info-table">
-                <tr><td>Full Name</td><td>Paula J. Johnson</td></tr>
-                <tr><td>Relationship</td><td>Mother</td></tr>
-                <tr><td>Email</td><td>paula@email.com</td></tr>
-                <tr><td>Joined</td><td>Sep 2024</td></tr>
+                <tr><td>Full Name</td><td id="info-fullname">Paula J. Johnson</td></tr>
+                <tr><td>Relationship</td><td id="info-relationship">Mother</td></tr>
+                <tr><td>Email</td><td id="info-email">paula@email.com</td></tr>
+                <tr><td>Joined</td><td id="info-joined">Sep 2024</td></tr>
             </table>
         </div>
         <div class="card">
             <div class="card-title"><span class="icon">🧒</span> Linked Learner</div>
             <a class="learner-card" href="student-profile.html">
                 <div class="lc-avatar">🧒</div>
-                <div class="lc-info"><h4>Jake J. Johnson</h4><p>Grade 3 · Level 5 · 1,240 XP</p></div>
+                <div class="lc-info">
+                    <h4 id="learner-name">Jake J. Johnson</h4>
+                    <p id="learner-stats">Grade 3 · Level 1 · 0 XP</p>
+                </div>
                 <span style="margin-left:auto;font-size:1.1rem;color:var(--teal);">→</span>
             </a>
         </div>
@@ -149,30 +166,98 @@
             </div>
         </div>
 
+        <!-- PREFERENCES TAB -->
         <div id="tab-preferences" class="tab-panel active card">
             <div class="card-title"><span class="icon">⚙️</span> Learning Preferences (for Jake)</div>
-            <div class="pref-row"><div><div class="pref-label">Font Size</div><div class="pref-desc">Adjust Jake's text size</div></div><select class="nl-select" onchange="applyFontSize(this.value)"><option>Small</option><option selected>Large</option><option>Medium</option></select></div>
-            <div class="pref-row"><div><div class="pref-label">Daily Time Limit</div><div class="pref-desc">Max learning time per day</div></div><select class="nl-select"><option>30 min</option><option selected>1 hour</option><option>2 hours</option></select></div>
-            <div class="save-bar" style="padding:16px 0 0;display:flex;justify-content:flex-end;gap:12px;"><button class="btn btn-teal btn-sm" onclick="showToast('Preferences saved! ✅')">Save Changes</button></div>
-        </div>
-
-        <div id="tab-notifications" class="tab-panel card">
-            <div class="card-title"><span class="icon">🔔</span> Notification Settings</div>
-            <div class="pref-row"><div><div class="pref-label">Daily Progress Summary</div></div><label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
-            <div class="pref-row"><div><div class="pref-label">Weekly Report</div></div><label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
-            <div class="pref-row"><div><div class="pref-label">Achievement Alerts</div></div><label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
-            <div class="card-title mt-16"><span class="icon">📬</span> Recent Notifications</div>
-            <div class="notif-list">
-                <div class="notif-item"><div class="notif-dot green"></div><div class="notif-info"><h4>Jake earned "Math Wizard" badge! 🥇</h4></div></div>
-                <div class="notif-item"><div class="notif-dot blue"></div><div class="notif-info"><h4>Daily summary: 15 min · Score 50/50</h4></div></div>
+            <div class="pref-row">
+                <div><div class="pref-label">Font Size</div><div class="pref-desc">Adjust Jake's text size</div></div>
+                <select id="font-size-select" class="nl-select">
+                    <option value="Small">Small</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Large" selected>Large</option>
+                </select>
+            </div>
+            <div class="pref-row">
+                <div><div class="pref-label">Daily Time Limit</div><div class="pref-desc">Max learning time per day</div></div>
+                <select id="time-limit-select" class="nl-select">
+                    <option value="30 min">30 min</option>
+                    <option value="1 hour" selected>1 hour</option>
+                    <option value="2 hours">2 hours</option>
+                    <option value="No limit">No limit</option>
+                </select>
+            </div>
+            <div class="pref-row">
+                <div><div class="pref-label">Color Mode</div><div class="pref-desc">Screen display contrast</div></div>
+                <select id="color-mode-select" class="nl-select">
+                    <option value="Standard">Standard</option>
+                    <option value="High Contrast" selected>High Contrast</option>
+                    <option value="Dark">Dark</option>
+                </select>
+            </div>
+            <div class="pref-row">
+                <div><div class="pref-label">Text-to-Speech</div><div class="pref-desc">Read questions aloud</div></div>
+                <label class="toggle-switch"><input type="checkbox" id="tts-toggle"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="pref-row">
+                <div><div class="pref-label">Adaptive Pacing</div><div class="pref-desc">Auto-adjust difficulty based on performance</div></div>
+                <label class="toggle-switch"><input type="checkbox" id="adaptive-toggle" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="save-bar" style="padding:16px 0 0;display:flex;justify-content:flex-end;gap:12px;">
+                <button class="btn btn-ghost btn-sm" onclick="discardPreferences()">Discard</button>
+                <button class="btn btn-teal btn-sm" onclick="savePreferences()">Save Changes</button>
             </div>
         </div>
 
+        <!-- NOTIFICATIONS TAB -->
+        <div id="tab-notifications" class="tab-panel card">
+            <div class="card-title"><span class="icon">🔔</span> Notification Settings</div>
+            <div class="pref-row">
+                <div><div class="pref-label">Daily Progress Summary</div><div class="pref-desc">Email each evening with Jake's activity</div></div>
+                <label class="toggle-switch"><input type="checkbox" id="daily-summary-toggle" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="pref-row">
+                <div><div class="pref-label">Weekly Report</div><div class="pref-desc">Full report every Monday morning</div></div>
+                <label class="toggle-switch"><input type="checkbox" id="weekly-report-toggle" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="pref-row">
+                <div><div class="pref-label">Achievement Alerts</div><div class="pref-desc">Notify when Jake earns a badge</div></div>
+                <label class="toggle-switch"><input type="checkbox" id="achievement-alerts-toggle" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="pref-row">
+                <div><div class="pref-label">Missed Day Alert</div><div class="pref-desc">Remind if Jake skips a day</div></div>
+                <label class="toggle-switch"><input type="checkbox" id="missed-day-toggle"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="save-bar" style="padding:16px 0 0;display:flex;justify-content:flex-end;gap:12px;">
+                <button class="btn btn-ghost btn-sm" onclick="discardNotifications()">Discard</button>
+                <button class="btn btn-teal btn-sm" onclick="saveNotifications()">Save Changes</button>
+            </div>
+            <div class="card-title mt-16"><span class="icon">📬</span> Recent Notifications</div>
+            <div class="notif-list" id="recent-notifications"></div>
+        </div>
+
+        <!-- ACCOUNT TAB -->
         <div id="tab-account" class="tab-panel card">
             <div class="card-title"><span class="icon">🔐</span> Account Settings</div>
-            <div><label class="pref-label">Full Name</label><input type="text" value="Paula J. Johnson" class="nl-select" style="width:100%;margin-top:5px;"></div>
-            <div class="mt-12"><label class="pref-label">Email</label><input type="email" value="paula@email.com" class="nl-select" style="width:100%;margin-top:5px;"></div>
-            <div class="save-bar" style="padding:16px 0 0;display:flex;justify-content:flex-end;gap:12px;"><button class="btn btn-teal btn-sm" onclick="showToast('Account updated! ✅')">Update Account</button></div>
+            <div>
+                <label class="pref-label">Full Name</label>
+                <input type="text" id="account-fullname" value="Paula J. Johnson" class="nl-select" style="width:100%;margin-top:5px;">
+            </div>
+            <div class="mt-12">
+                <label class="pref-label">Email</label>
+                <input type="email" id="account-email" value="paula@email.com" class="nl-select" style="width:100%;margin-top:5px;">
+            </div>
+            <div class="mt-12">
+                <label class="pref-label">Relationship</label>
+                <select id="account-relationship" class="nl-select" style="width:100%;margin-top:5px;">
+                    <option value="Mother" selected>Mother</option>
+                    <option value="Father">Father</option>
+                    <option value="Guardian">Guardian</option>
+                </select>
+            </div>
+            <div class="save-bar" style="padding:16px 0 0;display:flex;justify-content:flex-end;gap:12px;">
+                <button class="btn btn-ghost btn-sm" onclick="discardAccount()">Cancel</button>
+                <button class="btn btn-teal btn-sm" onclick="saveAccount()">Update Account</button>
+            </div>
         </div>
     </div>
 </div>
@@ -182,13 +267,388 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script src="script.js"></script>
+
 <script>
+    let currentParentId = null;
+    let originalData = {};
+
+    // Load parent data from Supabase
+    async function loadParentData() {
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            
+            if (user) {
+                // Get parent profile from database
+                const { data, error } = await supabase
+                    .from('parent_profiles')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .single();
+                
+                if (error && error.code !== 'PGRST116') {
+                    console.error('Error loading parent data:', error);
+                }
+                
+                if (data) {
+                    currentParentId = data.id;
+                    originalData = {
+                        fullname: data.fullname,
+                        email: data.email,
+                        relationship: data.relationship,
+                        font_size: data.font_size,
+                        time_limit: data.time_limit,
+                        color_mode: data.color_mode,
+                        tts_enabled: data.tts_enabled,
+                        adaptive_pacing: data.adaptive_pacing,
+                        daily_summary: data.daily_summary,
+                        weekly_report: data.weekly_report,
+                        achievement_alerts: data.achievement_alerts,
+                        missed_day_alert: data.missed_day_alert
+                    };
+                    
+                    // Update UI
+                    document.getElementById('parent-full-name').textContent = data.fullname;
+                    document.getElementById('info-fullname').textContent = data.fullname;
+                    document.getElementById('info-email').textContent = data.email;
+                    document.getElementById('info-relationship').textContent = data.relationship;
+                    document.getElementById('parent-name-display').textContent = data.fullname.split(' ')[0];
+                    
+                    document.getElementById('account-fullname').value = data.fullname;
+                    document.getElementById('account-email').value = data.email;
+                    document.getElementById('account-relationship').value = data.relationship;
+                    
+                    document.getElementById('font-size-select').value = data.font_size || 'Large';
+                    document.getElementById('time-limit-select').value = data.time_limit || '1 hour';
+                    document.getElementById('color-mode-select').value = data.color_mode || 'High Contrast';
+                    document.getElementById('tts-toggle').checked = data.tts_enabled || false;
+                    document.getElementById('adaptive-toggle').checked = data.adaptive_pacing !== false;
+                    document.getElementById('daily-summary-toggle').checked = data.daily_summary !== false;
+                    document.getElementById('weekly-report-toggle').checked = data.weekly_report !== false;
+                    document.getElementById('achievement-alerts-toggle').checked = data.achievement_alerts !== false;
+                    document.getElementById('missed-day-toggle').checked = data.missed_day_alert || false;
+                } else {
+                    // Create new profile if doesn't exist
+                    await createParentProfile(user.id, user.email);
+                }
+            } else {
+                // Use localStorage as fallback
+                loadFromLocalStorage();
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            loadFromLocalStorage();
+        }
+        
+        updateLearnerStats();
+        updateRecentNotifications();
+    }
+    
+    // Create new parent profile
+    async function createParentProfile(userId, userEmail) {
+        const defaultData = {
+            user_id: userId,
+            fullname: userEmail ? userEmail.split('@')[0] : 'Parent User',
+            email: userEmail || 'parent@email.com',
+            relationship: 'Mother',
+            font_size: 'Large',
+            time_limit: '1 hour',
+            color_mode: 'High Contrast',
+            tts_enabled: false,
+            adaptive_pacing: true,
+            daily_summary: true,
+            weekly_report: true,
+            achievement_alerts: true,
+            missed_day_alert: false,
+            created_at: new Date(),
+            updated_at: new Date()
+        };
+        
+        const { data, error } = await supabase
+            .from('parent_profiles')
+            .insert([defaultData])
+            .select()
+            .single();
+        
+        if (!error && data) {
+            currentParentId = data.id;
+            loadParentData(); // Reload to update UI
+        }
+    }
+    
+    // Save preferences to Supabase
+    async function savePreferences() {
+        if (!currentParentId) {
+            showToast('Please login to save preferences', '#FF8C42');
+            return;
+        }
+        
+        const preferences = {
+            font_size: document.getElementById('font-size-select').value,
+            time_limit: document.getElementById('time-limit-select').value,
+            color_mode: document.getElementById('color-mode-select').value,
+            tts_enabled: document.getElementById('tts-toggle').checked,
+            adaptive_pacing: document.getElementById('adaptive-toggle').checked,
+            updated_at: new Date()
+        };
+        
+        showSaving(true);
+        
+        const { error } = await supabase
+            .from('parent_profiles')
+            .update(preferences)
+            .eq('id', currentParentId);
+        
+        showSaving(false);
+        
+        if (error) {
+            console.error('Error saving preferences:', error);
+            showToast('Error saving preferences! ❌', '#FF6B6B');
+        } else {
+            applyFontSize(preferences.font_size);
+            showToast('Preferences saved successfully! ✅', '#4CAF7D');
+        }
+    }
+    
+    // Save notifications to Supabase
+    async function saveNotifications() {
+        if (!currentParentId) {
+            showToast('Please login to save notifications', '#FF8C42');
+            return;
+        }
+        
+        const notifications = {
+            daily_summary: document.getElementById('daily-summary-toggle').checked,
+            weekly_report: document.getElementById('weekly-report-toggle').checked,
+            achievement_alerts: document.getElementById('achievement-alerts-toggle').checked,
+            missed_day_alert: document.getElementById('missed-day-toggle').checked,
+            updated_at: new Date()
+        };
+        
+        showSaving(true);
+        
+        const { error } = await supabase
+            .from('parent_profiles')
+            .update(notifications)
+            .eq('id', currentParentId);
+        
+        showSaving(false);
+        
+        if (error) {
+            console.error('Error saving notifications:', error);
+            showToast('Error saving notifications! ❌', '#FF6B6B');
+        } else {
+            showToast('Notification settings saved! ✅', '#4CAF7D');
+        }
+    }
+    
+    // Save account to Supabase
+    async function saveAccount() {
+        if (!currentParentId) {
+            showToast('Please login to update account', '#FF8C42');
+            return;
+        }
+        
+        const accountData = {
+            fullname: document.getElementById('account-fullname').value,
+            email: document.getElementById('account-email').value,
+            relationship: document.getElementById('account-relationship').value,
+            updated_at: new Date()
+        };
+        
+        showSaving(true);
+        
+        const { error } = await supabase
+            .from('parent_profiles')
+            .update(accountData)
+            .eq('id', currentParentId);
+        
+        showSaving(false);
+        
+        if (error) {
+            console.error('Error saving account:', error);
+            showToast('Error updating account! ❌', '#FF6B6B');
+        } else {
+            // Update UI
+            document.getElementById('parent-full-name').textContent = accountData.fullname;
+            document.getElementById('info-fullname').textContent = accountData.fullname;
+            document.getElementById('info-email').textContent = accountData.email;
+            document.getElementById('info-relationship').textContent = accountData.relationship;
+            document.getElementById('parent-name-display').textContent = accountData.fullname.split(' ')[0];
+            
+            showToast('Account updated successfully! ✅', '#4CAF7D');
+        }
+    }
+    
+    // Load from localStorage as fallback
+    function loadFromLocalStorage() {
+        const savedName = localStorage.getItem('parent_fullname');
+        const savedEmail = localStorage.getItem('parent_email');
+        const savedRelationship = localStorage.getItem('parent_relationship');
+        
+        if (savedName) {
+            document.getElementById('parent-full-name').textContent = savedName;
+            document.getElementById('info-fullname').textContent = savedName;
+            document.getElementById('account-fullname').value = savedName;
+        }
+        if (savedEmail) {
+            document.getElementById('info-email').textContent = savedEmail;
+            document.getElementById('account-email').value = savedEmail;
+        }
+        if (savedRelationship) {
+            document.getElementById('info-relationship').textContent = savedRelationship;
+            document.getElementById('account-relationship').value = savedRelationship;
+        }
+        
+        // Load preferences from localStorage
+        const savedFontSize = localStorage.getItem('pref_font_size');
+        if (savedFontSize) document.getElementById('font-size-select').value = savedFontSize;
+        
+        const savedTimeLimit = localStorage.getItem('pref_time_limit');
+        if (savedTimeLimit) document.getElementById('time-limit-select').value = savedTimeLimit;
+        
+        const savedColorMode = localStorage.getItem('pref_color_mode');
+        if (savedColorMode) document.getElementById('color-mode-select').value = savedColorMode;
+        
+        const savedTTS = localStorage.getItem('pref_tts');
+        if (savedTTS) document.getElementById('tts-toggle').checked = savedTTS === 'true';
+        
+        const savedAdaptive = localStorage.getItem('pref_adaptive');
+        if (savedAdaptive) document.getElementById('adaptive-toggle').checked = savedAdaptive === 'true';
+        
+        const savedDailySummary = localStorage.getItem('notif_daily_summary');
+        if (savedDailySummary) document.getElementById('daily-summary-toggle').checked = savedDailySummary === 'true';
+        
+        const savedWeeklyReport = localStorage.getItem('notif_weekly_report');
+        if (savedWeeklyReport) document.getElementById('weekly-report-toggle').checked = savedWeeklyReport === 'true';
+        
+        const savedAchievementAlerts = localStorage.getItem('notif_achievement_alerts');
+        if (savedAchievementAlerts) document.getElementById('achievement-alerts-toggle').checked = savedAchievementAlerts === 'true';
+        
+        const savedMissedDay = localStorage.getItem('notif_missed_day');
+        if (savedMissedDay) document.getElementById('missed-day-toggle').checked = savedMissedDay === 'true';
+    }
+    
+    // Discard functions
+    function discardPreferences() {
+        loadParentData();
+        showToast('Changes discarded.', '#FF8C42');
+    }
+    
+    function discardNotifications() {
+        loadParentData();
+        showToast('Changes discarded.', '#FF8C42');
+    }
+    
+    function discardAccount() {
+        loadParentData();
+        showToast('Changes discarded.', '#FF8C42');
+    }
+    
+    // Update learner stats
+    function updateLearnerStats() {
+        const additionProgress = localStorage.getItem('progress_addition');
+        const subtractionProgress = localStorage.getItem('progress_subtraction');
+        
+        let additionCorrect = 0;
+        let subtractionCorrect = 0;
+        
+        if (additionProgress) {
+            try {
+                const progress = JSON.parse(additionProgress);
+                additionCorrect = progress.correctCount || 0;
+            } catch(e) {}
+        }
+        if (subtractionProgress) {
+            try {
+                const progress = JSON.parse(subtractionProgress);
+                subtractionCorrect = progress.correctCount || 0;
+            } catch(e) {}
+        }
+        
+        const totalXP = (additionCorrect * 10) + (subtractionCorrect * 10);
+        const level = Math.floor(totalXP / 100) + 1;
+        
+        document.getElementById('learner-stats').textContent = `Grade 3 · Level ${level} · ${totalXP} XP`;
+    }
+    
+    // Update recent notifications
+    function updateRecentNotifications() {
+        const notificationsDiv = document.getElementById('recent-notifications');
+        const notifications = [];
+        
+        const additionProgress = localStorage.getItem('progress_addition');
+        if (additionProgress) {
+            try {
+                const progress = JSON.parse(additionProgress);
+                if (progress.correctCount === 10) {
+                    notifications.push({ text: 'Jake earned "Math Wizard" badge! 🥇', time: 'Recently', color: 'green' });
+                }
+            } catch(e) {}
+        }
+        
+        const subtractionProgress = localStorage.getItem('progress_subtraction');
+        if (subtractionProgress) {
+            try {
+                const progress = JSON.parse(subtractionProgress);
+                if (progress.correctCount === 10) {
+                    notifications.push({ text: 'Jake earned "Perfect Score" badge! 🎯', time: 'Recently', color: 'blue' });
+                }
+            } catch(e) {}
+        }
+        
+        if (notifications.length === 0) {
+            notifications.push({ text: 'Complete a lesson to see notifications', time: '—', color: 'orange' });
+        }
+        
+        notificationsDiv.innerHTML = '';
+        notifications.forEach(notif => {
+            const notifItem = document.createElement('div');
+            notifItem.className = 'notif-item';
+            notifItem.innerHTML = `
+                <div class="notif-dot ${notif.color}"></div>
+                <div class="notif-info"><h4>${notif.text}</h4></div>
+                <span style="font-size:0.75rem;color:var(--text-light);">${notif.time}</span>
+            `;
+            notificationsDiv.appendChild(notifItem);
+        });
+    }
+    
+    // Show saving state
+    function showSaving(isSaving) {
+        const buttons = document.querySelectorAll('.btn-teal');
+        buttons.forEach(btn => {
+            if (isSaving) {
+                btn.classList.add('saving');
+                btn.textContent = 'Saving...';
+            } else {
+                btn.classList.remove('saving');
+                btn.textContent = btn.getAttribute('data-original-text') || 'Save Changes';
+            }
+        });
+    }
+    
+    // Store original button text
+    document.querySelectorAll('.btn-teal').forEach(btn => {
+        btn.setAttribute('data-original-text', btn.textContent);
+    });
+    
+    // Switch tabs
     function switchParentTab(name, btn) {
         document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.profile-tab').forEach(b => b.classList.remove('active'));
         document.getElementById('tab-' + name).classList.add('active');
         btn.classList.add('active');
     }
+    
+    // Load data on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        const studentUsername = localStorage.getItem('neurolearn_username');
+        if (studentUsername) {
+            document.getElementById('learner-name').textContent = studentUsername + ' J. Johnson';
+        }
+        
+        loadParentData();
+    });
 </script>
 </body>
 </html>
