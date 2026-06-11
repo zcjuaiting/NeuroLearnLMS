@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroLearn – Parent Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .profile-layout {
+            position: relative; z-index: 1;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 24px;
+            padding: 32px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .profile-left { display: flex; flex-direction: column; gap: 20px; }
+        .profile-right { display: flex; flex-direction: column; gap: 20px; }
+        .hero-card { text-align: center; padding: 32px 24px; }
+        .hero-card .avatar-wrap { position: relative; display: inline-block; margin-bottom: 16px; }
+        .parent-badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: linear-gradient(135deg, var(--orange), var(--yellow));
+            color: white; padding: 4px 14px; border-radius: 20px;
+            font-size: 0.8rem; font-weight: 800; margin-top: 10px;
+        }
+        .learner-card {
+            display: flex; align-items: center; gap: 14px;
+            padding: 18px 20px;
+            background: linear-gradient(135deg, rgba(110,198,245,0.12), rgba(76,175,125,0.08));
+            border: 1.5px solid rgba(110,198,245,0.3);
+            border-radius: var(--radius);
+            cursor: pointer; transition: all 0.2s;
+            text-decoration: none;
+        }
+        .learner-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+        .learner-card .lc-avatar {
+            width: 52px; height: 52px; border-radius: 14px;
+            background: linear-gradient(135deg, var(--sky-light), var(--green-light));
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem; border: 2px solid white;
+            flex-shrink: 0;
+        }
+        .profile-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+        .profile-tab {
+            padding: 8px 20px; border-radius: 30px;
+            border: 2px solid transparent;
+            font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.88rem;
+            cursor: pointer; transition: all 0.2s;
+            background: var(--card-bg); color: var(--text-mid);
+        }
+        .profile-tab.active {
+            background: linear-gradient(135deg, var(--teal), var(--sky-dark));
+            color: white;
+        }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+        .pref-row {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 0; border-bottom: 1px solid rgba(110,198,245,0.2);
+        }
+        .pref-row:last-child { border-bottom: none; }
+        .pref-label { font-weight: 700; font-size: 0.9rem; color: var(--text-dark); }
+        .pref-desc { font-size: 0.78rem; color: var(--text-light); font-weight: 600; margin-top: 2px; }
+        .notif-list { display: flex; flex-direction: column; gap: 12px; }
+        .notif-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 16px;
+            background: rgba(110,198,245,0.08);
+            border: 1.5px solid rgba(110,198,245,0.18);
+            border-radius: var(--radius-sm);
+        }
+        .notif-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .notif-dot.green { background: var(--green); }
+        .notif-dot.orange { background: var(--orange); }
+        .notif-info { flex: 1; }
+        .notif-info h4 { font-size: 0.88rem; font-weight: 800; color: var(--text-dark); }
+        .profile-avatar-lg {
+            width: 90px; height: 90px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.8rem;
+            border: 3px solid white;
+            box-shadow: 0 4px 16px rgba(110,198,245,0.4);
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #FFE0B2, #FFCC80);
+        }
+    </style>
+</head>
+<body>
+
+<nav class="topnav">
+    <a class="nav-logo" href="dashboard.html">NeuroLearn</a>
+    <div class="nav-center">
+        <a class="nav-tab" href="dashboard.html">🏠 Dashboard</a>
+        <a class="nav-tab" href="lesson.html">📐 Lesson</a>
+        <a class="nav-tab" href="student-profile.html">👤 Student Profile</a>
+        <a class="nav-tab active" href="parent-profile.html">👩 Parent Profile</a>
+        <a class="nav-tab" href="report.html">📋 Report</a>
+    </div>
+    <div class="nav-right">
+        <button class="icon-btn" title="Notifications" onclick="showToast('Notifications coming soon!')">🔔</button>
+        <div class="avatar-btn" onclick="showToast('Profile settings coming soon!')">
+            <div class="avatar-circle parent">👩</div>
+            <span>Paula</span>
+        </div>
+    </div>
+</nav>
+
+<div class="profile-layout">
+    <aside class="profile-left">
+        <div class="card hero-card">
+            <div class="avatar-wrap">
+                <div class="profile-avatar-lg parent">👩</div>
+                <div class="edit-avatar" style="position:absolute;bottom:2px;right:2px;width:28px;height:28px;border-radius:50%;background:var(--orange);color:white;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid white;" onclick="showToast('Avatar editor coming soon!')">✏️</div>
+            </div>
+            <h2>Paula J. Johnson</h2>
+            <p>Parent · Linked Account</p>
+            <div class="parent-badge">👨‍👩‍👦 Parent Account</div>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="icon">ℹ️</span> Parent Info</div>
+            <table class="info-table">
+                <tr><td>Full Name</td><td>Paula J. Johnson</td></tr>
+                <tr><td>Relationship</td><td>Mother</td></tr>
+                <tr><td>Email</td><td>paula@email.com</td></tr>
+                <tr><td>Joined</td><td>Sep 2024</td></tr>
+            </table>
+        </div>
+        <div class="card">
+            <div class="card-title"><span class="icon">🧒</span> Linked Learner</div>
+            <a class="learner-card" href="student-profile.html">
+                <div class="lc-avatar">🧒</div>
+                <div class="lc-info"><h4>Jake J. Johnson</h4><p>Grade 3 · Level 5 · 1,240 XP</p></div>
+                <span style="margin-left:auto;font-size:1.1rem;color:var(--teal);">→</span>
+            </a>
+        </div>
+        <a class="btn btn-teal" href="report.html" style="justify-content:center;">📋 View Progress Report</a>
+    </aside>
+
+    <div class="profile-right">
+        <div class="card" style="padding:20px 24px;">
+            <div class="profile-tabs">
+                <button class="profile-tab active" onclick="switchParentTab('preferences', this)">⚙️ Preferences</button>
+                <button class="profile-tab" onclick="switchParentTab('notifications', this)">🔔 Notifications</button>
+                <button class="profile-tab" onclick="switchParentTab('account', this)">🔐 Account</button>
+            </div>
+        </div>
+
+        <div id="tab-preferences" class="tab-panel active card">
+            <div class="card-title"><span class="icon">⚙️</span> Learning Preferences (for Jake)</div>
+            <div class="pref-row"><div><div class="pref-label">Font Size</div><div class="pref-desc">Adjust Jake's text size</div></div><select class="nl-select" onchange="applyFontSize(this.value)"><option>Small</option><option selected>Large</option><option>Medium</option></select></div>
+            <div class="pref-row"><div><div class="pref-label">Daily Time Limit</div><div class="pref-desc">Max learning time per day</div></div><select class="nl-select"><option>30 min</option><option selected>1 hour</option><option>2 hours</option></select></div>
+            <div class="save-bar" style="padding:16px 0 0;display:flex;justify-content:flex-end;gap:12px;"><button class="btn btn-teal btn-sm" onclick="showToast('Preferences saved! ✅')">Save Changes</button></div>
+        </div>
+
+        <div id="tab-notifications" class="tab-panel card">
+            <div class="card-title"><span class="icon">🔔</span> Notification Settings</div>
+            <div class="pref-row"><div><div class="pref-label">Daily Progress Summary</div></div><label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+            <div class="pref-row"><div><div class="pref-label">Weekly Report</div></div><label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+            <div class="pref-row"><div><div class="pref-label">Achievement Alerts</div></div><label class="toggle-switch"><input type="checkbox" checked><span class="toggle-slider"></span></label></div>
+            <div class="card-title mt-16"><span class="icon">📬</span> Recent Notifications</div>
+            <div class="notif-list">
+                <div class="notif-item"><div class="notif-dot green"></div><div class="notif-info"><h4>Jake earned "Math Wizard" badge! 🥇</h4></div></div>
+                <div class="notif-item"><div class="notif-dot blue"></div><div class="notif-info"><h4>Daily summary: 15 min · Score 50/50</h4></div></div>
+            </div>
+        </div>
+
+        <div id="tab-account" class="tab-panel card">
+            <div class="card-title"><span class="icon">🔐</span> Account Settings</div>
+            <div><label class="pref-label">Full Name</label><input type="text" value="Paula J. Johnson" class="nl-select" style="width:100%;margin-top:5px;"></div>
+            <div class="mt-12"><label class="pref-label">Email</label><input type="email" value="paula@email.com" class="nl-select" style="width:100%;margin-top:5px;"></div>
+            <div class="save-bar" style="padding:16px 0 0;display:flex;justify-content:flex-end;gap:12px;"><button class="btn btn-teal btn-sm" onclick="showToast('Account updated! ✅')">Update Account</button></div>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="script.js"></script>
+<script>
+    function switchParentTab(name, btn) {
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.profile-tab').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-' + name).classList.add('active');
+        btn.classList.add('active');
+    }
+</script>
+</body>
+</html>
