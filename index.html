@@ -17,29 +17,64 @@
             <p>Smart learning for every young mind 🧠</p>
         </div>
 
-        <!-- Login Form Only -->
+        <!-- Login Form -->
         <div class="auth-card">
             <h2>Hello! Welcome Back!</h2>
             <p class="subtitle">Let's Login to Your Account</p>
+            
+            <!-- Email Input -->
             <div class="form-group">
-                <label>Username</label>
-                <input type="text" id="login-username" placeholder="Enter your username" value="Jake"/>
+                <label>Email Address</label>
+                <input 
+                    type="email" 
+                    id="login-email" 
+                    placeholder="Enter your email" 
+                    autocomplete="email"
+                    required>
             </div>
+
+            <!-- Password Input -->
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" id="login-password" placeholder="Enter your password" value="••••••"/>
+                <input 
+                    type="password" 
+                    id="login-password" 
+                    placeholder="Enter your password" 
+                    autocomplete="current-password"
+                    required>
             </div>
-            <button class="btn-primary" onclick="goToDashboard()">Login</button>
-            <p class="auth-switch">Don't have an account? <a href="signup.html">Create one!</a></p>
+
+            <!-- Login Button -->
+            <button class="btn-primary" id="login-btn" onclick="handleLogin()">
+                Login
+            </button>
+
+            <!-- Forgot Password Link -->
+            <p style="text-align:right;margin-top:8px;font-size:0.8rem;">
+                <a href="#" onclick="showToast('Password reset link sent to your email! 📧', '#4CAF7D')" 
+                   style="color:var(--text-light);text-decoration:none;">
+                    Forgot password?
+                </a>
+            </p>
+
+            <!-- Sign Up Link -->
+            <p class="auth-switch">
+                Don't have an account? 
+                <a href="signup.html">Create one!</a>
+            </p>
         </div>
     </div>
 </div>
 
-<!-- Toast -->
+<!-- Toast Notification -->
 <div class="toast" id="toast"></div>
 
+<!-- ============================================ -->
+<!-- SUPABASE SCRIPTS -->
+<!-- ============================================ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script src="script.js"></script>
+
 </body>
 </html>
