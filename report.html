@@ -19,72 +19,239 @@
         .report-main { display: flex; flex-direction: column; gap: 22px; }
         .report-aside { display: flex; flex-direction: column; gap: 20px; }
         .report-header-card {
-            display: flex; align-items: center; gap: 24px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
             padding: 28px 32px;
+            flex-wrap: wrap;
         }
         .report-header-card .rh-avatar {
-            width: 72px; height: 72px; border-radius: 50%;
+            width: 72px; height: 72px;
+            border-radius: 50%;
             background: linear-gradient(135deg, var(--sky-light), var(--green-light));
-            display: flex; align-items: center; justify-content: center;
-            font-size: 2.2rem; border: 3px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            border: 3px solid white;
             flex-shrink: 0;
         }
-        .report-header-card .rh-info h2 { font-family: 'Baloo 2', cursive; font-size: 1.4rem; color: var(--text-dark); }
-        .rh-meta { margin-left: auto; text-align: right; }
-        .summary-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
-        .subject-breakdown { display: flex; flex-direction: column; gap: 14px; }
+        .report-header-card .rh-info h2 {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.4rem;
+            color: var(--text-dark);
+        }
+        .report-header-card .rh-info p {
+            font-size: 0.85rem;
+            color: var(--text-mid);
+            font-weight: 600;
+        }
+        .rh-meta {
+            margin-left: auto;
+            text-align: right;
+        }
+        .rh-meta .period {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .rh-meta .date {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1rem;
+            color: var(--teal);
+        }
+        .summary-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+        .subject-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
         .breakdown-row {
-            display: flex; align-items: center; gap: 14px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
             padding: 16px 18px;
             background: rgba(110,198,245,0.07);
             border: 1.5px solid rgba(110,198,245,0.18);
             border-radius: var(--radius-sm);
+            flex-wrap: wrap;
         }
         .br-icon {
-            width: 46px; height: 46px; border-radius: 13px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.4rem; flex-shrink: 0;
-               }
+            width: 46px; height: 46px;
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
         .br-icon.math { background: linear-gradient(135deg,#B3E5FC,#81D4FA); }
         .br-icon.science { background: linear-gradient(135deg,#C8E6C9,#A5D6A7); }
         .br-icon.reading { background: linear-gradient(135deg,#FFE0B2,#FFCC80); }
         .br-icon.history { background: linear-gradient(135deg,#E1BEE7,#CE93D8); }
-        .br-info { flex: 1; }
+        .br-info { flex: 1; min-width: 100px; }
         .br-info h4 { font-weight: 800; font-size: 0.92rem; color: var(--text-dark); }
-        .br-stats { display: flex; gap: 12px; align-items: center; }
-        .br-score { font-family: 'Baloo 2', cursive; font-size: 1.15rem; color: var(--teal); font-weight: 700; }
-        .br-trend.up { background: rgba(76,175,125,0.15); color: var(--green-dark); padding: 3px 9px; border-radius: 10px; font-size: 0.78rem; font-weight: 800; }
+        .br-info p { font-size: 0.75rem; color: var(--text-light); font-weight: 600; margin-top: 2px; }
+        .br-stats {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .br-score {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.15rem;
+            color: var(--teal);
+            font-weight: 700;
+        }
+        .br-trend {
+            padding: 3px 9px;
+            border-radius: 10px;
+            font-size: 0.78rem;
+            font-weight: 800;
+        }
+        .br-trend.up { background: rgba(76,175,125,0.15); color: var(--green-dark); }
+        .br-trend.down { background: rgba(255,107,107,0.12); color: var(--red); }
+        .br-trend.same { background: rgba(110,198,245,0.15); color: var(--sky-dark); }
         .narrative-block { padding: 24px 28px; }
-        .narrative-block h3 { font-family: 'Baloo 2', cursive; font-size: 1.05rem; color: var(--teal); margin-bottom: 10px; }
-        .narrative-para { font-size: 0.92rem; color: var(--text-dark); line-height: 1.7; font-weight: 600; }
-        .highlight-span { background: linear-gradient(135deg, rgba(110,198,245,0.2), rgba(76,175,125,0.15)); padding: 1px 6px; border-radius: 6px; font-weight: 800; color: var(--teal); }
-        .mini-ring { display: flex; flex-direction: column; align-items: center; padding: 24px 20px; }
+        .narrative-block h3 {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.05rem;
+            color: var(--teal);
+            margin-bottom: 10px;
+        }
+        .narrative-para {
+            font-size: 0.92rem;
+            color: var(--text-dark);
+            line-height: 1.7;
+            font-weight: 600;
+        }
+        .highlight-span {
+            background: linear-gradient(135deg, rgba(110,198,245,0.2), rgba(76,175,125,0.15));
+            padding: 1px 6px;
+            border-radius: 6px;
+            font-weight: 800;
+            color: var(--teal);
+        }
+        .mini-ring {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 20px;
+            text-align: center;
+        }
         .mini-ring svg { transform: rotate(-90deg); }
+        .ring-label {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.5rem;
+            color: var(--teal);
+            text-align: center;
+            margin-top: -8px;
+        }
+        .ring-label small {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-light);
+            font-weight: 700;
+        }
         .rec-list { display: flex; flex-direction: column; gap: 10px; }
         .rec-item {
-            display: flex; align-items: flex-start; gap: 10px;
-            padding: 12px; border-radius: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px;
+            border-radius: 12px;
             background: rgba(110,198,245,0.08);
             border: 1.5px solid rgba(110,198,245,0.18);
         }
-        .rec-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+        .rec-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
         .rec-dot.green { background: var(--green); }
         .rec-dot.orange { background: var(--orange); }
         .rec-dot.blue { background: var(--sky-dark); }
         .rec-info h4 { font-size: 0.85rem; font-weight: 800; color: var(--text-dark); }
+        .rec-info p { font-size: 0.75rem; color: var(--text-light); font-weight: 600; margin-top: 2px; }
         .period-toggle {
-            display: flex; gap: 6px; background: rgba(110,198,245,0.15);
-            padding: 5px; border-radius: 12px; border: 1.5px solid rgba(110,198,245,0.25);
+            display: flex;
+            gap: 6px;
+            background: rgba(110,198,245,0.15);
+            padding: 5px;
+            border-radius: 12px;
+            border: 1.5px solid rgba(110,198,245,0.25);
         }
         .period-btn {
-            padding: 6px 16px; border-radius: 9px;
-            border: none; font-family: 'Nunito',sans-serif; font-weight: 700; font-size: 0.82rem;
-            cursor: pointer; color: var(--text-mid); background: transparent; transition: all 0.2s;
+            padding: 6px 16px;
+            border-radius: 9px;
+            border: none;
+            font-family: 'Nunito',sans-serif;
+            font-weight: 700;
+            font-size: 0.82rem;
+            cursor: pointer;
+            color: var(--text-mid);
+            background: transparent;
+            transition: all 0.2s;
         }
-        .period-btn.active { background: var(--teal); color: white; box-shadow: 0 2px 8px rgba(46,140,140,0.3); }
-        .bar-chart { display: flex; align-items: flex-end; gap: 10px; height: 120px; margin-top: 20px; }
-        .bar-col { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
-        .bar-fill { width: 100%; border-radius: 10px 10px 0 0; transition: height 0.8s ease; min-height: 4px; }
+        .period-btn.active {
+            background: var(--teal);
+            color: white;
+            box-shadow: 0 2px 8px rgba(46,140,140,0.3);
+        }
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            height: 120px;
+            margin-top: 20px;
+        }
+        .bar-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+        }
+        .bar-fill {
+            width: 100%;
+            border-radius: 10px 10px 0 0;
+            transition: height 0.8s ease;
+            min-height: 4px;
+        }
+        .b-val {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+        .b-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+        .flex-center {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .gap-8 { gap: 8px; }
+        .gap-12 { gap: 12px; }
+        .mt-8 { margin-top: 8px; }
+        .mt-12 { margin-top: 12px; }
+        .mt-16 { margin-top: 16px; }
+        .mb-8 { margin-bottom: 8px; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
     </style>
 </head>
 <body>
@@ -100,34 +267,37 @@
     </div>
     <div class="nav-right">
         <button class="icon-btn" title="Notifications" onclick="showToast('Notifications coming soon!')">🔔</button>
-        <div class="avatar-btn" onclick="showToast('Profile settings coming soon!')">
+        <a class="avatar-btn" href="parent-profile.html">
             <div class="avatar-circle parent">👩</div>
-            <span>Paula</span>
-        </div>
+            <span id="report-parent-name">Paula</span>
+        </a>
     </div>
 </nav>
 
 <div class="report-layout">
     <div class="report-main">
+        <!-- Header -->
         <div class="card report-header-card">
             <div class="rh-avatar">🧒</div>
             <div class="rh-info">
-                <h2 id="report-name">Jake P. Johnson</h2>
-                <p>Grade 3 · Intermediate · NeuroLearn Progress Report</p>
+                <h2 id="report-name">Student</h2>
+                <p>Grade 3 · NeuroLearn Progress Report</p>
                 <div class="flex gap-8 mt-8">
                     <span class="badge teal">📐 Math</span>
                     <span class="badge green">🔬 Science</span>
                     <span class="badge blue">📖 Reading</span>
+                    <span class="badge purple">🏛️ History</span>
                 </div>
             </div>
             <div class="rh-meta">
                 <div class="period">Reporting Period</div>
-                <div class="date">June 1–11, 2026</div>
+                <div class="date" id="report-date">July 2026</div>
                 <button class="btn btn-ghost btn-sm mt-8" onclick="window.print()">🖨️ Print Report</button>
             </div>
         </div>
 
-        <div class="flex items-center justify-between">
+        <!-- Period Toggle -->
+        <div class="flex-center">
             <h2 style="font-family:'Baloo 2',cursive;font-size:1.4rem;color:var(--text-dark);">📊 Progress Overview</h2>
             <div class="period-toggle">
                 <button class="period-btn" onclick="setPeriod(this, 'week')">Week</button>
@@ -136,97 +306,85 @@
             </div>
         </div>
 
-        <div class="summary-row">
-            <div class="stat-pill"><div class="val">12</div><div class="lbl">Lessons Done</div></div>
-            <div class="stat-pill"><div class="val">84%</div><div class="lbl">Avg Score</div></div>
-            <div class="stat-pill"><div class="val">3h</div><div class="lbl">Total Time</div></div>
-            <div class="stat-pill"><div class="val">🔥5</div><div class="lbl">Day Streak</div></div>
+        <!-- Summary Stats -->
+        <div class="summary-row" id="summary-stats">
+            <div class="stat-pill"><div class="val" id="stat-lessons">0</div><div class="lbl">Lessons Done</div></div>
+            <div class="stat-pill"><div class="val" id="stat-avg">0%</div><div class="lbl">Avg Score</div></div>
+            <div class="stat-pill"><div class="val" id="stat-time">0h</div><div class="lbl">Total Time</div></div>
+            <div class="stat-pill"><div class="val" id="stat-streak">🔥0</div><div class="lbl">Day Streak</div></div>
         </div>
 
+        <!-- Bar Chart -->
         <div class="card">
             <div class="card-title">📅 Daily Activity (This Week)</div>
             <div class="bar-chart" id="bar-chart"></div>
         </div>
 
+        <!-- Subject Breakdown -->
         <div class="card">
             <div class="card-title">📚 Subject Breakdown</div>
-            <div class="subject-breakdown">
-                <div class="breakdown-row">
-                    <div class="br-icon math">📐</div>
-                    <div class="br-info"><h4>Mathematics</h4><p>8 lessons · 90 min total</p></div>
-                    <div class="br-stats"><div class="br-score">88%</div><div class="br-trend up">↑ +7%</div></div>
-                </div>
-                <div class="breakdown-row">
-                    <div class="br-icon science">🔬</div>
-                    <div class="br-info"><h4>Science</h4><p>4 lessons · 48 min total</p></div>
-                    <div class="br-stats"><div class="br-score">80%</div><div class="br-trend up">↑ +5%</div></div>
-                </div>
-                <div class="breakdown-row">
-                    <div class="br-icon reading">📖</div>
-                    <div class="br-info"><h4>Reading</h4><p>3 lessons · 36 min total</p></div>
-                    <div class="br-stats"><div class="br-score">72%</div><div class="br-trend up">→ 0%</div></div>
-                </div>
-                <div class="breakdown-row">
-                    <div class="br-icon history">🏛️</div>
-                    <div class="br-info"><h4>History</h4><p>1 lesson · 18 min total</p></div>
-                    <div class="br-stats"><div class="br-score">60%</div><div class="br-trend up">↓ -2%</div></div>
-                </div>
+            <div class="subject-breakdown" id="subject-breakdown">
+                <!-- Populated by JavaScript -->
             </div>
         </div>
 
+        <!-- Teacher's Note -->
         <div class="card narrative-block">
             <h3>📝 Teacher's Note to Parents</h3>
-            <p class="narrative-para">
-                Jake has made <span class="highlight-span">significant progress</span> during this reporting period.
-                He has completed <span class="highlight-span">12 lessons</span> across Math, Science, Reading, and History.
-                His overall average score is <span class="highlight-span">84%</span>, showing a
-                <span class="highlight-span">7% improvement</span> from the previous period.
-            </p>
-            <p class="narrative-para mt-12">
-                Jake particularly excels in <span class="highlight-span">Mathematics</span>, where he scored 88% and is ready to advance to multiplication.
-                We recommend continuing the current schedule and celebrating his recent achievements to keep motivation high.
+            <p class="narrative-para" id="teacher-note">
+                Loading report data...
             </p>
         </div>
     </div>
 
     <aside class="report-aside">
+        <!-- Overall Score Ring -->
         <div class="card mini-ring">
             <div class="card-title">🎯 Overall Score</div>
             <svg width="130" height="130" viewBox="0 0 130 130">
                 <circle cx="65" cy="65" r="54" fill="none" stroke="rgba(110,198,245,0.2)" stroke-width="13"/>
                 <circle id="overall-ring" cx="65" cy="65" r="54" fill="none" stroke="url(#rg)" stroke-width="13" stroke-dasharray="339" stroke-dashoffset="339" stroke-linecap="round"/>
-                <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#2E8C8C"/><stop offset="100%" style="stop-color:#6EC6F5"/></linearGradient></defs>
+                <defs>
+                    <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#2E8C8C"/>
+                        <stop offset="100%" style="stop-color:#6EC6F5"/>
+                    </linearGradient>
+                </defs>
             </svg>
-            <div class="ring-label" style="font-family:'Baloo 2',cursive;font-size:1.5rem;color:var(--teal);text-align:center;margin-top:-8px;">84%<small style="display:block;font-size:0.75rem;">Average Score</small></div>
+            <div class="ring-label" id="overall-score">0%<small>Average Score</small></div>
         </div>
 
+        <!-- Learner Quick View -->
         <div class="card">
             <div class="card-title">🧒 Learner Quick View</div>
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
                 <div style="width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,var(--sky-light),var(--green-light));display:flex;align-items:center;justify-content:center;font-size:1.5rem;border:2px solid white;">🧒</div>
-                <div><div style="font-weight:800;font-size:0.9rem;color:var(--text-dark);">Jake P. Johnson</div><div style="font-size:0.78rem;color:var(--text-light);font-weight:600;">Grade 3 · Level 5</div></div>
+                <div>
+                    <div style="font-weight:800;font-size:0.9rem;color:var(--text-dark);" id="learner-quick-name">Student</div>
+                    <div style="font-size:0.78rem;color:var(--text-light);font-weight:600;" id="learner-quick-level">Grade 3 · Level 1</div>
+                </div>
             </div>
             <table class="info-table">
-                <tr><td>Avg Session</td><td>18 min</td></tr>
-                <tr><td>Lessons / Week</td><td>12</td></tr>
-                <tr><td>Best Subject</td><td>Math</td></tr>
-                <tr><td>Pacing</td><td><span class="badge green">Normal</span></td></tr>
+                <tr><td>Avg Session</td><td id="learner-avg-session">--</td></tr>
+                <tr><td>Lessons / Week</td><td id="learner-lessons-week">0</td></tr>
+                <tr><td>Best Subject</td><td id="learner-best-subject">--</td></tr>
+                <tr><td>Pacing</td><td><span class="badge green" id="learner-pacing">Normal</span></td></tr>
             </table>
             <a class="btn btn-ghost btn-sm mt-12" href="student-profile.html" style="width:100%;justify-content:center;">View Full Profile →</a>
         </div>
 
+        <!-- Recommendations -->
         <div class="card">
             <div class="card-title">💡 Recommendations</div>
-            <div class="rec-list">
-                <div class="rec-item"><div class="rec-dot green"></div><div class="rec-info"><h4>Start Multiplication</h4><p>Jake is ready to advance in Math.</p></div></div>
-                <div class="rec-item"><div class="rec-dot orange"></div><div class="rec-info"><h4>Extra Reading Practice</h4><p>Short stories at home 2×/week.</p></div></div>
-                <div class="rec-item"><div class="rec-dot blue"></div><div class="rec-info"><h4>Maintain Streak</h4><p>Keep the 5-day streak going strong!</p></div></div>
+            <div class="rec-list" id="recommendations">
+                <!-- Populated by JavaScript -->
             </div>
         </div>
 
+        <!-- Actions -->
         <div class="flex flex-col gap-12">
             <a class="btn btn-teal" href="parent-profile.html" style="justify-content:center;">⚙️ Adjust Preferences</a>
-            <button class="btn btn-orange" onclick="showToast('Report emailed to paula@email.com 📧')" style="justify-content:center;">📧 Email Report</button>
+            <button class="btn btn-orange" onclick="showToast('Report emailed to parent 📧')" style="justify-content:center;">📧 Email Report</button>
         </div>
     </aside>
 </div>
@@ -236,37 +394,292 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script src="script.js"></script>
+
 <script>
-    const chartData = [
-        { day: 'Mon', score: 90, color: '#4CAF7D' },
-        { day: 'Tue', score: 75, color: '#3A9ED6' },
-        { day: 'Wed', score: 88, color: '#4CAF7D' },
-        { day: 'Thu', score: 95, color: '#4CAF7D' },
-        { day: 'Fri', score: 80, color: '#FF8C42' }
-    ];
-    function buildBarChart() {
+    // ============================================
+    // REPORT DATA (Read from localStorage)
+    // ============================================
+
+    function getLessonProgress(lessonId) {
+        const saved = localStorage.getItem(`progress_${lessonId}`);
+        if (saved) {
+            try {
+                return JSON.parse(saved);
+            } catch(e) {}
+        }
+        return null;
+    }
+
+    function getLessonScore(lessonId) {
+        const data = getLessonProgress(lessonId);
+        if (data && data.correctCount !== undefined) {
+            return Math.round((data.correctCount / 5) * 100);
+        }
+        return 0;
+    }
+
+    function getLessonProgressPct(lessonId) {
+        const pct = parseInt(localStorage.getItem(`progress_${lessonId}_pct`)) || 0;
+        return Math.min(pct, 100);
+    }
+
+    function loadReportData() {
+        // Get display name
+        const displayName = localStorage.getItem('neurolearn_display_name') || 'Student';
+        document.getElementById('report-name').textContent = displayName;
+        document.getElementById('learner-quick-name').textContent = displayName;
+        document.getElementById('report-parent-name').textContent = localStorage.getItem('parent_display_name') || 'Paula';
+
+        // Set date
+        const now = new Date();
+        document.getElementById('report-date').textContent = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+        // Get all lesson progress
+        const lessons = [
+            { id: 'addition', name: 'Addition', icon: '➕', subject: 'math', color: '#4CAF7D' },
+            { id: 'subtraction', name: 'Subtraction', icon: '➖', subject: 'math', color: '#3A9ED6' },
+            { id: 'plant', name: 'Plant Life Cycle', icon: '🌱', subject: 'science', color: '#4CAF7D' },
+            { id: 'reading', name: 'Story Comprehension', icon: '📖', subject: 'reading', color: '#FF8C42' },
+            { id: 'ancient', name: 'Ancient Civilizations', icon: '🏛️', subject: 'history', color: '#9B59B6' }
+        ];
+
+        let totalCorrect = 0;
+        let totalAnswered = 0;
+        let totalQuestions = 0;
+        let completedLessons = 0;
+        let bestSubject = '--';
+        let bestScore = 0;
+        const lessonData = [];
+
+        lessons.forEach(lesson => {
+            const progress = getLessonProgress(lesson.id);
+            const score = getLessonScore(lesson.id);
+            const pct = getLessonProgressPct(lesson.id);
+            
+            let correctCount = 0;
+            let answered = 0;
+            let completed = false;
+            
+            if (progress) {
+                correctCount = progress.correctCount || 0;
+                answered = progress.answers ? progress.answers.filter(a => a !== null).length : 0;
+                completed = progress.completed || false;
+            }
+            
+            totalCorrect += correctCount;
+            totalAnswered += answered;
+            totalQuestions += 5;
+            if (completed) completedLessons++;
+            
+            if (score > bestScore) {
+                bestScore = score;
+                bestSubject = lesson.name;
+            }
+            
+            lessonData.push({
+                ...lesson,
+                score,
+                pct,
+                correctCount,
+                answered,
+                completed
+            });
+        });
+
+        // Update summary stats
+        const avgScore = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
+        document.getElementById('stat-lessons').textContent = completedLessons;
+        document.getElementById('stat-avg').textContent = avgScore + '%';
+        document.getElementById('stat-time').textContent = (completedLessons * 15) + 'm';
+        document.getElementById('stat-streak').textContent = '🔥' + (completedLessons > 0 ? completedLessons : 0);
+
+        // Update overall ring
+        const ring = document.getElementById('overall-ring');
+        const pct = totalQuestions > 0 ? Math.min(totalCorrect / totalQuestions, 1) : 0;
+        const offset = 339 - (339 * pct);
+        ring.style.strokeDashoffset = offset;
+        document.getElementById('overall-score').innerHTML = Math.round(pct * 100) + '%<small>Average Score</small>';
+
+        // Update learner quick view
+        document.getElementById('learner-quick-level').textContent = `Grade 3 · Level ${Math.floor((totalCorrect * 10) / 100) + 1}`;
+        document.getElementById('learner-avg-session').textContent = completedLessons > 0 ? '15 min' : '--';
+        document.getElementById('learner-lessons-week').textContent = completedLessons;
+        document.getElementById('learner-best-subject').textContent = bestSubject;
+
+        // Build subject breakdown
+        const breakdownContainer = document.getElementById('subject-breakdown');
+        breakdownContainer.innerHTML = '';
+        
+        const subjectIcons = {
+            math: '📐',
+            science: '🔬',
+            reading: '📖',
+            history: '🏛️'
+        };
+        
+        const subjectColors = {
+            math: 'math',
+            science: 'science',
+            reading: 'reading',
+            history: 'history'
+        };
+
+        lessonData.forEach(lesson => {
+            const row = document.createElement('div');
+            row.className = 'breakdown-row';
+            const isCompleted = lesson.completed;
+            const trend = isCompleted ? 'up' : 'same';
+            const trendSymbol = isCompleted ? '↑' : '→';
+            const trendText = isCompleted ? '+100%' : '0%';
+            
+            row.innerHTML = `
+                <div class="br-icon ${subjectColors[lesson.subject]}">${lesson.icon}</div>
+                <div class="br-info">
+                    <h4>${lesson.name}</h4>
+                    <p>${isCompleted ? '✅ Completed' : '🔄 In Progress'} · ${lesson.correctCount}/5 correct</p>
+                </div>
+                <div class="br-stats">
+                    <div class="br-score">${lesson.score}%</div>
+                    <div class="br-trend ${trend}">${trendSymbol} ${trendText}</div>
+                </div>
+            `;
+            breakdownContainer.appendChild(row);
+        });
+
+        // Update teacher's note
+        const note = document.getElementById('teacher-note');
+        if (completedLessons === 0) {
+            note.innerHTML = `
+                <span class="highlight-span">Welcome to NeuroLearn!</span> 
+                Complete your first lesson to see progress reports here. 
+                Start with <span class="highlight-span">Addition</span> or 
+                <span class="highlight-span">Subtraction</span> to begin your learning journey! 🚀
+            `;
+        } else if (completedLessons === 5) {
+            note.innerHTML = `
+                <span class="highlight-span">Outstanding work!</span> 
+                ${displayName} has completed <span class="highlight-span">all 5 lessons</span> with an average score of 
+                <span class="highlight-span">${avgScore}%</span>. This is a remarkable achievement!
+                ${displayName} is ready for more advanced challenges. 🌟
+            `;
+        } else {
+            note.innerHTML = `
+                ${displayName} has made <span class="highlight-span">great progress</span> by completing 
+                <span class="highlight-span">${completedLessons} out of 5 lessons</span> with an average score of 
+                <span class="highlight-span">${avgScore}%</span>. Keep up the momentum! 💪
+            `;
+        }
+
+        // Build recommendations
+        const recContainer = document.getElementById('recommendations');
+        recContainer.innerHTML = '';
+        
+        const recs = [];
+        
+        // Find incomplete lessons
+        const incomplete = lessonData.filter(l => !l.completed);
+        if (incomplete.length > 0) {
+            recs.push({
+                dot: 'green',
+                title: `Start ${incomplete[0].name}`,
+                desc: `Complete ${incomplete[0].name} to build your skills.`
+            });
+        }
+        
+        if (completedLessons === 5) {
+            recs.push({
+                dot: 'blue',
+                title: '🎉 All Complete!',
+                desc: 'You\'ve mastered all lessons. Great job!'
+            });
+        }
+        
+        // Find low score lessons
+        const lowScore = lessonData.filter(l => l.score > 0 && l.score < 60);
+        if (lowScore.length > 0 && recs.length < 2) {
+            recs.push({
+                dot: 'orange',
+                title: `Review ${lowScore[0].name}`,
+                desc: `Practice ${lowScore[0].name} to improve your score.`
+            });
+        }
+        
+        if (recs.length === 0) {
+            recs.push({
+                dot: 'green',
+                title: '🏆 Great Progress!',
+                desc: 'Continue learning to unlock more lessons!'
+            });
+        }
+        
+        // Limit to 3 recommendations
+        recs.slice(0, 3).forEach(rec => {
+            const item = document.createElement('div');
+            item.className = 'rec-item';
+            item.innerHTML = `
+                <div class="rec-dot ${rec.dot}"></div>
+                <div class="rec-info">
+                    <h4>${rec.title}</h4>
+                    <p>${rec.desc}</p>
+                </div>
+            `;
+            recContainer.appendChild(item);
+        });
+
+        // Build bar chart (weekly activity)
+        buildBarChart(lessonData);
+    }
+
+    function buildBarChart(lessonData) {
         const el = document.getElementById('bar-chart');
         if (!el) return;
         el.innerHTML = '';
-        chartData.forEach(d => {
+        
+        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+        const colors = ['#4CAF7D', '#3A9ED6', '#FF8C42', '#9B59B6', '#4CAF7D'];
+        
+        // Use lesson scores as daily activity
+        const scores = lessonData.map(l => l.score);
+        // If no scores, use default data
+        const data = scores.every(s => s === 0) ? [0, 0, 0, 0, 0] : scores.slice(0, 5);
+        
+        // Pad to 5 days if needed
+        while (data.length < 5) {
+            data.push(0);
+        }
+        
+        data.forEach((score, i) => {
             const col = document.createElement('div');
             col.className = 'bar-col';
-            const h = d.score > 0 ? Math.max(8, d.score * 1.1) : 8;
-            col.innerHTML = `<div class="b-val">${d.score}%</div><div class="bar-fill" style="height:0px;background:${d.color};border-radius:10px 10px 0 0;"></div><div class="b-label" style="font-size:0.72rem;font-weight:700;color:var(--text-light);">${d.day}</div>`;
+            const h = score > 0 ? Math.max(8, score * 1.1) : 8;
+            const label = score > 0 ? score + '%' : '—';
+            col.innerHTML = `
+                <div class="b-val">${label}</div>
+                <div class="bar-fill" style="height:0px;background:${colors[i % colors.length]};border-radius:10px 10px 0 0;"></div>
+                <div class="b-label">${days[i % days.length]}</div>
+            `;
             el.appendChild(col);
-            setTimeout(() => { col.querySelector('.bar-fill').style.height = h + 'px'; }, 200);
+            setTimeout(() => {
+                const fill = col.querySelector('.bar-fill');
+                if (fill) fill.style.height = h + 'px';
+            }, 200 + (i * 50));
         });
     }
-    buildBarChart();
-    setTimeout(() => {
-        const ring = document.getElementById('overall-ring');
-        if (ring) ring.style.strokeDashoffset = 339 - (339 * 0.84);
-    }, 400);
+
     function setPeriod(btn, period) {
         document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         showToast(`Showing ${period} data 📊`);
+        // Reload data for the period
+        loadReportData();
     }
+
+    // Load data on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadReportData();
+        if (typeof setActiveNav === 'function') setActiveNav();
+    });
 </script>
+
 </body>
 </html>
