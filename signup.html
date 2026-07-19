@@ -1,54 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NeuroLearn - Sign Up</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
-<!-- =================== SIGNUP SCREEN =================== -->
-<div id="login-screen" class="screen active">
+<div id="signup-screen" class="screen active">
+
     <div style="display:flex;flex-direction:column;align-items:center;width:100%;">
+
         <div class="brand">
             <h1>NeuroLearn</h1>
             <p>Smart learning for every young mind 🧠</p>
         </div>
 
-        <!-- Register Form -->
         <div class="auth-card">
+
             <h2>Create Your Account!</h2>
-            <p class="subtitle">Join NeuroLearn today</p>
+
+            <p class="subtitle">
+                Join NeuroLearn today
+            </p>
+
+            <!-- Email -->
             <div class="form-group">
+
                 <label>Email</label>
-                <input type="email" placeholder="Enter your email" id="signup-email"/>
+
+                <input
+                    type="email"
+                    id="signup-email"
+                    placeholder="Enter your email"
+                    autocomplete="email"
+                    required>
+
             </div>
+
+            <!-- Username -->
             <div class="form-group">
+
                 <label>Username</label>
-                <input type="text" placeholder="Choose a username" id="signup-username"/>
+
+                <input
+                    type="text"
+                    id="signup-username"
+                    placeholder="Choose a username"
+                    autocomplete="username"
+                    required>
+
             </div>
+
+            <!-- Password -->
             <div class="form-group">
+
                 <label>Password</label>
-                <input type="password" placeholder="Create a password" id="signup-password"/>
+
+                <input
+                    type="password"
+                    id="signup-password"
+                    placeholder="Create a password"
+                    autocomplete="new-password"
+                    required>
+
             </div>
+
+            <!-- Role -->
             <div class="role-selector">
-                <button class="role-btn active" onclick="selectRole(this)">As student</button>
-                <button class="role-btn" onclick="selectRole(this)">As admin</button>
-                <button class="role-btn" onclick="selectRole(this)">As parent</button>
+
+                <button
+                    type="button"
+                    class="role-btn active"
+                    data-role="student"
+                    onclick="selectRole(this)">
+                    Student
+                </button>
+
+                <button
+                    type="button"
+                    class="role-btn"
+                    data-role="admin"
+                    onclick="selectRole(this)">
+                    Admin
+                </button>
+
+                <button
+                    type="button"
+                    class="role-btn"
+                    data-role="parent"
+                    onclick="selectRole(this)">
+                    Parent
+                </button>
+
             </div>
-            <button class="btn-primary" onclick="goToDashboard()">Create Account</button>
-            <p class="auth-switch">Already have an account? <a href="index.html">Login here!</a></p>
+
+            <!-- Sign Up Button -->
+            <button
+                type="button"
+                class="btn-primary"
+                onclick="handleSignUpWithCaptcha()">
+
+                Create Account
+
+            </button>
+
+            <p class="auth-switch">
+
+                Already have an account?
+
+                <a href="index.html">
+                    Login here!
+                </a>
+
+            </p>
+
         </div>
+
     </div>
+
 </div>
 
-<!-- Toast -->
-<div class="toast" id="toast"></div>
+<div id="toast" class="toast"></div>
 
+<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script src="supabase-config.js"></script>
+
 <script src="script.js"></script>
+
 </body>
+
+</html>
 </html>
