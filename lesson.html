@@ -21,13 +21,17 @@
         .lesson-meta-card .subject-icon {
             width: 72px; height: 72px;
             border-radius: 20px;
-            background: linear-gradient(135deg, #B3E5FC, #81D4FA);
             display: flex; align-items: center; justify-content: center;
             font-size: 2.2rem;
             margin: 0 auto 14px;
             border: 2px solid white;
             box-shadow: 0 4px 14px rgba(110,198,245,0.35);
         }
+        .lesson-meta-card .subject-icon.addition { background: linear-gradient(135deg, #C8E6C9, #A5D6A7); }
+        .lesson-meta-card .subject-icon.subtraction { background: linear-gradient(135deg, #B3E5FC, #81D4FA); }
+        .lesson-meta-card .subject-icon.plant { background: linear-gradient(135deg, #C8E6C9, #81C784); }
+        .lesson-meta-card .subject-icon.reading { background: linear-gradient(135deg, #FFE0B2, #FFCC80); }
+        .lesson-meta-card .subject-icon.ancient { background: linear-gradient(135deg, #E1BEE7, #CE93D8); }
         .lesson-meta-card h2 { font-family: 'Baloo 2', cursive; font-size: 1.3rem; color: var(--teal); }
         .lesson-meta-card p { font-size: 0.85rem; color: var(--text-mid); font-weight: 600; margin-top: 4px; }
         .question-list { display: flex; flex-direction: column; gap: 8px; }
@@ -157,9 +161,9 @@
 <div class="lesson-layout">
     <aside class="lesson-sidebar">
         <div class="card lesson-meta-card">
-            <div class="subject-icon">➖</div>
-            <h2>Subtraction</h2>
-            <p>Math · Chapter 4 · Intermediate</p>
+            <div class="subject-icon" id="lesson-icon">➖</div>
+            <h2 id="lesson-title">Subtraction</h2>
+            <p id="lesson-desc">Math · Chapter 4 · Intermediate</p>
             <div class="mt-12">
                 <div class="progress-bar-label"><span>Overall</span><span id="overall-pct">0%</span></div>
                 <div class="progress-bar"><div class="progress-fill blue" id="overall-bar" style="width:0%"></div></div>
@@ -174,7 +178,7 @@
 
     <main class="question-area">
         <div class="question-header">
-            <span class="q-counter">Question <strong id="q-num">1</strong> of <strong>5</strong></span>
+            <span class="q-counter">Question <strong id="q-num">1</strong> of <strong id="total-q">5</strong></span>
             <div class="timer-pill" id="timer-pill">⏱ <span id="timer-val">30</span>s</div>
         </div>
         <div class="card question-card">
@@ -216,7 +220,7 @@
     <div class="modal-box">
         <div class="modal-trophy" id="modal-trophy">🏆</div>
         <h2 id="modal-title">Lesson Complete!</h2>
-        <p id="modal-msg">You finished the Subtraction lesson!</p>
+        <p id="modal-msg">Great job!</p>
         <div class="modal-stats">
             <div class="stat-pill"><div class="val" id="modal-score">0</div><div class="lbl">Score</div></div>
             <div class="stat-pill"><div class="val" id="modal-xp">+0</div><div class="lbl">XP Earned</div></div>
@@ -234,20 +238,116 @@
 <script src="supabase-config.js"></script>
 <script src="script.js"></script>
 <script>
-    const QUESTIONS = [
-        { text: '15 - 5 = ??', choices: [5, 10, 15, 20], correct: 2, hint: 'Count up from 5 ten more times.' },
-        { text: '20 – 8 = ??', choices: [10, 12, 14, 16], correct: 1, hint: 'Start at 20 and count back 8 steps.' },
-        { text: '15 – 6 = ??', choices: [7, 8, 9, 10], correct: 2, hint: 'Think: 6 + ? = 15' },
-        { text: '30 – 14 = ??', choices: [14, 16, 18, 20], correct: 1, hint: 'Break it: 30–10=20, 20–4=16' },
-        { text: '100 – 47 = ??', choices: [43, 53, 57, 63], correct: 1, hint: 'Think: what + 47 = 100?' }
-    ];
-    const LETTERS = ['A','B','C','D'];
+    // LESSON DATA - All 5 Lessons
+    const LESSON_DATA = {
+        subtraction: {
+            title: "Subtraction",
+            subject: "Math · Chapter 4 · Intermediate",
+            icon: "➖",
+            iconClass: "subtraction",
+            totalQuestions: 5,
+            hint: "Start from the larger number and count down.",
+            questions: [
+                { text: '15 - 5 = ?', choices: [5, 10, 15, 20], correct: 1, hint: '15 minus 5 equals 10' },
+                { text: '20 - 8 = ?', choices: [10, 12, 14, 16], correct: 1, hint: '20 minus 8 equals 12' },
+                { text: '15 - 6 = ?', choices: [7, 8, 9, 10], correct: 2, hint: '15 minus 6 equals 9' },
+                { text: '30 - 14 = ?', choices: [14, 16, 18, 20], correct: 1, hint: '30 minus 14 equals 16' },
+                { text: '100 - 47 = ?', choices: [43, 53, 57, 63], correct: 1, hint: '100 minus 47 equals 53' }
+            ]
+        },
+        addition: {
+            title: "Addition",
+            subject: "Math · Chapter 3 · Beginner",
+            icon: "➕",
+            iconClass: "addition",
+            totalQuestions: 5,
+            hint: "Add the numbers together carefully.",
+            questions: [
+                { text: '5 + 3 = ?', choices: [6, 7, 8, 9], correct: 2, hint: '5 + 3 = 8' },
+                { text: '9 + 4 = ?', choices: [12, 13, 14, 15], correct: 1, hint: '9 + 4 = 13' },
+                { text: '12 + 7 = ?', choices: [17, 18, 19, 20], correct: 2, hint: '12 + 7 = 19' },
+                { text: '15 + 10 = ?', choices: [20, 25, 30, 35], correct: 1, hint: '15 + 10 = 25' },
+                { text: '23 + 16 = ?', choices: [37, 38, 39, 40], correct: 2, hint: '23 + 16 = 39' }
+            ]
+        },
+        plant: {
+            title: "Plant Life Cycle",
+            subject: "Science · Chapter 1 · Beginner",
+            icon: "🌱",
+            iconClass: "plant",
+            totalQuestions: 5,
+            hint: "Think about how plants grow from seeds to full-grown plants.",
+            questions: [
+                { text: 'What is the first stage of a plant\'s life cycle?', choices: ['Seed', 'Sprout', 'Flower', 'Fruit'], correct: 0, hint: 'It all starts with a tiny packet of life.' },
+                { text: 'What does a seed need to germinate?', choices: ['Sunlight only', 'Water and warmth', 'Fertilizer only', 'Just soil'], correct: 1, hint: 'Plants need water and the right temperature to start growing.' },
+                { text: 'What comes after a sprout in the plant life cycle?', choices: ['Seed', 'Seedling', 'Flower', 'Fruit'], correct: 1, hint: 'It grows bigger and develops leaves.' },
+                { text: 'What part of the plant makes food using sunlight?', choices: ['Roots', 'Stem', 'Leaves', 'Flowers'], correct: 2, hint: 'They are green and capture sunlight for photosynthesis.' },
+                { text: 'What is the final stage of a plant\'s life cycle?', choices: ['Seed', 'Sprout', 'Flower', 'Fruit and seeds'], correct: 3, hint: 'The plant reproduces and creates new seeds to start the cycle again.' }
+            ]
+        },
+        reading: {
+            title: "Story Comprehension",
+            subject: "Reading · Chapter 3 · Beginner",
+            icon: "📖",
+            iconClass: "reading",
+            totalQuestions: 5,
+            hint: "Read the story carefully and remember the details.",
+            questions: [
+                { text: 'What is the main character\'s name in the story?', choices: ['Maria', 'Juan', 'Ana', 'Pedro'], correct: 2, hint: 'The story starts with "Ana loved to read..."' },
+                { text: 'Where did the story take place?', choices: ['Park', 'Library', 'School', 'Home'], correct: 1, hint: 'It was a quiet place filled with books.' },
+                { text: 'What did the main character find in the library?', choices: ['A toy', 'A magical book', 'A friend', 'A map'], correct: 1, hint: 'It was a special book that glowed.' },
+                { text: 'How did the main character feel at the end of the story?', choices: ['Sad', 'Happy', 'Scared', 'Tired'], correct: 1, hint: 'She smiled and couldn\'t wait to read more.' },
+                { text: 'What is the moral of the story?', choices: ['Reading is boring', 'Reading can take you on adventures', 'Books are heavy', 'Reading is only for school'], correct: 1, hint: 'The story showed how books can transport you to new worlds.' }
+            ]
+        },
+        ancient: {
+            title: "Ancient Civilizations",
+            subject: "History · Chapter 2 · Intermediate",
+            icon: "🏛️",
+            iconClass: "ancient",
+            totalQuestions: 5,
+            hint: "Look for clues about rivers, leaders, inventions, and famous landmarks.",
+            questions: [
+                { text: 'Which ancient civilization built the pyramids of Giza?', choices: ['Romans', 'Egyptians', 'Greeks', 'Chinese'], correct: 1, hint: 'They lived along the Nile River.' },
+                { text: 'Mesopotamia was located between which two rivers?', choices: ['Nile and Amazon', 'Tigris and Euphrates', 'Yangtze and Yellow', 'Indus and Ganges'], correct: 1, hint: "Its name means 'land between rivers.'" },
+                { text: 'Which civilization is known as the birthplace of democracy?', choices: ['Egypt', 'Rome', 'Greece', 'China'], correct: 2, hint: 'Athens was one of its famous city-states.' },
+                { text: 'The Great Wall belongs to which civilization?', choices: ['Roman', 'Chinese', 'Persian', 'Greek'], correct: 1, hint: 'It was built to defend the empire.' },
+                { text: 'Which writing system was used by Ancient Egypt?', choices: ['Latin', 'Alphabet', 'Hieroglyphics', 'Cuneiform'], correct: 2, hint: 'Picture symbols carved on temples.' }
+            ]
+        }
+    };
+
+    // Get current lesson from localStorage
+    const lessonKey = localStorage.getItem('currentLesson') || 'subtraction';
+    const lesson = LESSON_DATA[lessonKey];
+    const QUESTIONS = lesson.questions;
+    const LETTERS = ['A', 'B', 'C', 'D'];
+
     let current = 0;
     let answers = new Array(QUESTIONS.length).fill(null);
     let correctCount = 0;
     let wrongCount = 0;
     let timerVal = 30;
     let timerInt = null;
+
+    // Initialize lesson
+    function initLesson() {
+        // Update UI with lesson info
+        document.getElementById('lesson-title').textContent = lesson.title;
+        document.getElementById('lesson-desc').textContent = lesson.subject;
+        document.getElementById('total-q').textContent = lesson.totalQuestions;
+        document.getElementById('hint-text').textContent = lesson.hint;
+        
+        const iconDiv = document.getElementById('lesson-icon');
+        iconDiv.textContent = lesson.icon;
+        iconDiv.className = 'subject-icon ' + lesson.iconClass;
+        
+        buildQuestionList();
+        renderQuestion(0);
+        
+        // Load saved progress
+        loadProgress();
+    }
 
     function buildQuestionList() {
         const container = document.getElementById('q-list');
@@ -256,7 +356,7 @@
             const div = document.createElement('div');
             div.className = 'q-item';
             div.onclick = () => goToQ(i);
-            div.innerHTML = `<div class="q-dot">${i+1}</div>${q.text.split('??')[0].trim()}`;
+            div.innerHTML = `<div class="q-dot">${i+1}</div>${q.text.split('?')[0]}`;
             container.appendChild(div);
         });
     }
@@ -266,6 +366,7 @@
         document.getElementById('q-num').textContent = idx + 1;
         document.getElementById('q-text').textContent = q.text;
         document.getElementById('hint-text').textContent = q.hint;
+        
         const grid = document.getElementById('choices-grid');
         grid.innerHTML = '';
         q.choices.forEach((val, i) => {
@@ -281,13 +382,16 @@
             }
             grid.appendChild(btn);
         });
+        
         document.getElementById('feedback').style.display = 'none';
+        
         document.querySelectorAll('.q-item').forEach((el, i) => {
             el.classList.remove('active', 'done', 'wrong');
             if (i === idx) el.classList.add('active');
             else if (answers[i] === true) el.classList.add('done');
             else if (answers[i] !== null) el.classList.add('wrong');
         });
+        
         document.getElementById('btn-prev').disabled = idx === 0;
         document.getElementById('btn-next').disabled = answers[idx] === null;
         resetTimer();
@@ -297,24 +401,37 @@
         const q = QUESTIONS[current];
         const isCorrect = choiceIdx === q.correct;
         answers[current] = isCorrect;
+        
         document.querySelectorAll('.choice-btn').forEach((btn, i) => {
             btn.disabled = true;
             if (i === q.correct) btn.classList.add('correct');
             else if (i === choiceIdx && !isCorrect) btn.classList.add('wrong');
         });
-        if (isCorrect) { correctCount++; showToast('✅ Correct! +10 XP'); }
-        else { wrongCount++; showToast('❌ Not quite!'); }
+        
+        if (isCorrect) { 
+            correctCount++; 
+            showToast('✅ Correct! +10 XP');
+        } else { 
+            wrongCount++; 
+            showToast('❌ Not quite!');
+        }
+        
         updateScore();
         document.getElementById('btn-next').disabled = false;
         clearInterval(timerInt);
+        
         const fb = document.getElementById('feedback');
         fb.style.display = 'flex';
         fb.className = 'feedback-banner ' + (isCorrect ? 'correct' : 'wrong');
         document.getElementById('fb-icon').textContent = isCorrect ? '✅' : '❌';
         document.getElementById('fb-title').textContent = isCorrect ? 'Correct!' : 'Not quite!';
+        
         const items = document.querySelectorAll('.q-item');
         items[current].classList.remove('active');
         items[current].classList.add(isCorrect ? 'done' : 'wrong');
+        
+        // Save progress
+        saveProgress();
     }
 
     function updateScore() {
@@ -324,18 +441,71 @@
         document.getElementById('score-label').innerHTML = `${correctCount}/${answered || 1}<small>Score</small>`;
         const pct = correctCount / QUESTIONS.length;
         document.getElementById('score-ring').style.strokeDashoffset = 314 - (314 * pct);
-        const ovPct = Math.round((answered / QUESTIONS.length) * 100);
+        
+        // Cap overall progress at 100%
+        let ovPct = Math.round((answered / QUESTIONS.length) * 100);
+        if (ovPct > 100) ovPct = 100;
         document.getElementById('overall-bar').style.width = ovPct + '%';
         document.getElementById('overall-pct').textContent = ovPct + '%';
     }
 
-    function nextQ() {
-        if (current < QUESTIONS.length - 1) { current++; renderQuestion(current); }
-        else finishLesson();
+    function saveProgress() {
+        const progress = {
+            answers: answers,
+            correctCount: correctCount,
+            wrongCount: wrongCount,
+            completed: answers.every(a => a !== null)
+        };
+        localStorage.setItem(`progress_${lessonKey}`, JSON.stringify(progress));
+        
+        // Calculate progress percentage, cap at 100%
+        let pct = Math.round((answers.filter(a => a !== null).length / QUESTIONS.length) * 100);
+        if (pct > 100) pct = 100;
+        localStorage.setItem(`progress_${lessonKey}_pct`, pct);
     }
 
-    function prevQ() { if (current > 0) { current--; renderQuestion(current); } }
-    function goToQ(idx) { if (answers[idx-1] !== null || idx <= current) { current = idx; renderQuestion(current); } }
+    function loadProgress() {
+        const saved = localStorage.getItem(`progress_${lessonKey}`);
+        if (saved) {
+            try {
+                const progress = JSON.parse(saved);
+                answers = progress.answers || new Array(QUESTIONS.length).fill(null);
+                correctCount = progress.correctCount || 0;
+                wrongCount = progress.wrongCount || 0;
+                updateScore();
+                
+                document.querySelectorAll('.q-item').forEach((el, i) => {
+                    if (answers[i] === true) el.classList.add('done');
+                    else if (answers[i] !== null) el.classList.add('wrong');
+                });
+            } catch(e) {
+                console.log('No saved progress found');
+            }
+        }
+    }
+
+    function nextQ() {
+        if (current < QUESTIONS.length - 1) {
+            current++;
+            renderQuestion(current);
+        } else {
+            finishLesson();
+        }
+    }
+
+    function prevQ() {
+        if (current > 0) {
+            current--;
+            renderQuestion(current);
+        }
+    }
+
+    function goToQ(idx) {
+        if (answers[idx-1] !== null || idx <= current) {
+            current = idx;
+            renderQuestion(current);
+        }
+    }
 
     function resetTimer() {
         clearInterval(timerInt);
@@ -344,7 +514,9 @@
         const val = document.getElementById('timer-val');
         pill.classList.remove('urgent');
         val.textContent = timerVal;
+        
         if (answers[current] !== null) return;
+        
         timerInt = setInterval(() => {
             timerVal--;
             val.textContent = timerVal;
@@ -361,6 +533,7 @@
                         if (i === QUESTIONS[current].correct) b.classList.add('correct');
                     });
                     showToast('⏰ Time\'s up!');
+                    saveProgress();
                 }
             }
         }, 1000);
@@ -371,23 +544,32 @@
         const pct = Math.round((correctCount / QUESTIONS.length) * 100);
         document.getElementById('modal-trophy').textContent = pct >= 80 ? '🏆' : pct >= 50 ? '⭐' : '📚';
         document.getElementById('modal-title').textContent = pct >= 80 ? 'Excellent Work!' : pct >= 50 ? 'Good Effort!' : 'Keep Practicing!';
-        document.getElementById('modal-msg').textContent = `You scored ${correctCount} out of ${QUESTIONS.length} on Subtraction!`;
+        document.getElementById('modal-msg').textContent = `You scored ${correctCount} out of ${QUESTIONS.length} on ${lesson.title}!`;
         document.getElementById('modal-score').textContent = `${correctCount}/${QUESTIONS.length}`;
         document.getElementById('modal-xp').textContent = '+' + (correctCount * 10);
         document.getElementById('result-modal').classList.add('show');
     }
 
     function restartLesson() {
-        document.getElementById('result-modal').classList.remove('show');
-        current = 0;
-        answers = new Array(QUESTIONS.length).fill(null);
-        correctCount = 0; wrongCount = 0;
-        updateScore();
-        renderQuestion(0);
+        if (confirm(`Are you sure you want to restart the ${lesson.title} lesson? This will reset your progress.`)) {
+            document.getElementById('result-modal').classList.remove('show');
+            current = 0;
+            answers = new Array(QUESTIONS.length).fill(null);
+            correctCount = 0;
+            wrongCount = 0;
+            updateScore();
+            
+            // Clear all progress for this lesson
+            localStorage.removeItem(`progress_${lessonKey}`);
+            localStorage.removeItem(`progress_${lessonKey}_pct`);
+            
+            renderQuestion(0);
+            showToast('🔄 Progress reset! Starting from the beginning.');
+        }
     }
 
-    buildQuestionList();
-    renderQuestion(0);
+    // Initialize
+    initLesson();
 </script>
 </body>
 </html>
