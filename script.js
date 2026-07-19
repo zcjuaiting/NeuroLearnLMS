@@ -12,123 +12,6 @@ function showToast(msg, color) {
     _toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
 }
 
-// ---- CAPTCHA ----
-async function goToDashboardWithCaptcha() {
-
-    const captchaResponse = grecaptcha.getResponse();
-
-    if (!captchaResponse) {
-        showToast("Complete the CAPTCHA check first", "#ff4d4d");
-        return;
-    }
-
-    const username = document
-        .getElementById("login-username")
-        .value
-        .trim();
-
-    const password = document
-        .getElementById("login-password")
-        .value;
-
-    if (!username || !password) {
-        showToast("Enter username and password", "#ff4d4d");
-        return;
-    }
-
-
-    try {
-
-        const { data: user, error: userError } =
-            await supabaseClient
-                .from("users")
-                .select("email, username")
-                .eq("username", username)
-                .single();
-
-
-        if (userError || !user) {
-
-            showToast(
-                "Username not found",
-                "#ff4d4d"
-            );
-
-            grecaptcha.reset();
-            return;
-        }
-
-        const { data, error } =
-await supabaseClient.auth.signUp({
-
-    email,
-
-    password,
-
-    options: {
-
-        data: {
-
-            username: username,
-
-            role: selectedRole
-
-        }
-
-    }
-
-});
-
-
-        if (error) {
-
-            showToast(
-                "Incorrect password",
-                "#ff4d4d"
-            );
-
-            grecaptcha.reset();
-            return;
-        }
-
-        localStorage.setItem(
-            "neurolearn_username",
-            user.username
-        );
-
-        showToast(
-            "Login successful"
-        );
-
-        setTimeout(() => {
-
-            window.location.href =
-                "dashboard.html";
-
-        }, 1000);
-
-    } catch (err) {
-        console.error(err);
-        showToast(
-            "Login error occurred",
-            "#ff4d4d"
-        );
-    }
-}
-
-function handleSignUpWithCaptcha() {
-    const captchaResponse = grecaptcha.getResponse();
-
-    if (captchaResponse.length === 0) {
-        showToast("CAPTCHA verification is required to register.", "#ff4d4d");
-        return;
-    }
-
-    console.log("Sign-Up CAPTCHA verified successfully.");
-    grecaptcha.reset();
-    goToDashboard();
-}
-
 // ---- Navigation Functions ----
 function goToDashboard() {
     let username = 'Jake';
@@ -284,7 +167,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setActiveNav();
     animateProgressBars();
 });
-*/
 
 // ---- New script for testing ---- //
 
@@ -315,33 +197,10 @@ function selectRole(button) {
     selectedRole = button.dataset.role;
 }
 
-// ---------- CAPTCHA ----------
-function verifyCaptcha() {
-    if (typeof grecaptcha === "undefined") {
-        showToast("reCAPTCHA failed to load.", "#ff4d4d");
-        return false;
-    }
-
-    const token = grecaptcha.getResponse();
-
-    if (!token) {
-        showToast("Please complete the CAPTCHA.", "#ff4d4d");
-        return false;
-    }
-
-    return true;
-}
-
 // ---------- LOGIN ----------
 async function goToDashboardWithCaptcha() {
-
-    if (!verifyCaptcha()) return;
-
-    const username =
-        document.getElementById("login-username").value.trim();
-
-    const password =
-        document.getElementById("login-password").value;
+    const username = document.getElementById("login-username").value.trim();
+    const password = document.getElementById("login-password").value;
 
     if (!username || !password) {
         showToast("Please enter your username and password.", "#ff4d4d");
@@ -349,7 +208,6 @@ async function goToDashboardWithCaptcha() {
     }
 
     try {
-
         // Find email using username
         const { data: userRecord, error: lookupError } =
             await supabaseClient
@@ -360,7 +218,6 @@ async function goToDashboardWithCaptcha() {
 
         if (lookupError || !userRecord) {
             showToast("Username not found.", "#ff4d4d");
-            grecaptcha.reset();
             return;
         }
 
@@ -373,15 +230,10 @@ async function goToDashboardWithCaptcha() {
 
         if (error) {
             showToast(error.message, "#ff4d4d");
-            grecaptcha.reset();
             return;
         }
 
-        localStorage.setItem(
-            "neurolearn_username",
-            userRecord.username
-        );
-
+        localStorage.setItem("neurolearn_username", userRecord.username);
         showToast("Login successful! 🎉", "#28a745");
 
         setTimeout(() => {
@@ -389,532 +241,267 @@ async function goToDashboardWithCaptcha() {
         }, 1000);
 
     } catch (err) {
-
         console.error(err);
-
-        showToast(
-            "Unexpected error occurred.",
-            "#ff4d4d"
-        );
-
+        showToast("Unexpected error occurred.", "#ff4d4d");
     }
-
-    grecaptcha.reset();
-
 }
 
 // ---------- SIGN UP ----------
 async function handleSignUpWithCaptcha() {
-
-    if (!verifyCaptcha()) return;
-
-    const email =
-        document.getElementById("signup-email").value.trim();
-
-    const username =
-        document.getElementById("signup-username").value.trim();
-
-    const password =
-        document.getElementById("signup-password").value;
+    const email = document.getElementById("signup-email").value.trim();
+    const username = document.getElementById("signup-username").value.trim();
+    const password = document.getElementById("signup-password").value;
 
     if (!email || !username || !password) {
-
-        showToast(
-            "Please complete all fields.",
-            "#ff4d4d"
-        );
-
+        showToast("Please complete all fields.", "#ff4d4d");
         return;
     }
 
     if (password.length < 6) {
-
-        showToast(
-            "Password must be at least 6 characters.",
-            "#ff4d4d"
-        );
-
+        showToast("Password must be at least 6 characters.", "#ff4d4d");
         return;
     }
 
     try {
-
-        const {
-            data: existingUsername
-        } = await supabaseClient
+        const { data: existingUsername } = await supabaseClient
             .from("users")
             .select("id")
             .eq("username", username)
             .maybeSingle();
 
         if (existingUsername) {
-
-            showToast(
-                "Username already exists.",
-                "#ff4d4d"
-            );
-
-            grecaptcha.reset();
-
+            showToast("Username already exists.", "#ff4d4d");
             return;
         }
 
-        const {
-            data,
-            error
-        } = await supabaseClient.auth.signUp({
-
+        const { data, error } = await supabaseClient.auth.signUp({
             email: email,
             password: password
-
         });
 
         if (error) {
-
-            showToast(
-                error.message,
-                "#ff4d4d"
-            );
-
-            grecaptcha.reset();
-
+            showToast(error.message, "#ff4d4d");
             return;
         }
 
         if (!data.user) {
-
-            showToast(
-                "Unable to create account.",
-                "#ff4d4d"
-            );
-
-            grecaptcha.reset();
-
+            showToast("Unable to create account.", "#ff4d4d");
             return;
         }
 
-        // -------------------------------
         // Insert profile into users table
-        // -------------------------------
-
-        const {
-            error: profileError
-        } = await supabaseClient
+        const { error: profileError } = await supabaseClient
             .from("users")
             .insert({
-
                 id: data.user.id,
-
                 email: email,
-
                 username: username,
-
                 role: selectedRole,
-
                 level: 1,
-
                 xp: 0,
-
                 streak_days: 0
-
             });
 
         if (profileError) {
-
             console.error(profileError);
-
-            showToast(
-                profileError.message,
-                "#ff4d4d"
-            );
-
-            grecaptcha.reset();
-
+            showToast(profileError.message, "#ff4d4d");
             return;
         }
 
-
-        const {
-            error: loginError
-        } = await supabaseClient.auth.signInWithPassword({
-
+        const { error: loginError } = await supabaseClient.auth.signInWithPassword({
             email: email,
-
             password: password
-
         });
 
         if (loginError) {
-
-            showToast(
-                loginError.message,
-                "#ff4d4d"
-            );
-
+            showToast(loginError.message, "#ff4d4d");
             return;
         }
 
-        localStorage.setItem(
-            "neurolearn_username",
-            username
-        );
-
-        showToast(
-            "Account created successfully! 🎉",
-            "#28a745"
-        );
+        localStorage.setItem("neurolearn_username", username);
+        showToast("Account created successfully! 🎉", "#28a745");
 
         setTimeout(() => {
-
-            window.location.href =
-                "dashboard.html";
-
+            window.location.href = "dashboard.html";
         }, 1200);
 
-    }
-    catch (err) {
-
+    } catch (err) {
         console.error(err);
-
-        showToast(
-            "Unexpected signup error.",
-            "#ff4d4d"
-        );
-
+        showToast("Unexpected signup error.", "#ff4d4d");
     }
-
-    grecaptcha.reset();
-
 }
 
 // ---------- LOGOUT ----------
 async function showLogout() {
-
     try {
-
         await supabaseClient.auth.signOut();
-
     } catch (err) {
-
         console.error(err);
-
     }
 
     localStorage.removeItem("neurolearn_username");
-
     window.location.href = "index.html";
-
 }
 
 // ---------- CHECK SESSION ----------
 async function checkSession() {
-
-    const {
-
-        data: { session }
-
-    } = await supabaseClient.auth.getSession();
-
-    const isDashboard =
-        document.getElementById("dashboard-screen");
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    const isDashboard = document.getElementById("dashboard-screen");
 
     if (isDashboard && !session) {
-
         window.location.href = "index.html";
-
         return;
-
     }
 
     return session;
-
 }
 
 // ---------- LOAD USER ----------
 async function loadUsername() {
-
     const session = await checkSession();
-
     if (!session) return;
 
     const userId = session.user.id;
-
-    const {
-
-        data: profile,
-        error
-
-    } = await supabaseClient
-
+    const { data: profile, error } = await supabaseClient
         .from("users")
-
         .select("*")
-
         .eq("id", userId)
-
         .single();
 
     if (error) {
-
         console.error(error);
-
         return;
-
     }
 
-    localStorage.setItem(
-        "neurolearn_username",
-        profile.username
-    );
+    localStorage.setItem("neurolearn_username", profile.username);
 
     const username = profile.username;
-
     const ids = [
-
         "welcome-username",
         "nav-username",
         "profile-username",
         "lesson-username",
         "report-name"
-
     ];
 
     ids.forEach(id => {
-
-        const element =
-            document.getElementById(id);
-
+        const element = document.getElementById(id);
         if (element) {
-
             element.textContent = username;
-
         }
-
     });
 
-    const studentName =
-        document.getElementById("student-name");
-
+    const studentName = document.getElementById("student-name");
     if (studentName) {
-
-        studentName.textContent =
-            username + " J. Johnson";
-
+        studentName.textContent = username + " J. Johnson";
     }
 
-    const infoName =
-        document.getElementById("info-name");
-
+    const infoName = document.getElementById("info-name");
     if (infoName) {
-
-        infoName.textContent =
-            username + " J. Johnson";
-
+        infoName.textContent = username + " J. Johnson";
     }
-
 }
 
 // ---------- REDIRECT IF ALREADY LOGGED IN ----------
 async function redirectIfLoggedIn() {
-
-    const {
-
-        data: { session }
-
-    } = await supabaseClient.auth.getSession();
+    const { data: { session } } = await supabaseClient.auth.getSession();
 
     if (
-
         session &&
-
         (
             window.location.pathname.endsWith("index.html") ||
-
             window.location.pathname.endsWith("signup.html") ||
-
             window.location.pathname === "/"
-
         )
-
     ) {
-
-        window.location.href =
-            "dashboard.html";
-
+        window.location.href = "dashboard.html";
     }
-
 }
 
 // ---------- LESSON FILTERS ----------
-
 let currentDifficulty = "all";
 let currentSubject = "math";
 
 function filterSubject(btn, subject) {
-
     document.querySelectorAll(".subject-tab").forEach(tab => {
         tab.classList.remove("active");
     });
 
     btn.classList.add("active");
-
     filterLessons(subject, currentDifficulty);
-
 }
 
 function filterDifficulty(value) {
-
     currentDifficulty = value;
-
     filterLessons(currentSubject, value);
-
 }
 
 function filterLessons(subject, difficulty) {
-
     currentSubject = subject;
-
     const cards = document.querySelectorAll(".lesson-card");
 
     cards.forEach(card => {
+        const cardSubject = card.dataset.subject;
+        const cardDifficulty = card.dataset.difficulty;
+        const matchSubject = subject === "all" || cardSubject === subject;
+        const matchDifficulty = difficulty === "all" || cardDifficulty === difficulty;
 
-        const cardSubject =
-            card.dataset.subject;
-
-        const cardDifficulty =
-            card.dataset.difficulty;
-
-        const matchSubject =
-            subject === "all" ||
-            cardSubject === subject;
-
-        const matchDifficulty =
-            difficulty === "all" ||
-            cardDifficulty === difficulty;
-
-        card.style.display =
-            matchSubject && matchDifficulty
-                ? "flex"
-                : "none";
-
+        card.style.display = matchSubject && matchDifficulty ? "flex" : "none";
     });
-
 }
 
 // ---------- PROGRESS BARS ----------
-
 function animateProgressBars() {
-
-    document
-        .querySelectorAll(".progress-fill")
-        .forEach(bar => {
-
-            const target =
-                bar.dataset.width ||
-                bar.style.width;
-
-            bar.style.width = "0%";
-
-            setTimeout(() => {
-
-                bar.style.width = target;
-
-            }, 150);
-
-        });
-
+    document.querySelectorAll(".progress-fill").forEach(bar => {
+        const target = bar.dataset.width || bar.style.width;
+        bar.style.width = "0%";
+        setTimeout(() => {
+            bar.style.width = target;
+        }, 150);
+    });
 }
 
 // ---------- FONT SIZE ----------
-
 function applyFontSize(size) {
-
     const map = {
-
         Small: "14px",
-
         Medium: "16px",
-
         Large: "18px"
-
     };
 
-    document.documentElement.style.fontSize =
-        map[size] || "16px";
-
-    showToast(
-        "Font size changed to " + size
-    );
-
+    document.documentElement.style.fontSize = map[size] || "16px";
+    showToast("Font size changed to " + size);
 }
 
 // ---------- ACTIVE NAV ----------
-
 function setActiveNav() {
+    const page = window.location.pathname.split("/").pop();
 
-    const page =
-        window.location.pathname.split("/").pop();
-
-    document
-        .querySelectorAll(".nav-tab")
-        .forEach(link => {
-
-            if (
-                link.getAttribute("href") === page
-            ) {
-
-                link.classList.add("active");
-
-            } else {
-
-                link.classList.remove("active");
-
-            }
-
-        });
-
+    document.querySelectorAll(".nav-tab").forEach(link => {
+        if (link.getAttribute("href") === page) {
+            link.classList.add("active");
+        } else {
+            link.classList.remove("active");
+        }
+    });
 }
 
 // ---------- PAGE INITIALIZATION ----------
-
-document.addEventListener(
-    "DOMContentLoaded",
-    async () => {
-
-        await redirectIfLoggedIn();
-
-        await loadUsername();
-
-        animateProgressBars();
-
-        setActiveNav();
-
-    }
-);
+document.addEventListener("DOMContentLoaded", async () => {
+    await redirectIfLoggedIn();
+    await loadUsername();
+    animateProgressBars();
+    setActiveNav();
+});
 
 // ---------- AUTH STATE ----------
+supabaseClient.auth.onAuthStateChange((event, session) => {
+    console.log("Auth Event:", event);
 
-supabaseClient.auth.onAuthStateChange(
-    (event, session) => {
-
-        console.log(
-            "Auth Event:",
-            event
-        );
-
-        if (event === "SIGNED_OUT") {
-
-            localStorage.removeItem(
-                "neurolearn_username"
-            );
-
-        }
-
+    if (event === "SIGNED_OUT") {
+        localStorage.removeItem("neurolearn_username");
     }
-);
+});
 
 // ---------- DEBUG ----------
-
-console.log(
-    "✅ NeuroLearn Authentication Loaded"
-);
+console.log("✅ NeuroLearn Authentication Loaded");
