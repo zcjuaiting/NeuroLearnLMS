@@ -46,6 +46,13 @@ async function handleLogin() {
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
     const btn = document.getElementById('login-btn');
+   
+   const captcha = grecaptcha.getResponse();
+   
+   if (!captcha) {
+    showToast("Please complete the CAPTCHA.", "#FF6B6B");
+    return;
+   }
     
     if (!email) {
         showToast('Please enter your email address!', '#FF6B6B');
@@ -138,7 +145,7 @@ async function handleLogin() {
             
             const displayName = localStorage.getItem('neurolearn_display_name');
             showToast(`Welcome back, ${displayName}! 🎉`, '#4CAF7D');
-            
+       
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
             }, 800);
@@ -162,6 +169,12 @@ async function handleSignup() {
 
     const activeRoleBtn = document.querySelector('.role-btn.active');
     const role = activeRoleBtn ? activeRoleBtn.dataset.role : 'student';
+
+   const captcha = grecaptcha.getResponse();
+   if (!captcha) {
+        showToast("Please complete the CAPTCHA.", "#FF6B6B");
+        return;
+    }
 
     // ----- VALIDATION -----
     if (!displayName) {
