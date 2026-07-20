@@ -116,10 +116,10 @@
     </div>
     <div class="nav-right">
         <button class="icon-btn" title="Notifications" onclick="showToast('Notifications coming soon!')">🔔</button>
-        <div class="avatar-btn" onclick="showToast('Profile settings coming soon!')">
+        <a class="avatar-btn" href="student-profile.html">
             <div class="avatar-circle parent">👩</div>
-            <span id="parent-name-display">Paula</span>
-        </div>
+            <span id="parent-name-display">Parent</span>
+        </a>
     </div>
 </nav>
 
@@ -130,16 +130,16 @@
                 <div class="profile-avatar-lg parent">👩</div>
                 <div class="edit-avatar" onclick="showToast('Avatar editor coming soon!')">✏️</div>
             </div>
-            <h2 id="parent-full-name">Paula J. Johnson</h2>
+            <h2 id="parent-full-name">Parent</h2>
             <p>Parent · Linked Account</p>
             <div class="parent-badge">👨‍👩‍👦 Parent Account</div>
         </div>
         <div class="card">
             <div class="card-title"><span class="icon">ℹ️</span> Parent Info</div>
             <table class="info-table">
-                <tr><td>Full Name</td><td id="info-fullname">Paula J. Johnson</td></tr>
+                <tr><td>Full Name</td><td id="info-fullname">Parent</td></tr>
                 <tr><td>Relationship</td><td id="info-relationship">Mother</td></tr>
-                <tr><td>Email</td><td id="info-email">paula@email.com</td></tr>
+                <tr><td>Email</td><td id="info-email">parent@email.com</td></tr>
                 <tr><td>Joined</td><td id="info-joined">Sep 2024</td></tr>
             </table>
         </div>
@@ -148,7 +148,7 @@
             <a class="learner-card" href="student-profile.html">
                 <div class="lc-avatar">🧒</div>
                 <div class="lc-info">
-                    <h4 id="learner-name">Jake J. Johnson</h4>
+                    <h4 id="learner-name">Student</h4>
                     <p id="learner-stats">Grade 3 · Level 1 · 0 XP</p>
                 </div>
                 <span style="margin-left:auto;font-size:1.1rem;color:var(--teal);">→</span>
@@ -168,9 +168,9 @@
 
         <!-- PREFERENCES TAB -->
         <div id="tab-preferences" class="tab-panel active card">
-            <div class="card-title"><span class="icon">⚙️</span> Learning Preferences (for Jake)</div>
+            <div class="card-title"><span class="icon">⚙️</span> Learning Preferences (for <span id="pref-learner-name">Student</span>)</div>
             <div class="pref-row">
-                <div><div class="pref-label">Font Size</div><div class="pref-desc">Adjust Jake's text size</div></div>
+                <div><div class="pref-label">Font Size</div><div class="pref-desc">Adjust text size</div></div>
                 <select id="font-size-select" class="nl-select">
                     <option value="Small">Small</option>
                     <option value="Medium">Medium</option>
@@ -212,7 +212,7 @@
         <div id="tab-notifications" class="tab-panel card">
             <div class="card-title"><span class="icon">🔔</span> Notification Settings</div>
             <div class="pref-row">
-                <div><div class="pref-label">Daily Progress Summary</div><div class="pref-desc">Email each evening with Jake's activity</div></div>
+                <div><div class="pref-label">Daily Progress Summary</div><div class="pref-desc">Email each evening with activity</div></div>
                 <label class="toggle-switch"><input type="checkbox" id="daily-summary-toggle" checked><span class="toggle-slider"></span></label>
             </div>
             <div class="pref-row">
@@ -220,11 +220,11 @@
                 <label class="toggle-switch"><input type="checkbox" id="weekly-report-toggle" checked><span class="toggle-slider"></span></label>
             </div>
             <div class="pref-row">
-                <div><div class="pref-label">Achievement Alerts</div><div class="pref-desc">Notify when Jake earns a badge</div></div>
+                <div><div class="pref-label">Achievement Alerts</div><div class="pref-desc">Notify when learner earns a badge</div></div>
                 <label class="toggle-switch"><input type="checkbox" id="achievement-alerts-toggle" checked><span class="toggle-slider"></span></label>
             </div>
             <div class="pref-row">
-                <div><div class="pref-label">Missed Day Alert</div><div class="pref-desc">Remind if Jake skips a day</div></div>
+                <div><div class="pref-label">Missed Day Alert</div><div class="pref-desc">Remind if learner skips a day</div></div>
                 <label class="toggle-switch"><input type="checkbox" id="missed-day-toggle"><span class="toggle-slider"></span></label>
             </div>
             <div class="save-bar" style="padding:16px 0 0;display:flex;justify-content:flex-end;gap:12px;">
@@ -240,11 +240,11 @@
             <div class="card-title"><span class="icon">🔐</span> Account Settings</div>
             <div>
                 <label class="pref-label">Full Name</label>
-                <input type="text" id="account-fullname" value="Paula J. Johnson" class="nl-select" style="width:100%;margin-top:5px;">
+                <input type="text" id="account-fullname" value="Parent" class="nl-select" style="width:100%;margin-top:5px;">
             </div>
             <div class="mt-12">
                 <label class="pref-label">Email</label>
-                <input type="email" id="account-email" value="paula@email.com" class="nl-select" style="width:100%;margin-top:5px;">
+                <input type="email" id="account-email" value="parent@email.com" class="nl-select" style="width:100%;margin-top:5px;">
             </div>
             <div class="mt-12">
                 <label class="pref-label">Relationship</label>
@@ -278,7 +278,6 @@
             const { data: { user } } = await supabase.auth.getUser();
             
             if (user) {
-                // Get parent profile from database
                 const { data, error } = await supabase
                     .from('parent_profiles')
                     .select('*')
@@ -327,11 +326,9 @@
                     document.getElementById('achievement-alerts-toggle').checked = data.achievement_alerts !== false;
                     document.getElementById('missed-day-toggle').checked = data.missed_day_alert || false;
                 } else {
-                    // Create new profile if doesn't exist
                     await createParentProfile(user.id, user.email);
                 }
             } else {
-                // Use localStorage as fallback
                 loadFromLocalStorage();
             }
         } catch (error) {
@@ -341,6 +338,7 @@
         
         updateLearnerStats();
         updateRecentNotifications();
+        updateLearnerName();
     }
     
     // Create new parent profile
@@ -371,8 +369,15 @@
         
         if (!error && data) {
             currentParentId = data.id;
-            loadParentData(); // Reload to update UI
+            loadParentData();
         }
+    }
+    
+    // Update learner name from localStorage
+    function updateLearnerName() {
+        const displayName = localStorage.getItem('neurolearn_display_name') || 'Student';
+        document.getElementById('learner-name').textContent = displayName;
+        document.getElementById('pref-learner-name').textContent = displayName;
     }
     
     // Save preferences to Supabase
@@ -468,7 +473,6 @@
             console.error('Error saving account:', error);
             showToast('Error updating account! ❌', '#FF6B6B');
         } else {
-            // Update UI
             document.getElementById('parent-full-name').textContent = accountData.fullname;
             document.getElementById('info-fullname').textContent = accountData.fullname;
             document.getElementById('info-email').textContent = accountData.email;
@@ -499,7 +503,6 @@
             document.getElementById('account-relationship').value = savedRelationship;
         }
         
-        // Load preferences from localStorage
         const savedFontSize = localStorage.getItem('pref_font_size');
         if (savedFontSize) document.getElementById('font-size-select').value = savedFontSize;
         
@@ -548,26 +551,26 @@
     function updateLearnerStats() {
         const additionProgress = localStorage.getItem('progress_addition');
         const subtractionProgress = localStorage.getItem('progress_subtraction');
+        const plantProgress = localStorage.getItem('progress_plant');
+        const readingProgress = localStorage.getItem('progress_reading');
+        const ancientProgress = localStorage.getItem('progress_ancient');
         
-        let additionCorrect = 0;
-        let subtractionCorrect = 0;
+        let totalXP = 0;
+        let completed = 0;
         
-        if (additionProgress) {
-            try {
-                const progress = JSON.parse(additionProgress);
-                additionCorrect = progress.correctCount || 0;
-            } catch(e) {}
-        }
-        if (subtractionProgress) {
-            try {
-                const progress = JSON.parse(subtractionProgress);
-                subtractionCorrect = progress.correctCount || 0;
-            } catch(e) {}
-        }
+        const allProgress = [additionProgress, subtractionProgress, plantProgress, readingProgress, ancientProgress];
         
-        const totalXP = (additionCorrect * 10) + (subtractionCorrect * 10);
+        allProgress.forEach(progress => {
+            if (progress) {
+                try {
+                    const data = JSON.parse(progress);
+                    totalXP += (data.correctCount || 0) * 10;
+                    if (data.completed) completed++;
+                } catch(e) {}
+            }
+        });
+        
         const level = Math.floor(totalXP / 100) + 1;
-        
         document.getElementById('learner-stats').textContent = `Grade 3 · Level ${level} · ${totalXP} XP`;
     }
     
@@ -580,8 +583,10 @@
         if (additionProgress) {
             try {
                 const progress = JSON.parse(additionProgress);
-                if (progress.correctCount === 10) {
-                    notifications.push({ text: 'Jake earned "Math Wizard" badge! 🥇', time: 'Recently', color: 'green' });
+                if (progress.correctCount === 5) {
+                    notifications.push({ text: 'Learner completed Addition with 100%! 🎉', time: 'Recently', color: 'green' });
+                } else if (progress.correctCount > 0) {
+                    notifications.push({ text: `Learner scored ${progress.correctCount}/5 on Addition`, time: 'Recently', color: 'blue' });
                 }
             } catch(e) {}
         }
@@ -590,8 +595,10 @@
         if (subtractionProgress) {
             try {
                 const progress = JSON.parse(subtractionProgress);
-                if (progress.correctCount === 10) {
-                    notifications.push({ text: 'Jake earned "Perfect Score" badge! 🎯', time: 'Recently', color: 'blue' });
+                if (progress.correctCount === 5) {
+                    notifications.push({ text: 'Learner completed Subtraction with 100%! 🎯', time: 'Recently', color: 'green' });
+                } else if (progress.correctCount > 0) {
+                    notifications.push({ text: `Learner scored ${progress.correctCount}/5 on Subtraction`, time: 'Recently', color: 'blue' });
                 }
             } catch(e) {}
         }
@@ -601,7 +608,7 @@
         }
         
         notificationsDiv.innerHTML = '';
-        notifications.forEach(notif => {
+        notifications.slice(0, 3).forEach(notif => {
             const notifItem = document.createElement('div');
             notifItem.className = 'notif-item';
             notifItem.innerHTML = `
@@ -641,11 +648,16 @@
     }
     
     // Load data on page load
-    document.addEventListener('DOMContentLoaded', () => {
-        const studentUsername = localStorage.getItem('neurolearn_username');
-        if (studentUsername) {
-            document.getElementById('learner-name').textContent = studentUsername + ' J. Johnson';
-        }
+    document.addEventListener('DOMContentLoaded', function() {
+        // Update learner name from localStorage
+        updateLearnerName();
+        
+        // Update parent name from localStorage
+        const parentName = localStorage.getItem('parent_display_name') || 'Parent';
+        document.getElementById('parent-name-display').textContent = parentName;
+        document.getElementById('parent-full-name').textContent = parentName;
+        document.getElementById('info-fullname').textContent = parentName;
+        document.getElementById('account-fullname').value = parentName;
         
         loadParentData();
     });
