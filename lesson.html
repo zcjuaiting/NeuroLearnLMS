@@ -151,10 +151,10 @@
     </div>
     <div class="nav-right">
         <button class="icon-btn" title="Notifications" onclick="showToast('Notifications coming soon!')">🔔</button>
-        <div class="avatar-btn" onclick="showToast('Profile settings coming soon!')">
+        <a class="avatar-btn" href="student-profile.html">
             <div class="avatar-circle">🧒</div>
-            <span id="lesson-username">Jake</span>
-        </div>
+            <span id="lesson-username">Student</span>
+        </a>
     </div>
 </nav>
 
@@ -329,9 +329,250 @@
     let wrongCount = 0;
     let timerVal = 30;
     let timerInt = null;
+    let lessonDatabaseId = null;
+
+    // ---- HELPER: Wait for Supabase ----
+    function waitForSupabase() {
+        return new Promise((resolve) => {
+            if (typeof supabase !== 'undefined' && supabase && supabase.auth) {
+                resolve(supabase);
+                return;
+            }
+            if (typeof window.supabaseClient !== 'undefined' && window.supabaseClient && window.supabaseClient.auth) {
+                resolve(window.supabaseClient);
+                return;
+            }
+            setTimeout(() => waitForSupabase().then(resolve), 500);
+        });
+    }
+
+    // ---- GET LESSON ID FROM SUPABASE ----
+    async function getLessonId() {
+        try {
+            const supabaseClient = await waitForSupabase();
+            if (!supabaseClient) return null;
+            
+            const { data, error } = await supabaseClient
+                .from('lessons')
+                .select('id')
+                .eq('lesson_key', lessonKey)
+                .single();
+            
+            if (error) {
+                console.error('Error getting lesson ID:', error);
+                return null;
+            }
+            return data ? data.id : null;
+        } catch (error) {
+            console.error('Error:', error);
+            return null;
+        }
+    }
+
+    // ---- SAVE PROGRESS TO SUPABASE ----
+    async function saveProgressToSupabase() {
+        try {
+            const supabaseClient = await waitForSupabase();
+            if (!supabaseClient) {
+                saveProgressToLocalStorage();
+                return;
+            }
+
+            // Get current user
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) {
+                saveProgressToLocalStorage();
+                return;
+            }
+
+            // Get lesson ID if not already cached
+            if (!lessonDatabaseId) {
+                lessonDatabaseId = await getLessonId();
+                if (!lessonDatabaseId) {
+                    saveProgressToLocalStorage();
+                    return;
+                }
+            }
+
+            const answeredCount = answers.filter(a => a !== null).length;
+            const progress = {
+                progress_percentage: Math.round((answeredCount / QUESTIONS.length) * 100),
+                status: answers.every(a => a !== null) ? 'completed' : 'in_progress',
+                score: correctCount,
+                correct_count: correctCount,
+                wrong_count: wrongCount,
+                answers: answers,
+                last_accessed: new Date().toISOString(),
+                completed_at: answers.every(a => a !== null) ? new Date().toISOString() : null
+            };
+
+            // Check if progress exists
+            const { data: existingProgress } = await supabaseClient
+                .from('user_progress')
+                .select('id')
+                .eq('user_id', user.id)
+                .eq('lesson_id', lessonDatabaseId)
+                .single();
+
+            let result;
+            if (existingProgress) {
+                // Update existing progress
+                result = await supabaseClient
+                    .from('user_progress')
+                    .update(progress)
+                    .eq('id', existingProgress.id);
+            } else {
+                // Insert new progress
+                result = await supabaseClient
+                    .from('user_progress')
+                    .insert({
+                        user_id: user.id,
+                        lesson_id: lessonDatabaseId,
+                        ...progress
+                    });
+            }
+
+            if (result.error) {
+                console.error('Error saving to Supabase:', result.error);
+            } else {
+                console.log('✅ Progress saved to Supabase');
+            }
+
+            // Also save to localStorage as backup
+            saveProgressToLocalStorage();
+
+        } catch (error) {
+            console.error('Error saving progress:', error);
+            saveProgressToLocalStorage();
+        }
+    }
+
+    // ---- SAVE PROGRESS TO LOCALSTORAGE (BACKUP) ----
+    function saveProgressToLocalStorage() {
+        const progress = {
+            answers: answers,
+            correctCount: correctCount,
+            wrongCount: wrongCount,
+            completed: answers.every(a => a !== null)
+        };
+        localStorage.setItem(`progress_${lessonKey}`, JSON.stringify(progress));
+        
+        let pct = Math.round((answers.filter(a => a !== null).length / QUESTIONS.length) * 100);
+        if (pct > 100) pct = 100;
+        localStorage.setItem(`progress_${lessonKey}_pct`, pct);
+    }
+
+    // ---- LOAD PROGRESS FROM SUPABASE ----
+    async function loadProgressFromSupabase() {
+        try {
+            const supabaseClient = await waitForSupabase();
+            if (!supabaseClient) {
+                loadProgressFromLocalStorage();
+                return;
+            }
+
+            // Get current user
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) {
+                loadProgressFromLocalStorage();
+                return;
+            }
+
+            // Get lesson ID
+            if (!lessonDatabaseId) {
+                lessonDatabaseId = await getLessonId();
+                if (!lessonDatabaseId) {
+                    loadProgressFromLocalStorage();
+                    return;
+                }
+            }
+
+            // Get progress from Supabase
+            const { data: progress, error } = await supabaseClient
+                .from('user_progress')
+                .select('*')
+                .eq('user_id', user.id)
+                .eq('lesson_id', lessonDatabaseId)
+                .single();
+
+            if (error && error.code !== 'PGRST116') {
+                console.error('Error loading progress:', error);
+                loadProgressFromLocalStorage();
+                return;
+            }
+
+            if (progress) {
+                answers = progress.answers || new Array(QUESTIONS.length).fill(null);
+                correctCount = progress.correct_count || 0;
+                wrongCount = progress.wrong_count || 0;
+                updateScore();
+                
+                document.querySelectorAll('.q-item').forEach((el, i) => {
+                    if (answers[i] === true) el.classList.add('done');
+                    else if (answers[i] !== null) el.classList.add('wrong');
+                });
+                
+                console.log('✅ Progress loaded from Supabase');
+            } else {
+                // No progress in Supabase, check localStorage
+                loadProgressFromLocalStorage();
+            }
+
+        } catch (error) {
+            console.error('Error loading progress:', error);
+            loadProgressFromLocalStorage();
+        }
+    }
+
+    // ---- LOAD PROGRESS FROM LOCALSTORAGE (BACKUP) ----
+    function loadProgressFromLocalStorage() {
+        const saved = localStorage.getItem(`progress_${lessonKey}`);
+        if (saved) {
+            try {
+                const progress = JSON.parse(saved);
+                answers = progress.answers || new Array(QUESTIONS.length).fill(null);
+                correctCount = progress.correctCount || 0;
+                wrongCount = progress.wrongCount || 0;
+                updateScore();
+                
+                document.querySelectorAll('.q-item').forEach((el, i) => {
+                    if (answers[i] === true) el.classList.add('done');
+                    else if (answers[i] !== null) el.classList.add('wrong');
+                });
+            } catch(e) {
+                console.log('No saved progress found in localStorage');
+            }
+        }
+    }
+
+    // ---- CLEAR PROGRESS FROM SUPABASE ----
+    async function clearProgressFromSupabase() {
+        try {
+            const supabaseClient = await waitForSupabase();
+            if (!supabaseClient) return;
+            
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) return;
+            
+            if (!lessonDatabaseId) {
+                lessonDatabaseId = await getLessonId();
+                if (!lessonDatabaseId) return;
+            }
+            
+            await supabaseClient
+                .from('user_progress')
+                .delete()
+                .eq('user_id', user.id)
+                .eq('lesson_id', lessonDatabaseId);
+                
+            console.log('✅ Progress cleared from Supabase');
+        } catch (error) {
+            console.error('Error clearing progress:', error);
+        }
+    }
 
     // Initialize lesson
-    function initLesson() {
+    async function initLesson() {
         // Update UI with lesson info
         document.getElementById('lesson-title').textContent = lesson.title;
         document.getElementById('lesson-desc').textContent = lesson.subject;
@@ -345,8 +586,8 @@
         buildQuestionList();
         renderQuestion(0);
         
-        // Load saved progress
-        loadProgress();
+        // Load saved progress from Supabase
+        await loadProgressFromSupabase();
     }
 
     function buildQuestionList() {
@@ -397,7 +638,7 @@
         resetTimer();
     }
 
-    function answer(choiceIdx) {
+    async function answer(choiceIdx) {
         const q = QUESTIONS[current];
         const isCorrect = choiceIdx === q.correct;
         answers[current] = isCorrect;
@@ -430,8 +671,8 @@
         items[current].classList.remove('active');
         items[current].classList.add(isCorrect ? 'done' : 'wrong');
         
-        // Save progress
-        saveProgress();
+        // Save progress to Supabase
+        await saveProgressToSupabase();
     }
 
     function updateScore() {
@@ -447,41 +688,6 @@
         if (ovPct > 100) ovPct = 100;
         document.getElementById('overall-bar').style.width = ovPct + '%';
         document.getElementById('overall-pct').textContent = ovPct + '%';
-    }
-
-    function saveProgress() {
-        const progress = {
-            answers: answers,
-            correctCount: correctCount,
-            wrongCount: wrongCount,
-            completed: answers.every(a => a !== null)
-        };
-        localStorage.setItem(`progress_${lessonKey}`, JSON.stringify(progress));
-        
-        // Calculate progress percentage, cap at 100%
-        let pct = Math.round((answers.filter(a => a !== null).length / QUESTIONS.length) * 100);
-        if (pct > 100) pct = 100;
-        localStorage.setItem(`progress_${lessonKey}_pct`, pct);
-    }
-
-    function loadProgress() {
-        const saved = localStorage.getItem(`progress_${lessonKey}`);
-        if (saved) {
-            try {
-                const progress = JSON.parse(saved);
-                answers = progress.answers || new Array(QUESTIONS.length).fill(null);
-                correctCount = progress.correctCount || 0;
-                wrongCount = progress.wrongCount || 0;
-                updateScore();
-                
-                document.querySelectorAll('.q-item').forEach((el, i) => {
-                    if (answers[i] === true) el.classList.add('done');
-                    else if (answers[i] !== null) el.classList.add('wrong');
-                });
-            } catch(e) {
-                console.log('No saved progress found');
-            }
-        }
     }
 
     function nextQ() {
@@ -533,7 +739,7 @@
                         if (i === QUESTIONS[current].correct) b.classList.add('correct');
                     });
                     showToast('⏰ Time\'s up!');
-                    saveProgress();
+                    saveProgressToSupabase();
                 }
             }
         }, 1000);
@@ -550,7 +756,7 @@
         document.getElementById('result-modal').classList.add('show');
     }
 
-    function restartLesson() {
+    async function restartLesson() {
         if (confirm(`Are you sure you want to restart the ${lesson.title} lesson? This will reset your progress.`)) {
             document.getElementById('result-modal').classList.remove('show');
             current = 0;
@@ -559,7 +765,8 @@
             wrongCount = 0;
             updateScore();
             
-            // Clear all progress for this lesson
+            // Clear all progress from Supabase and localStorage
+            await clearProgressFromSupabase();
             localStorage.removeItem(`progress_${lessonKey}`);
             localStorage.removeItem(`progress_${lessonKey}_pct`);
             
@@ -570,6 +777,12 @@
 
     // Initialize
     initLesson();
+
+    // Load username on lesson page
+    document.addEventListener('DOMContentLoaded', function() {
+        var displayName = localStorage.getItem('neurolearn_display_name') || 'Student';
+        document.getElementById('lesson-username').textContent = displayName;
+    });
 </script>
 </body>
 </html>
