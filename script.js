@@ -1,6 +1,27 @@
 /* ============================================================
-   NeuroLearn – Complete Shared JavaScript (PRESENTATION MODE)
+   NeuroLearn – Complete Shared JavaScript
    ============================================================ */
+
+// ---- CHECK IF SUPABASE IS LOADED ----
+console.log("🔵 script.js loaded");
+
+// Wait for supabase to be available
+function waitForSupabase() {
+    return new Promise((resolve) => {
+        if (typeof supabase !== 'undefined' && supabase && supabase.auth) {
+            resolve(supabase);
+            return;
+        }
+        if (typeof window.supabaseClient !== 'undefined' && window.supabaseClient && window.supabaseClient.auth) {
+            // Use the client from window
+            var supabase = window.supabaseClient;
+            resolve(supabase);
+            return;
+        }
+        // Check again in 500ms
+        setTimeout(() => waitForSupabase().then(resolve), 500);
+    });
+}
 
 // ---- Toast Notification ----
 let _toastTimer;
@@ -17,28 +38,11 @@ function showToast(msg, color) {
 }
 
 // ============================================
-// CLEAR ALL PROGRESS
+// SUPABASE AUTHENTICATION FUNCTIONS
 // ============================================
 
-function clearAllProgress() {
-    console.log('🔵 Clearing all progress data...');
-    const lessonKeys = ['addition', 'subtraction', 'plant', 'reading', 'ancient'];
-    lessonKeys.forEach(key => {
-        localStorage.removeItem(`progress_${key}`);
-        localStorage.removeItem(`progress_${key}_pct`);
-    });
-    localStorage.removeItem('currentLesson');
-    localStorage.removeItem('currentLessonData');
-    console.log('✅ All progress cleared!');
-}
-
-// ============================================
-// LOGIN WITH SUPABASE (ALWAYS PROCEEDS TO DASHBOARD)
-// ============================================
-
+// ---- LOGIN WITH SUPABASE ----
 async function handleLogin() {
-    console.log('🔵 handleLogin() called (PRESENTATION MODE)');
-    
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
     const btn = document.getElementById('login-btn');
@@ -59,66 +63,97 @@ async function handleLogin() {
     btn.disabled = true;
     
     try {
-        // Try Supabase login (silent - won't block dashboard)
-        try {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email: email,
-                password: password
-            });
-            
-            if (error) {
-                console.warn('⚠️ Supabase login error (continuing to dashboard):', error.message);
-            } else if (data.user) {
-                console.log('✅ Supabase user logged in:', data.user.id);
-            }
-        } catch (err) {
-            console.warn('⚠️ Supabase error (continuing to dashboard):', err);
+        // Wait for supabase to be available
+        const supabaseClient = await waitForSupabase();
+        
+        if (!supabaseClient || !supabaseClient.auth) {
+            showToast('Supabase not ready. Please refresh.', '#FF6B6B');
+            btn.textContent = 'Login';
+            btn.disabled = false;
+            return;
         }
         
-        // ✅ ALWAYS PROCEED TO DASHBOARD
-        // Use email prefix as display name
-        const displayName = email.split('@')[0];
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
         
-        localStorage.setItem('neurolearn_display_name', displayName);
-        localStorage.setItem('neurolearn_user_email', email);
-        localStorage.setItem('neurolearn_user_id', 'demo_user_' + Date.now());
-        localStorage.setItem('neurolearn_level', '1');
-        localStorage.setItem('neurolearn_xp', '0');
+        if (error) {
+            if (error.message.includes('Invalid login credentials')) {
+                showToast('Invalid email or password. Please try again.', '#FF6B6B');
+            } else if (error.message.includes('Email not confirmed')) {
+                showToast('Please verify your email before logging in. 📧', '#FF8C42');
+            } else {
+                showToast(error.message, '#FF6B6B');
+            }
+            btn.textContent = 'Login';
+            btn.disabled = false;
+            return;
+        }
         
-        showToast(`Welcome back, ${displayName}! 🎉`, '#4CAF7D');
-        
-        setTimeout(() => {
-            window.location.href = 'dashboard.html';
-        }, 800);
-        
+        if (data.user) {
+            console.log('✅ User logged in:', data.user.id);
+            
+            // Get user data from users table
+            const { data: userData, error: userError } = await supabaseClient
+                .from('users')
+                .select('display_name, level, xp')
+                .eq('id', data.user.id)
+                .single();
+            
+            if (userError) {
+                console.warn('⚠️ User not found in users table, creating record...');
+                
+                const displayName = email.split('@')[0];
+                const { error: insertError } = await supabaseClient
+                    .from('users')
+                    .insert({
+                        id: data.user.id,
+                        email: email,
+                        display_name: displayName,
+                        role: 'student',
+                        level: 1,
+                        xp: 0,
+                        streak_days: 0
+                    });
+                
+                if (insertError) {
+                    console.error('Error inserting user:', insertError);
+                } else {
+                    console.log('✅ User inserted into users table');
+                }
+                
+                localStorage.setItem('neurolearn_display_name', displayName);
+                localStorage.setItem('neurolearn_level', '1');
+                localStorage.setItem('neurolearn_xp', '0');
+            } else {
+                const displayName = userData.display_name || email.split('@')[0];
+                localStorage.setItem('neurolearn_display_name', displayName);
+                localStorage.setItem('neurolearn_level', userData.level || 1);
+                localStorage.setItem('neurolearn_xp', userData.xp || 0);
+            }
+            
+            localStorage.setItem('neurolearn_user_email', email);
+            localStorage.setItem('neurolearn_user_id', data.user.id);
+            
+            const displayName = localStorage.getItem('neurolearn_display_name');
+            showToast(`Welcome back, ${displayName}! 🎉`, '#4CAF7D');
+            
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 800);
+        }
     } catch (error) {
-        console.warn('⚠️ Login error, but redirecting to dashboard:', error);
-        // Even on error, proceed to dashboard
-        const displayName = email.split('@')[0];
-        localStorage.setItem('neurolearn_display_name', displayName);
-        localStorage.setItem('neurolearn_user_email', email);
-        localStorage.setItem('neurolearn_user_id', 'demo_user_' + Date.now());
-        localStorage.setItem('neurolearn_level', '1');
-        localStorage.setItem('neurolearn_xp', '0');
-        
-        showToast(`Welcome, ${displayName}! 🎉`, '#4CAF7D');
-        
-        setTimeout(() => {
-            window.location.href = 'dashboard.html';
-        }, 800);
+        console.error('💥 Login error:', error);
+        showToast('An error occurred. Please try again.', '#FF6B6B');
     } finally {
         btn.textContent = 'Login';
         btn.disabled = false;
     }
 }
 
-// ============================================
-// SIGNUP WITH SUPABASE (ALWAYS PROCEEDS TO DASHBOARD)
-// ============================================
-
+// ---- SIGNUP WITH SUPABASE ----
 async function handleSignup() {
-    console.log('🔵 handleSignup() called (PRESENTATION MODE)');
-    
     const displayName = document.getElementById('signup-displayname').value.trim();
     const email = document.getElementById('signup-email').value.trim();
     const password = document.getElementById('signup-password').value;
@@ -166,74 +201,191 @@ async function handleSignup() {
         return;
     }
 
-    console.log('✅ All validations passed!');
-
     btn.textContent = 'Creating account...';
     btn.disabled = true;
 
     try {
-        // 🟢 CLEAR ALL OLD PROGRESS FOR NEW USER
-        clearAllProgress();
+        // Wait for supabase to be available
+        const supabaseClient = await waitForSupabase();
         
-        // Try Supabase signup (silent - won't block dashboard)
-        try {
-            console.log('🔄 Trying Supabase signup...');
-            const { data, error } = await supabase.auth.signUp({
-                email: email,
-                password: password,
-                options: {
-                    data: {
-                        display_name: displayName,
-                        role: role
-                    }
+        if (!supabaseClient || !supabaseClient.auth) {
+            showToast('Supabase not ready. Please refresh.', '#FF6B6B');
+            btn.textContent = 'Create Account';
+            btn.disabled = false;
+            return;
+        }
+        
+        console.log('🔵 Attempting Supabase auth signup...');
+        
+        const { data, error } = await supabaseClient.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+                data: {
+                    display_name: displayName,
+                    role: role
                 }
-            });
-            
-            if (error) {
-                console.warn('⚠️ Supabase signup error (continuing to dashboard):', error.message);
-            } else if (data.user) {
-                console.log('✅ Supabase user created:', data.user.id);
             }
-        } catch (err) {
-            console.warn('⚠️ Supabase error (continuing to dashboard):', err);
+        });
+
+        if (error) {
+            console.error('🔴 Supabase auth error:', error);
+            if (error.message.includes('User already registered')) {
+                showToast('This email is already registered. Please login instead.', '#FF8C42');
+            } else {
+                showToast(error.message, '#FF6B6B');
+            }
+            btn.textContent = 'Create Account';
+            btn.disabled = false;
+            return;
         }
 
-        // ✅ ALWAYS PROCEED TO DASHBOARD - USE THE DISPLAY NAME FROM FORM
-        localStorage.setItem('neurolearn_display_name', displayName);
-        localStorage.setItem('neurolearn_user_email', email);
-        localStorage.setItem('neurolearn_user_id', 'demo_user_' + Date.now());
-        localStorage.setItem('neurolearn_level', '1');
-        localStorage.setItem('neurolearn_xp', '0');
+        if (data && data.user) {
+            console.log('✅ Supabase user created:', data.user.id);
+            
+            try {
+                // Check if user already exists in users table
+                const { data: existingUser } = await supabaseClient
+                    .from('users')
+                    .select('id')
+                    .eq('id', data.user.id)
+                    .single();
 
-        showToast(`Account created successfully, ${displayName}! 🎉`, '#4CAF7D');
-        
-        setTimeout(() => {
-            window.location.href = 'dashboard.html';
-        }, 800);
+                if (!existingUser) {
+                    const { error: insertError } = await supabaseClient
+                        .from('users')
+                        .insert({
+                            id: data.user.id,
+                            email: email,
+                            display_name: displayName,
+                            role: role,
+                            level: 1,
+                            xp: 0,
+                            streak_days: 0
+                        });
 
+                    if (insertError) {
+                        console.warn('⚠️ Could not insert into users table:', insertError.message);
+                    } else {
+                        console.log('✅ User inserted into users table');
+                    }
+                }
+            } catch (err) {
+                console.warn('⚠️ User insertion check failed:', err.message);
+            }
+
+            localStorage.setItem('neurolearn_display_name', displayName);
+            localStorage.setItem('neurolearn_user_email', email);
+            localStorage.setItem('neurolearn_user_id', data.user.id);
+            localStorage.setItem('neurolearn_level', '1');
+            localStorage.setItem('neurolearn_xp', '0');
+
+            if (data.session) {
+                showToast(`Account created successfully, ${displayName}! 🎉`, '#4CAF7D');
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 800);
+            } else {
+                showToast('Account created! Please check your email to confirm your account. 📧', '#4CAF7D');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 3000);
+            }
+        } else {
+            showToast('Something went wrong. Please try again.', '#FF6B6B');
+            btn.textContent = 'Create Account';
+            btn.disabled = false;
+        }
     } catch (error) {
-        console.warn('⚠️ Error, but redirecting to dashboard:', error);
-        // Even on error, proceed to dashboard
-        localStorage.setItem('neurolearn_display_name', displayName);
-        localStorage.setItem('neurolearn_user_email', email);
-        localStorage.setItem('neurolearn_user_id', 'demo_user_' + Date.now());
-        localStorage.setItem('neurolearn_level', '1');
-        localStorage.setItem('neurolearn_xp', '0');
-
-        showToast(`Account created successfully, ${displayName}! 🎉`, '#4CAF7D');
-        
-        setTimeout(() => {
-            window.location.href = 'dashboard.html';
-        }, 800);
+        console.error('💥 Signup error:', error);
+        showToast('An error occurred. Please try again.', '#FF6B6B');
+        btn.textContent = 'Create Account';
+        btn.disabled = false;
     } finally {
         btn.textContent = 'Create Account';
         btn.disabled = false;
     }
 }
 
+// ---- AUTO-LOGIN CHECK ----
+async function checkAuthAndRedirect() {
+    try {
+        // Wait for supabase to be available
+        const supabaseClient = await waitForSupabase();
+        
+        if (!supabaseClient || !supabaseClient.auth) {
+            console.warn('⚠️ supabase not available for auth check');
+            return;
+        }
+        
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
+        if (session) {
+            const displayName = localStorage.getItem('neurolearn_display_name') || 
+                               session.user.email.split('@')[0];
+            localStorage.setItem('neurolearn_display_name', displayName);
+            localStorage.setItem('neurolearn_user_email', session.user.email);
+            localStorage.setItem('neurolearn_user_id', session.user.id);
+            
+            const currentPage = window.location.pathname.split('/').pop();
+            if (currentPage === 'index.html' || currentPage === 'signup.html' || currentPage === '') {
+                window.location.href = 'dashboard.html';
+            }
+        }
+    } catch (error) {
+        console.error('Auth check error:', error);
+    }
+}
+
+// ---- CHECK IF USER IS LOGGED IN ----
+async function checkAuth() {
+    try {
+        const supabaseClient = await waitForSupabase();
+        if (!supabaseClient || !supabaseClient.auth) {
+            return false;
+        }
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        return !!session;
+    } catch (error) {
+        console.error('Auth check error:', error);
+        return false;
+    }
+}
+
+// ---- LOGOUT ----
+async function showLogout() {
+    try {
+        const supabaseClient = await waitForSupabase();
+        if (supabaseClient && supabaseClient.auth) {
+            const { error } = await supabaseClient.auth.signOut();
+            if (error) console.error('Logout error:', error);
+        }
+    } catch (error) {
+        console.error('Logout error:', error);
+    }
+    localStorage.removeItem('neurolearn_display_name');
+    localStorage.removeItem('neurolearn_user_email');
+    localStorage.removeItem('neurolearn_user_id');
+    localStorage.removeItem('neurolearn_level');
+    localStorage.removeItem('neurolearn_xp');
+    window.location.href = 'index.html';
+    showToast('Logged out successfully 👋');
+}
+
 // ============================================
-// SELECT ROLE
+// NAVIGATION FUNCTIONS
 // ============================================
+
+function goToDashboard() {
+    checkAuth().then(isLoggedIn => {
+        if (isLoggedIn) {
+            window.location.href = 'dashboard.html';
+        } else {
+            showToast('Please login first!', '#FF6B6B');
+            window.location.href = 'index.html';
+        }
+    });
+}
 
 function selectRole(btn) {
     document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
@@ -241,7 +393,7 @@ function selectRole(btn) {
 }
 
 // ============================================
-// LOAD USER INFO ON DASHBOARD
+// LOAD USER INFO (FIXED - No "J. Johnson")
 // ============================================
 
 function loadUserInfo() {
@@ -258,82 +410,10 @@ function loadUserInfo() {
     if (studentName) {
         studentName.textContent = displayName;
     }
-    
     const infoName = document.getElementById('info-name');
     if (infoName) {
         infoName.textContent = displayName;
     }
-}
-
-// ============================================
-// AUTO-LOGIN CHECK
-// ============================================
-
-async function checkAuthAndRedirect() {
-    try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-            const displayName = localStorage.getItem('neurolearn_display_name') || session.user.email.split('@')[0];
-            localStorage.setItem('neurolearn_display_name', displayName);
-            localStorage.setItem('neurolearn_user_email', session.user.email);
-            localStorage.setItem('neurolearn_user_id', session.user.id);
-            
-            const currentPage = window.location.pathname.split('/').pop();
-            if (currentPage === 'index.html' || currentPage === 'signup.html' || currentPage === '') {
-                window.location.href = 'dashboard.html';
-            }
-        }
-    } catch (error) {
-        console.error('Auth check error:', error);
-    }
-}
-
-// ============================================
-// CHECK IF USER IS LOGGED IN
-// ============================================
-
-async function checkAuth() {
-    try {
-        const { data: { session } } = await supabase.auth.getSession();
-        return !!session;
-    } catch (error) {
-        return false;
-    }
-}
-
-// ============================================
-// LOGOUT
-// ============================================
-
-async function showLogout() {
-    try {
-        await supabase.auth.signOut();
-    } catch (error) {
-        console.error('Logout error:', error);
-    }
-    localStorage.removeItem('neurolearn_display_name');
-    localStorage.removeItem('neurolearn_user_email');
-    localStorage.removeItem('neurolearn_user_id');
-    localStorage.removeItem('neurolearn_level');
-    localStorage.removeItem('neurolearn_xp');
-    clearAllProgress();
-    window.location.href = 'index.html';
-    showToast('Logged out successfully 👋');
-}
-
-// ============================================
-// GO TO DASHBOARD
-// ============================================
-
-function goToDashboard() {
-    checkAuth().then(isLoggedIn => {
-        if (isLoggedIn) {
-            window.location.href = 'dashboard.html';
-        } else {
-            showToast('Please login first!', '#FF6B6B');
-            window.location.href = 'index.html';
-        }
-    });
 }
 
 // ============================================
@@ -367,17 +447,13 @@ function filterLessons(subject, difficulty) {
 }
 
 // ============================================
-// START LESSON
+// LESSON FUNCTIONS
 // ============================================
 
 function startLesson(lessonType) {
     localStorage.setItem('currentLesson', lessonType);
     window.location.href = 'lesson.html';
 }
-
-// ============================================
-// LOAD LESSON PROGRESS
-// ============================================
 
 function loadLessonProgress() {
     const lessons = [
@@ -391,6 +467,15 @@ function loadLessonProgress() {
     lessons.forEach(lesson => {
         let pct = parseInt(localStorage.getItem(`progress_${lesson.id}_pct`)) || 0;
         if (pct > 100) pct = 100;
+
+        const savedProgress = localStorage.getItem(`progress_${lesson.id}`);
+        let completed = false;
+        if (savedProgress) {
+            try {
+                const progress = JSON.parse(savedProgress);
+                completed = progress.completed || false;
+            } catch(e) {}
+        }
 
         const progressEl = document.getElementById(lesson.progressEl);
         const barEl = document.getElementById(lesson.barEl);
@@ -424,7 +509,7 @@ function loadLessonProgress() {
 }
 
 // ============================================
-// ANIMATE PROGRESS BARS
+// ANIMATION FUNCTIONS
 // ============================================
 
 function animateProgressBars() {
@@ -443,7 +528,7 @@ function animateProgressBars() {
 }
 
 // ============================================
-// FONT SIZE PREFERENCE
+// PREFERENCE FUNCTIONS
 // ============================================
 
 function applyFontSize(val) {
@@ -453,7 +538,7 @@ function applyFontSize(val) {
 }
 
 // ============================================
-// SET ACTIVE NAVIGATION
+// NAVIGATION LINK ACTIVE STATE
 // ============================================
 
 function setActiveNav() {
