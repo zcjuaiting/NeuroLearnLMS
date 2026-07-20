@@ -121,10 +121,10 @@
     </div>
     <div class="nav-right">
         <button class="icon-btn" title="Notifications" onclick="showToast('Notifications coming soon!')">🔔</button>
-        <div class="avatar-btn" onclick="showToast('Profile settings coming soon!')">
+        <a class="avatar-btn" href="student-profile.html">
             <div class="avatar-circle">🧒</div>
-            <span id="profile-username">Jake</span>
-        </div>
+            <span id="profile-username">Student</span>
+        </a>
     </div>
 </nav>
 
@@ -135,7 +135,7 @@
                 <div class="profile-avatar-lg student">🧒</div>
                 <div class="edit-avatar" onclick="showToast('Avatar editor coming soon!')">✏️</div>
             </div>
-            <h2 id="student-name">Jake J. Johnson</h2>
+            <h2 id="student-name">Student</h2>
             <p>Student · Grade 3</p>
             <div class="xp-badge" id="xp-badge">⭐ Level 1 · 0 XP</div>
             <div class="level-bar-wrap mt-12">
@@ -146,7 +146,7 @@
         <div class="card">
             <div class="card-title"><span class="icon">ℹ️</span> Student Info</div>
             <table class="info-table">
-                <tr><td>Full Name</td><td id="info-name">Jake J. Johnson</td></tr>
+                <tr><td>Full Name</td><td id="info-name">Student</td></tr>
                 <tr><td>Birthday</td><td>01/01/2018</td></tr>
                 <tr><td>Grade</td><td>Grade 3</td></tr>
                 <tr><td>Joined</td><td>Sep 2024</td></tr>
@@ -466,14 +466,22 @@
         btn.classList.add('active');
     }
     
-    // Load username and progress on page load
-    document.addEventListener('DOMContentLoaded', () => {
-        // Load username from localStorage
-        const username = localStorage.getItem('neurolearn_username');
-        if (username) {
-            document.getElementById('profile-username').textContent = username;
-            document.getElementById('student-name').textContent = username + ' J. Johnson';
-            document.getElementById('info-name').textContent = username + ' J. Johnson';
+    // Load user info and progress on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // ✅ FIXED: Use neurolearn_display_name instead of neurolearn_username
+        var displayName = localStorage.getItem('neurolearn_display_name') || 'Student';
+        
+        console.log('🔵 Student Profile - Display Name:', displayName);
+        
+        // Update all name fields - NO "J. Johnson" suffix!
+        document.getElementById('profile-username').textContent = displayName;
+        document.getElementById('student-name').textContent = displayName;
+        document.getElementById('info-name').textContent = displayName;
+        
+        // Also update the avatar link in the nav
+        const navAvatar = document.querySelector('.avatar-btn span');
+        if (navAvatar) {
+            navAvatar.textContent = displayName;
         }
         
         // Load real progress data
