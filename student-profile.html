@@ -106,6 +106,78 @@
         .achievement-earned { background: rgba(255,217,61,0.1) !important; }
         .achievement-green { background: rgba(76,175,125,0.1) !important; }
         .achievement-orange { background: rgba(255,140,66,0.1) !important; }
+
+        .child-code-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: rgba(46,140,140,0.08);
+            border-radius: var(--radius-sm);
+            border: 2px dashed var(--teal);
+            margin-top: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .child-code-box .code-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-mid);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .child-code-box .code-value {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.2rem;
+            color: var(--teal);
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+        .child-code-box .code-copy {
+            padding: 4px 14px;
+            border-radius: 8px;
+            border: none;
+            background: var(--teal);
+            color: white;
+            font-weight: 700;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .child-code-box .code-copy:hover {
+            background: var(--sky-dark);
+            transform: scale(1.02);
+        }
+
+        .topnav .nav-center {
+            display: flex;
+            gap: 6px;
+            background: rgba(110,198,245,0.15);
+            padding: 6px;
+            border-radius: 14px;
+            border: 1.5px solid rgba(110,198,245,0.3);
+        }
+        .topnav .nav-tab {
+            padding: 8px 22px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-mid);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: transparent;
+            font-family: 'Nunito', sans-serif;
+            text-decoration: none;
+        }
+        .topnav .nav-tab:hover {
+            color: var(--teal);
+        }
+        .topnav .nav-tab.active {
+            background: var(--teal);
+            color: white;
+            box-shadow: 0 3px 10px rgba(46,140,140,0.3);
+        }
     </style>
 </head>
 <body>
@@ -115,9 +187,7 @@
     <div class="nav-center">
         <a class="nav-tab" href="dashboard.html">🏠 Dashboard</a>
         <a class="nav-tab" href="lesson.html">📐 Lesson</a>
-        <a class="nav-tab active" href="student-profile.html">👤 Student Profile</a>
-        <a class="nav-tab" href="parent-profile.html">👩 Parent Profile</a>
-        <a class="nav-tab" href="report.html">📋 Report</a>
+        <a class="nav-tab active" href="student-profile.html">👤 Profile</a>
     </div>
     <div class="nav-right">
         <button class="icon-btn" title="Notifications" onclick="showToast('Notifications coming soon!')">🔔</button>
@@ -136,20 +206,25 @@
                 <div class="edit-avatar" onclick="showToast('Avatar editor coming soon!')">✏️</div>
             </div>
             <h2 id="student-name">Student</h2>
-            <p>Student · Grade 3</p>
+            <p id="student-grade">Student · Grade 3</p>
             <div class="xp-badge" id="xp-badge">⭐ Level 1 · 0 XP</div>
             <div class="level-bar-wrap mt-12">
                 <div class="progress-bar-label"><span>Progress to Next Level</span><span id="xp-progress">0 / 100</span></div>
                 <div class="progress-bar"><div class="progress-fill blue" id="xp-bar" style="width:0%"></div></div>
+            </div>
+            <div class="child-code-box">
+                <span class="code-label">🔗 Your Code</span>
+                <span class="code-value" id="child-code-display">----</span>
+                <button class="code-copy" onclick="copyChildCode()">📋 Copy</button>
             </div>
         </div>
         <div class="card">
             <div class="card-title"><span class="icon">ℹ️</span> Student Info</div>
             <table class="info-table">
                 <tr><td>Full Name</td><td id="info-name">Student</td></tr>
-                <tr><td>Birthday</td><td>01/01/2018</td></tr>
-                <tr><td>Grade</td><td>Grade 3</td></tr>
-                <tr><td>Joined</td><td>Sep 2024</td></tr>
+                <tr><td>Birthday</td><td id="info-birthday">--</td></tr>
+                <tr><td>Grade</td><td id="info-grade">--</td></tr>
+                <tr><td>Joined</td><td id="info-joined">--</td></tr>
             </table>
         </div>
         <div class="card">
@@ -160,7 +235,7 @@
                 <div class="stat-pill"><div class="val" id="weekly-streak">🔥0</div><div class="lbl">Streak</div></div>
             </div>
         </div>
-        <a class="btn btn-ghost" href="parent-profile.html" style="justify-content:center;text-align:center;">👨‍👩‍👦 Parent Profile →</a>
+        <a class="btn btn-ghost" href="dashboard.html" style="justify-content:center;text-align:center;">← Back to Dashboard</a>
     </aside>
 
     <div class="profile-right">
@@ -175,7 +250,6 @@
         <div id="tab-progress" class="tab-panel active card">
             <div class="card-title"><span class="icon">📈</span> Subject Progress</div>
             <div class="subject-progress-list">
-                <!-- Math - Addition -->
                 <div class="subject-row">
                     <div class="s-icon math">➕</div>
                     <div class="s-info">
@@ -188,7 +262,6 @@
                     </div>
                     <div class="br-score" id="addition-score">0%</div>
                 </div>
-                <!-- Math - Subtraction -->
                 <div class="subject-row">
                     <div class="s-icon math">➖</div>
                     <div class="s-info">
@@ -201,7 +274,6 @@
                     </div>
                     <div class="br-score" id="subtraction-score">0%</div>
                 </div>
-                <!-- Science - Plant Life Cycle -->
                 <div class="subject-row">
                     <div class="s-icon science">🌱</div>
                     <div class="s-info">
@@ -214,7 +286,6 @@
                     </div>
                     <div class="br-score" id="plant-score">0%</div>
                 </div>
-                <!-- Reading - Story Comprehension -->
                 <div class="subject-row">
                     <div class="s-icon reading">📖</div>
                     <div class="s-info">
@@ -227,7 +298,6 @@
                     </div>
                     <div class="br-score" id="reading-score">0%</div>
                 </div>
-                <!-- History - Ancient Civilizations -->
                 <div class="subject-row">
                     <div class="s-icon history">🏛️</div>
                     <div class="s-info">
@@ -246,7 +316,6 @@
         <div id="tab-activity" class="tab-panel card">
             <div class="card-title"><span class="icon">🕐</span> Recent Activity</div>
             <div class="activity-list" id="activity-list">
-                <!-- Activity items will be populated by JavaScript -->
                 <div class="activity-item">
                     <div class="activity-icon" style="background:linear-gradient(135deg,#E0E0E0,#BDBDBD)">📚</div>
                     <div class="activity-info">
@@ -260,9 +329,7 @@
 
         <div id="tab-achievements" class="tab-panel card">
             <div class="card-title"><span class="icon">🏆</span> Achievements</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;" id="achievements-list">
-                <!-- Achievements will be populated by JavaScript -->
-            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;" id="achievements-list"></div>
         </div>
     </div>
 </div>
@@ -274,40 +341,186 @@
 <script src="script.js"></script>
 
 <script>
-    // Function to calculate XP based on correct answers
+    function waitForSupabase() {
+        return new Promise((resolve) => {
+            if (typeof supabase !== 'undefined' && supabase && supabase.auth) {
+                resolve(supabase);
+                return;
+            }
+            if (typeof window.supabaseClient !== 'undefined' && window.supabaseClient && window.supabaseClient.auth) {
+                resolve(window.supabaseClient);
+                return;
+            }
+            setTimeout(() => waitForSupabase().then(resolve), 500);
+        });
+    }
+
+    function copyChildCode() {
+        const code = document.getElementById('child-code-display').textContent;
+        if (code && code !== '----') {
+            navigator.clipboard.writeText(code).then(() => {
+                showToast('📋 Child code copied!', '#4CAF7D');
+            }).catch(() => {
+                const input = document.createElement('input');
+                input.value = code;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                input.remove();
+                showToast('📋 Child code copied!', '#4CAF7D');
+            });
+        } else {
+            showToast('No child code available yet', '#FF8C42');
+        }
+    }
+
     function calculateXP(correctCount) {
         return correctCount * 10;
     }
 
-    // Function to calculate level based on total XP
     function calculateLevel(totalXP) {
         return Math.floor(totalXP / 100) + 1;
     }
 
-    // Get lesson progress helper function
-    function getLessonProgress(lessonId, totalQuestions) {
-        const saved = localStorage.getItem(`progress_${lessonId}`);
-        let correctCount = 0;
-        let answered = 0;
-        let completed = false;
-        
-        if (saved) {
-            try {
-                const progress = JSON.parse(saved);
-                correctCount = progress.correctCount || 0;
-                answered = progress.answers ? progress.answers.filter(a => a !== null).length : 0;
-                completed = progress.completed || false;
-            } catch(e) {}
+    // ---- CLEAR LOCALSTORAGE FOR NEW USER ----
+    function clearLocalStorageForNewUser(userId) {
+        const storedUserId = localStorage.getItem('neurolearn_user_id');
+        if (storedUserId && storedUserId !== userId) {
+            console.log('🔄 New user detected. Clearing localStorage...');
+            const lessonKeys = ['addition', 'subtraction', 'plant', 'reading', 'ancient'];
+            lessonKeys.forEach(key => {
+                localStorage.removeItem(`progress_${key}`);
+                localStorage.removeItem(`progress_${key}_pct`);
+            });
+            localStorage.setItem('neurolearn_user_id', userId);
+            return true;
         }
-        
-        const pct = Math.min(Math.round((answered / totalQuestions) * 100), 100);
-        const scorePct = Math.min(Math.round((correctCount / totalQuestions) * 100), 100);
-        
-        return { correctCount, answered, completed, pct, scorePct };
+        return false;
     }
 
-    // Function to load and display real progress for ALL 5 lessons
-    function loadRealProgress() {
+    // ---- LOAD STUDENT PROFILE FROM SUPABASE ----
+    async function loadStudentProfile() {
+        try {
+            const supabaseClient = await waitForSupabase();
+            if (!supabaseClient) return;
+
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) {
+                console.warn('⚠️ No user logged in');
+                return;
+            }
+
+            // Clear localStorage if new user
+            clearLocalStorageForNewUser(user.id);
+
+            const { data: userData, error } = await supabaseClient
+                .from('users')
+                .select('*')
+                .eq('id', user.id)
+                .single();
+
+            if (error) {
+                console.error('Error loading user data:', error);
+                return;
+            }
+
+            if (userData) {
+                const displayName = userData.display_name || 'Student';
+                document.getElementById('profile-username').textContent = displayName;
+                document.getElementById('student-name').textContent = displayName;
+                document.getElementById('info-name').textContent = displayName;
+                
+                if (userData.birthday) {
+                    const birthdayDate = new Date(userData.birthday);
+                    document.getElementById('info-birthday').textContent = 
+                        birthdayDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+                }
+                
+                const grade = userData.grade || '--';
+                document.getElementById('info-grade').textContent = grade;
+                document.getElementById('student-grade').textContent = `Student · ${grade}`;
+                
+                if (userData.created_at) {
+                    document.getElementById('info-joined').textContent = 
+                        new Date(userData.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                }
+
+                if (userData.child_code) {
+                    document.getElementById('child-code-display').textContent = userData.child_code;
+                }
+
+                const totalXP = userData.xp || 0;
+                const level = calculateLevel(totalXP);
+                const xpProgress = totalXP % 100;
+                
+                document.getElementById('xp-badge').textContent = `⭐ Level ${level} · ${totalXP} XP`;
+                document.getElementById('xp-progress').textContent = `${xpProgress} / 100`;
+                document.getElementById('xp-bar').style.width = xpProgress + '%';
+            }
+
+        } catch (error) {
+            console.error('Error loading student profile:', error);
+        }
+    }
+
+    // ---- GET LESSON PROGRESS ----
+    async function getLessonProgress(lessonKey, totalQuestions) {
+        try {
+            const supabaseClient = await waitForSupabase();
+            if (!supabaseClient) {
+                return { correctCount: 0, answered: 0, completed: false, pct: 0, scorePct: 0 };
+            }
+
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) {
+                return { correctCount: 0, answered: 0, completed: false, pct: 0, scorePct: 0 };
+            }
+
+            const { data: lessonData } = await supabaseClient
+                .from('lessons')
+                .select('id')
+                .eq('lesson_key', lessonKey)
+                .single();
+
+            if (!lessonData) {
+                return { correctCount: 0, answered: 0, completed: false, pct: 0, scorePct: 0 };
+            }
+
+            const { data: progress, error } = await supabaseClient
+                .from('user_progress')
+                .select('*')
+                .eq('user_id', user.id)
+                .eq('lesson_id', lessonData.id)
+                .single();
+
+            if (error && error.code !== 'PGRST116') {
+                console.error('Error loading progress:', error);
+                return { correctCount: 0, answered: 0, completed: false, pct: 0, scorePct: 0 };
+            }
+
+            if (progress) {
+                let parsedAnswers = progress.answers;
+                if (typeof parsedAnswers === 'string') {
+                    try { parsedAnswers = JSON.parse(parsedAnswers); } catch(e) { parsedAnswers = []; }
+                }
+                const correctCount = progress.correct_count || 0;
+                const answered = parsedAnswers ? parsedAnswers.filter(a => a !== null).length : 0;
+                const completed = progress.status === 'completed';
+                const pct = Math.min(Math.round((answered / totalQuestions) * 100), 100);
+                const scorePct = Math.min(Math.round((correctCount / totalQuestions) * 100), 100);
+                return { correctCount, answered, completed, pct, scorePct };
+            }
+
+            return { correctCount: 0, answered: 0, completed: false, pct: 0, scorePct: 0 };
+
+        } catch (error) {
+            console.error('Error:', error);
+            return { correctCount: 0, answered: 0, completed: false, pct: 0, scorePct: 0 };
+        }
+    }
+
+    // ---- LOAD REAL PROGRESS ----
+    async function loadRealProgress() {
         const lessons = [
             { id: 'addition', name: 'Addition', total: 5, icon: '➕', color: 'green', pctEl: 'addition-pct', barEl: 'addition-progress-bar', scoreEl: 'addition-score' },
             { id: 'subtraction', name: 'Subtraction', total: 5, icon: '➖', color: 'blue', pctEl: 'subtraction-pct', barEl: 'subtraction-progress-bar', scoreEl: 'subtraction-score' },
@@ -323,45 +536,30 @@
         let completedLessons = 0;
         const lessonDetails = [];
 
-        lessons.forEach(lesson => {
-            const data = getLessonProgress(lesson.id, lesson.total);
+        for (const lesson of lessons) {
+            const data = await getLessonProgress(lesson.id, lesson.total);
             
-            // Update display
             document.getElementById(lesson.pctEl).textContent = data.pct + '%';
             document.getElementById(lesson.barEl).style.width = data.pct + '%';
             document.getElementById(lesson.scoreEl).textContent = data.scorePct + '%';
             
-            // Accumulate totals
             totalCorrect += data.correctCount;
             totalQuestions += lesson.total;
             totalAnswered += data.answered;
             totalXP += data.correctCount * 10;
             if (data.completed) completedLessons++;
             
-            lessonDetails.push({
-                ...lesson,
-                ...data
-            });
-        });
+            lessonDetails.push({ ...lesson, ...data });
+        }
 
-        // Update XP and level
-        const level = calculateLevel(totalXP);
-        const xpProgress = totalXP % 100;
-        
-        document.getElementById('xp-badge').textContent = `⭐ Level ${level} · ${totalXP} XP`;
-        document.getElementById('xp-progress').textContent = `${xpProgress} / 100`;
-        document.getElementById('xp-bar').style.width = xpProgress + '%';
-        
-        // Update weekly stats
+        await loadStudentProfile();
+
         const avgScore = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
         document.getElementById('weekly-lessons').textContent = completedLessons;
         document.getElementById('weekly-avg').textContent = avgScore + '%';
         document.getElementById('weekly-streak').textContent = '🔥' + (completedLessons > 0 ? completedLessons : 0);
         
-        // Update Activity
         updateActivityList(lessonDetails);
-        
-        // Update Achievements
         updateAchievements(lessonDetails, totalXP, completedLessons);
     }
     
@@ -372,9 +570,7 @@
         const hasActivity = lessonDetails.some(l => l.answered > 0);
         
         if (hasActivity) {
-            // Show lessons with activity first, sorted by completion
             const sorted = [...lessonDetails].sort((a, b) => b.answered - a.answered);
-            
             sorted.forEach(lesson => {
                 if (lesson.answered > 0) {
                     const activityItem = document.createElement('div');
@@ -414,41 +610,25 @@
         const allPerfect = lessonDetails.every(l => l.completed && l.scorePct === 100);
         const xpCollectorEarned = totalXP >= 100;
         
-        // Math Wizard - Complete any lesson with 100%
-        const mathWizardEarned = anyPerfect;
         achievementsList.innerHTML += `
-            <div class="${mathWizardEarned ? 'achievement-earned' : 'achievement-locked'}" style="border-radius:16px;padding:16px;text-align:center;">
+            <div class="${anyPerfect ? 'achievement-earned' : 'achievement-locked'}" style="border-radius:16px;padding:16px;text-align:center;">
                 <div style="font-size:2rem;">🥇</div>
                 <div style="font-weight:800;">Math Wizard</div>
                 <div style="font-size:0.75rem;color:var(--text-light);">Complete any lesson with 100%</div>
-                <div style="margin-top:8px;font-size:0.78rem;font-weight:800;color:var(--orange);">${mathWizardEarned ? '✅ Earned' : '🔒 Locked'}</div>
+                <div style="margin-top:8px;font-size:0.78rem;font-weight:800;color:var(--orange);">${anyPerfect ? '✅ Earned' : '🔒 Locked'}</div>
             </div>
-        `;
-        
-        // Perfect Scholar - 100% on all lessons
-        const perfectScholarEarned = allPerfect;
-        achievementsList.innerHTML += `
-            <div class="${perfectScholarEarned ? 'achievement-green' : 'achievement-locked'}" style="border-radius:16px;padding:16px;text-align:center;">
+            <div class="${allPerfect ? 'achievement-green' : 'achievement-locked'}" style="border-radius:16px;padding:16px;text-align:center;">
                 <div style="font-size:2rem;">🎓</div>
                 <div style="font-weight:800;">Perfect Scholar</div>
                 <div style="font-size:0.75rem;color:var(--text-light);">Get 100% on all lessons</div>
-                <div style="margin-top:8px;font-size:0.78rem;font-weight:800;color:var(--orange);">${perfectScholarEarned ? '✅ Earned' : '🔒 Locked'}</div>
+                <div style="margin-top:8px;font-size:0.78rem;font-weight:800;color:var(--orange);">${allPerfect ? '✅ Earned' : '🔒 Locked'}</div>
             </div>
-        `;
-        
-        // Dedicated Learner - Complete all lessons
-        const dedicatedEarned = allCompleted;
-        achievementsList.innerHTML += `
-            <div class="${dedicatedEarned ? 'achievement-orange' : 'achievement-locked'}" style="border-radius:16px;padding:16px;text-align:center;">
+            <div class="${allCompleted ? 'achievement-orange' : 'achievement-locked'}" style="border-radius:16px;padding:16px;text-align:center;">
                 <div style="font-size:2rem;">📚</div>
                 <div style="font-weight:800;">Dedicated Learner</div>
                 <div style="font-size:0.75rem;color:var(--text-light);">Complete all 5 lessons</div>
-                <div style="margin-top:8px;font-size:0.78rem;font-weight:800;color:var(--orange);">${dedicatedEarned ? '✅ Earned' : '🔒 Locked'}</div>
+                <div style="margin-top:8px;font-size:0.78rem;font-weight:800;color:var(--orange);">${allCompleted ? '✅ Earned' : '🔒 Locked'}</div>
             </div>
-        `;
-        
-        // XP Collector - Earn 100+ XP
-        achievementsList.innerHTML += `
             <div class="${xpCollectorEarned ? 'achievement-earned' : 'achievement-locked'}" style="border-radius:16px;padding:16px;text-align:center;">
                 <div style="font-size:2rem;">⭐</div>
                 <div style="font-weight:800;">XP Collector</div>
@@ -458,7 +638,6 @@
         `;
     }
     
-    // Function to switch tabs
     function switchTab(name, btn) {
         document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.profile-tab').forEach(b => b.classList.remove('active'));
@@ -466,26 +645,9 @@
         btn.classList.add('active');
     }
     
-    // Load user info and progress on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        // ✅ FIXED: Use neurolearn_display_name instead of neurolearn_username
-        var displayName = localStorage.getItem('neurolearn_display_name') || 'Student';
-        
-        console.log('🔵 Student Profile - Display Name:', displayName);
-        
-        // Update all name fields - NO "J. Johnson" suffix!
-        document.getElementById('profile-username').textContent = displayName;
-        document.getElementById('student-name').textContent = displayName;
-        document.getElementById('info-name').textContent = displayName;
-        
-        // Also update the avatar link in the nav
-        const navAvatar = document.querySelector('.avatar-btn span');
-        if (navAvatar) {
-            navAvatar.textContent = displayName;
-        }
-        
-        // Load real progress data
-        loadRealProgress();
+    document.addEventListener('DOMContentLoaded', async function() {
+        await loadStudentProfile();
+        await loadRealProgress();
     });
 </script>
 </body>
