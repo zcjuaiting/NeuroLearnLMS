@@ -1,529 +1,1168 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NeuroLearn - Dashboard</title>
+    <title>NeuroLearn – Lessons</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-</head>
+    <style>
+        .lesson-layout {
+            position: relative; z-index: 1;
+            display: grid;
+            grid-template-columns: 260px 1fr 280px;
+            gap: 24px;
+            padding: 32px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: calc(100vh - 70px);
+        }
+        .lesson-sidebar { display: flex; flex-direction: column; gap: 20px; }
+        .lesson-meta-card { text-align: center; padding: 28px 20px; }
+        .lesson-meta-card .subject-icon {
+            width: 72px; height: 72px;
+            border-radius: 20px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.2rem;
+            margin: 0 auto 14px;
+            border: 2px solid white;
+            box-shadow: 0 4px 14px rgba(110,198,245,0.35);
+        }
+        .lesson-meta-card .subject-icon.addition { background: linear-gradient(135deg, #C8E6C9, #A5D6A7); }
+        .lesson-meta-card .subject-icon.subtraction { background: linear-gradient(135deg, #B3E5FC, #81D4FA); }
+        .lesson-meta-card .subject-icon.plant { background: linear-gradient(135deg, #C8E6C9, #81C784); }
+        .lesson-meta-card .subject-icon.reading { background: linear-gradient(135deg, #FFE0B2, #FFCC80); }
+        .lesson-meta-card .subject-icon.ancient { background: linear-gradient(135deg, #E1BEE7, #CE93D8); }
+        .lesson-meta-card h2 { font-family: 'Baloo 2', cursive; font-size: 1.3rem; color: var(--teal); }
+        .lesson-meta-card p { font-size: 0.85rem; color: var(--text-mid); font-weight: 600; margin-top: 4px; }
+        .question-list { display: flex; flex-direction: column; gap: 8px; }
+        .q-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-weight: 700; font-size: 0.88rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-mid);
+            border: 1.5px solid transparent;
+        }
+        .q-item:hover { background: rgba(110,198,245,0.15); color: var(--teal); }
+        .q-item.active {
+            background: linear-gradient(135deg, rgba(46,140,140,0.12), rgba(110,198,245,0.15));
+            color: var(--teal); border-color: rgba(46,140,140,0.2);
+        }
+        .q-item.done { color: var(--green-dark); }
+        .q-item.wrong { color: var(--red); }
+        .q-dot {
+            width: 28px; height: 28px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; font-weight: 800;
+            background: rgba(110,198,245,0.2);
+            border: 2px solid rgba(110,198,245,0.3);
+            flex-shrink: 0;
+        }
+        .q-item.active .q-dot { background: var(--teal); color: white; border-color: transparent; }
+        .q-item.done .q-dot { background: var(--green); color: white; border-color: transparent; }
+        .q-item.wrong .q-dot { background: var(--red); color: white; border-color: transparent; }
+        .question-area { display: flex; flex-direction: column; gap: 20px; }
+        .question-header { display: flex; align-items: center; justify-content: space-between; }
+        .q-counter { font-family: 'Baloo 2', cursive; font-size: 1rem; color: var(--text-mid); }
+        .timer-pill {
+            display: flex; align-items: center; gap: 6px;
+            padding: 6px 16px;
+            background: rgba(255,140,66,0.12);
+            border: 1.5px solid rgba(255,140,66,0.25);
+            border-radius: 30px;
+            font-weight: 800; font-size: 0.92rem;
+            color: var(--orange);
+        }
+        .timer-pill.urgent { background: rgba(255,107,107,0.15); border-color: rgba(255,107,107,0.3); color: var(--red); animation: pulse 0.8s infinite; }
+        .question-card { padding: 36px 36px 30px; text-align: center; }
+        .question-text { font-family: 'Baloo 2', cursive; font-size: 2.8rem; color: var(--text-dark); margin-bottom: 8px; }
+        .choices-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .choice-btn {
+            display: flex; align-items: center; gap: 14px;
+            padding: 18px 22px;
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            border: 2px solid rgba(110,198,245,0.3);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 800; font-size: 1.3rem;
+            color: var(--text-dark);
+            box-shadow: var(--shadow);
+        }
+        .choice-btn:hover { border-color: var(--teal); transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+        .choice-btn.correct { background: linear-gradient(135deg, rgba(76,175,125,0.15), rgba(76,175,125,0.08)); border-color: var(--green); color: var(--green-dark); }
+        .choice-btn.wrong { background: linear-gradient(135deg, rgba(255,107,107,0.12), rgba(255,107,107,0.06)); border-color: var(--red); color: var(--red); }
+        .choice-btn:disabled { cursor: default; transform: none; }
+        .choice-letter {
+            width: 36px; height: 36px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; font-weight: 900;
+            background: rgba(110,198,245,0.2);
+            color: var(--teal);
+            flex-shrink: 0;
+        }
+        .feedback-banner {
+            border-radius: var(--radius-sm);
+            padding: 16px 22px;
+            display: flex; align-items: center; gap: 14px;
+            font-weight: 700; font-size: 0.95rem;
+            display: none;
+        }
+        .feedback-banner.correct { background: rgba(76,175,125,0.15); border: 1.5px solid rgba(76,175,125,0.4); color: var(--green-dark); }
+        .feedback-banner.wrong { background: rgba(255,107,107,0.12); border: 1.5px solid rgba(255,107,107,0.3); color: var(--red); }
+        .lesson-nav-btns {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+        .lesson-right { display: flex; flex-direction: column; gap: 20px; }
+        .score-ring-wrap { display: flex; flex-direction: column; align-items: center; padding: 28px 20px; }
+        .score-ring-wrap svg { transform: rotate(-90deg); }
+        .ring-label { font-family: 'Baloo 2', cursive; font-size: 1.5rem; color: var(--teal); text-align: center; margin-top: -4px; }
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(30,58,76,0.4);
+            backdrop-filter: blur(6px);
+            display: none; align-items: center; justify-content: center;
+            z-index: 999;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal-box {
+            background: white;
+            border-radius: 28px;
+            padding: 40px 48px;
+            text-align: center;
+            max-width: 440px; width: 90%;
+            box-shadow: 0 16px 60px rgba(30,58,76,0.25);
+            animation: popIn 0.5s cubic-bezier(.34,1.56,.64,1);
+        }
+        .modal-trophy { font-size: 4rem; margin-bottom: 16px; }
+        .modal-stats { display: flex; gap: 12px; justify-content: center; margin-bottom: 28px; }
+        .modal-btn-row {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .lesson-selection-full {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            min-height: calc(100vh - 70px);
+            width: 100%;
+        }
+        .lesson-selection-full .selection-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .lesson-selection-full .selection-header h2 {
+            font-family: 'Baloo 2', cursive;
+            font-size: 2.2rem;
+            color: var(--teal);
+        }
+        .lesson-selection-full .selection-header p {
+            color: var(--text-mid);
+            font-weight: 600;
+            font-size: 1rem;
+            margin-top: 4px;
+        }
+        .lesson-grid-selection {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 20px;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        .lesson-card-selection {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 30px 20px;
+            text-align: center;
+            border: 2px solid rgba(110,198,245,0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+        .lesson-card-selection:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--teal);
+        }
+        .lesson-card-selection .ls-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        .lesson-card-selection h3 {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+        .lesson-card-selection p {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+        .lesson-card-selection .ls-progress {
+            margin-top: 12px;
+            font-weight: 700;
+            color: var(--teal);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .lesson-card-selection .ls-progress .pct {
+            background: rgba(46,140,140,0.12);
+            padding: 2px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+        .lesson-card-selection .ls-progress .status-badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .status-badge.not-started { background: rgba(110,198,245,0.15); color: var(--text-mid); }
+        .status-badge.in-progress { background: rgba(255,140,66,0.15); color: var(--orange); }
+        .status-badge.completed { background: rgba(76,175,125,0.15); color: var(--green-dark); }
+        .back-to-dashboard {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            border-radius: var(--radius-sm);
+            border: 2px solid rgba(110,198,245,0.3);
+            background: transparent;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-mid);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            margin-top: 30px;
+        }
+        .back-to-dashboard:hover {
+            background: rgba(110,198,245,0.1);
+            border-color: var(--teal);
+            color: var(--teal);
+        }
+        .back-to-selection {
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            border: 2px solid rgba(110,198,245,0.3);
+            background: transparent;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-mid);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .back-to-selection:hover {
+            background: rgba(110,198,245,0.1);
+            border-color: var(--teal);
+            color: var(--teal);
+        }
+        #question-area-container {
+            display: none;
+        }
+        #question-area-container.active {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        #lesson-selection-container {
+            display: block;
+            grid-column: 1 / -1;
+            width: 100%;
+        }
+        #lesson-selection-container.hidden {
+            display: none;
+        }
+        .selection-mode .lesson-sidebar,
+        .selection-mode .lesson-right {
+            display: none;
+        }
+        .selection-mode .question-area {
+            grid-column: 1 / -1;
+        }
+        .selection-mode .lesson-layout {
+            grid-template-columns: 1fr;
+        }
 
+        @media (max-width: 1024px) {
+            .lesson-grid-selection { grid-template-columns: repeat(3, 1fr); max-width: 700px; }
+        }
+        @media (max-width: 768px) {
+            .lesson-grid-selection { grid-template-columns: repeat(2, 1fr); max-width: 500px; }
+            .lesson-layout { padding: 20px; grid-template-columns: 1fr; }
+            .lesson-sidebar, .lesson-right { display: none; }
+            .question-area { grid-column: 1 / -1; }
+        }
+        @media (max-width: 480px) {
+            .lesson-grid-selection { grid-template-columns: 1fr; max-width: 300px; }
+            .lesson-selection-full .selection-header h2 { font-size: 1.6rem; }
+            .choices-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
 <body>
 
-    <div id="dashboard-screen" class="screen active">
-        <nav class="topnav">
-            <a class="nav-logo" href="dashboard.html">NeuroLearn</a>
-            <div class="nav-center">
-                <a class="nav-tab active" href="dashboard.html">🏠 Dashboard</a>
-                <a class="nav-tab" href="lesson.html">📐 Lesson</a>
-                <a class="nav-tab" href="student-profile.html">👤 Profile</a>
+<nav class="topnav">
+    <a class="nav-logo" href="dashboard.html">NeuroLearn</a>
+    <div class="nav-center">
+        <a class="nav-tab" href="dashboard.html">🏠 Dashboard</a>
+        <a class="nav-tab active" href="lesson.html">📐 Lesson</a>
+        <a class="nav-tab" href="student-profile.html">👤 Profile</a>
+    </div>
+    <div class="nav-right">
+        <button class="icon-btn" title="Notifications" onclick="showToast('Notifications coming soon!')">🔔</button>
+        <a class="avatar-btn" href="student-profile.html">
+            <div class="avatar-circle">🧒</div>
+            <span id="lesson-username">Student</span>
+        </a>
+    </div>
+</nav>
+
+<div class="lesson-layout" id="main-layout">
+    <aside class="lesson-sidebar" id="lesson-sidebar">
+        <div class="card lesson-meta-card">
+            <div class="subject-icon" id="lesson-icon">📚</div>
+            <h2 id="lesson-title">Select a Lesson</h2>
+            <p id="lesson-desc">Choose a lesson to begin learning</p>
+            <div class="mt-12">
+                <div class="progress-bar-label"><span>Overall</span><span id="overall-pct">0%</span></div>
+                <div class="progress-bar"><div class="progress-fill blue" id="overall-bar" style="width:0%"></div></div>
             </div>
-            <div class="nav-right">
-                <button class="icon-btn" title="Notifications" onclick="showToast('Notifications coming soon!')">🔔</button>
-                <a class="avatar-btn" href="student-profile.html">
-                    <div class="avatar-circle">🧒</div>
-                    <span id="nav-username">Student</span>
-                </a>
+        </div>
+        <div class="card" id="questions-sidebar">
+            <div class="card-title"><span class="icon">📋</span> Questions</div>
+            <div class="question-list" id="q-list"></div>
+        </div>
+        <a class="btn btn-ghost" href="dashboard.html" style="justify-content:center;">← Back to Dashboard</a>
+    </aside>
+
+    <main class="question-area" id="question-area">
+        <div id="lesson-selection-container">
+            <div class="lesson-selection-full">
+                <div class="selection-header">
+                    <h2>📚 Choose Your Lesson</h2>
+                    <p>Pick a lesson to start learning. Track your progress as you go!</p>
+                </div>
+                <div class="lesson-grid-selection" id="lesson-grid-selection"></div>
+                <a class="back-to-dashboard" href="dashboard.html">← Back to Dashboard</a>
             </div>
-        </nav>
+        </div>
 
-        <div class="dashboard-body">
-            <aside class="sidebar">
-                <div class="card welcome-card">
-                    <div class="welcome-avatar">🧒</div>
-                    <h2>Welcome, <span id="welcome-username">Student</span>!</h2>
-                    <p>Keep up the great work!</p>
-                    <div class="level-badge">⭐ Level 1 Learner</div>
-                </div>
+        <div id="question-area-container">
+            <div class="question-header">
+                <span class="q-counter">Question <strong id="q-num">1</strong> of <strong id="total-q">5</strong></span>
+                <div class="timer-pill" id="timer-pill">⏱ <span id="timer-val">30</span>s</div>
+            </div>
+            <div class="card question-card">
+                <div class="question-text" id="q-text">Loading...</div>
+            </div>
+            <div class="choices-grid" id="choices-grid"></div>
+            <div class="feedback-banner" id="feedback">
+                <div class="feedback-icon" id="fb-icon">✅</div>
+                <div><div style="font-size:1rem;" id="fb-title">Correct!</div></div>
+            </div>
+            <div class="lesson-nav-btns">
+                <button class="back-to-selection" onclick="goBackToSelection()">← Back to Lessons</button>
+                <button class="btn btn-ghost" onclick="prevQ()" id="btn-prev">← Previous</button>
+                <button class="btn btn-teal" onclick="nextQ()" id="btn-next" disabled>Next →</button>
+            </div>
+        </div>
+    </main>
 
-                <div class="card">
-                    <div class="card-title"><span class="icon">🔥</span> Weekly Streak</div>
-                    <div class="streak-row">
-                        <div class="streak-day"><div class="streak-dot" id="streak-mon">○</div><span class="streak-label">Mon</span></div>
-                        <div class="streak-day"><div class="streak-dot" id="streak-tue">○</div><span class="streak-label">Tue</span></div>
-                        <div class="streak-day"><div class="streak-dot" id="streak-wed">○</div><span class="streak-label">Wed</span></div>
-                        <div class="streak-day"><div class="streak-dot" id="streak-thu">○</div><span class="streak-label">Thu</span></div>
-                        <div class="streak-day"><div class="streak-dot" id="streak-fri">○</div><span class="streak-label">Fri</span></div>
-                        <div class="streak-day"><div class="streak-dot" id="streak-sat">○</div><span class="streak-label">Sat</span></div>
-                        <div class="streak-day"><div class="streak-dot" id="streak-sun">○</div><span class="streak-label">Sun</span></div>
-                    </div>
-                </div>
+    <aside class="lesson-right" id="lesson-right">
+        <div class="card score-ring-wrap">
+            <div class="card-title" style="justify-content:center;"><span class="icon">⭐</span> Score</div>
+            <svg width="120" height="120" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(110,198,245,0.2)" stroke-width="12"/>
+                <circle id="score-ring" cx="60" cy="60" r="50" fill="none" stroke="url(#grad2)" stroke-width="12" stroke-dasharray="314" stroke-dashoffset="314" stroke-linecap="round"/>
+                <defs><linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#2E8C8C"/><stop offset="100%" style="stop-color:#6EC6F5"/></linearGradient></defs>
+            </svg>
+            <div class="ring-label" id="score-label">0/5<small>Score</small></div>
+            <div class="flex gap-12 mt-12">
+                <div class="stat-pill"><div class="val" id="correct-count">0</div><div class="lbl">Correct</div></div>
+                <div class="stat-pill"><div class="val" id="wrong-count">0</div><div class="lbl">Wrong</div></div>
+            </div>
+        </div>
+        <div class="card hint-card">
+            <div class="card-title"><span class="icon">💡</span> Tip</div>
+            <p id="hint-text">Select a lesson to get started!</p>
+        </div>
+    </aside>
+</div>
 
-                <div class="card">
-                    <div class="card-title"><span class="icon">🗂️</span> Menu</div>
-                    <div class="nav-items">
-                        <a class="nav-item active" href="dashboard.html"><div class="ni-icon">📚</div> My Lessons</a>
-                        <a class="nav-item" href="student-profile.html"><div class="ni-icon">📊</div> My Progress</a>
-                        <a class="nav-item" href="lesson.html"><div class="ni-icon">📝</div> Current Lesson</a>
-                        <a class="nav-item" href="#" onclick="showToast('Rewards coming soon!')"><div class="ni-icon">🏆</div> Rewards</a>
-                        <a class="nav-item" href="#" onclick="showToast('Messages coming soon!')"><div class="ni-icon">💬</div> Messages</a>
-                        <a class="nav-item" href="#" onclick="showLogout()"><div class="ni-icon">🚪</div> Logout</a>
-                    </div>
-                </div>
-            </aside>
-
-            <main class="main-content">
-                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
-                    <div>
-                        <h2 style="font-family:'Baloo 2',cursive;font-size:1.6rem;color:var(--text-dark);">Select a Lesson to begin</h2>
-                        <p style="color:var(--text-mid);font-size:0.9rem;font-weight:600;margin-top:2px;">You have <strong style="color:var(--teal);" id="active-lessons-count">0</strong> lessons completed</p>
-                    </div>
-                    <div id="subject-tabs" class="subject-tabs">
-                        <button class="subject-tab active" onclick="filterSubject(this,'all')">📚 All</button>
-                        <button class="subject-tab" onclick="filterSubject(this,'math')">📐 Math</button>
-                        <button class="subject-tab" onclick="filterSubject(this,'science')">🔬 Science</button>
-                        <button class="subject-tab" onclick="filterSubject(this,'reading')">📖 Reading</button>
-                        <button class="subject-tab" onclick="filterSubject(this,'history')">🏛️ History</button>
-                    </div>
-                </div>
-
-                <div class="filters-bar">
-                    <span>Filter:</span>
-                    <select class="filter-select" id="difficulty-filter" onchange="filterDifficulty(this.value)">
-                        <option value="all">All Levels</option>
-                        <option value="beginner">Beginner</option>
-                        <option value="intermediate">Intermediate</option>
-                        <option value="advanced">Advanced</option>
-                    </select>
-                    <button class="sort-btn ml-auto" onclick="showToast('Sorted by difficulty!')">↕ Sort</button>
-                </div>
-
-                <div class="lessons-grid" id="lessons-container">
-                    <!-- ADDITION LESSON -->
-                    <div class="lesson-card" data-subject="math" data-difficulty="beginner" data-lesson="addition">
-                        <div class="lesson-icon math">➕</div>
-                        <div class="lesson-info">
-                            <h3>Addition</h3>
-                            <p>Math · Chapter 2 · 5 exercises</p>
-                            <span class="difficulty-badge beginner">Beginner</span>
-                        </div>
-                        <div class="progress-wrap">
-                            <div class="progress-label"><span>Progress</span><span id="addition-progress">0%</span></div>
-                            <div class="progress-bar"><div class="progress-fill green" id="addition-bar" style="width:0%"></div></div>
-                        </div>
-                        <div class="lesson-action">
-                            <button class="btn-action start" id="addition-btn" onclick="startLesson('addition')">▷ Start</button>
-                        </div>
-                    </div>
-
-                    <!-- SUBTRACTION LESSON -->
-                    <div class="lesson-card" data-subject="math" data-difficulty="intermediate" data-lesson="subtraction">
-                        <div class="lesson-icon math">➖</div>
-                        <div class="lesson-info">
-                            <h3>Subtraction</h3>
-                            <p>Math · Chapter 4 · 5 exercises</p>
-                            <span class="difficulty-badge intermediate">Intermediate</span>
-                        </div>
-                        <div class="progress-wrap">
-                            <div class="progress-label"><span>Progress</span><span id="subtraction-progress">0%</span></div>
-                            <div class="progress-bar"><div class="progress-fill blue" id="subtraction-bar" style="width:0%"></div></div>
-                        </div>
-                        <div class="lesson-action">
-                            <button class="btn-action start" id="subtraction-btn" onclick="startLesson('subtraction')">▷ Start</button>
-                        </div>
-                    </div>
-
-                    <!-- PLANT LIFE CYCLE LESSON -->
-                    <div class="lesson-card" data-subject="science" data-difficulty="beginner" data-lesson="plant">
-                        <div class="lesson-icon science">🌱</div>
-                        <div class="lesson-info">
-                            <h3>Plant Life Cycle</h3>
-                            <p>Science · Chapter 1 · 5 exercises</p>
-                            <span class="difficulty-badge beginner">Beginner</span>
-                        </div>
-                        <div class="progress-wrap">
-                            <div class="progress-label"><span>Progress</span><span id="plant-progress">0%</span></div>
-                            <div class="progress-bar"><div class="progress-fill green" id="plant-bar" style="width:0%"></div></div>
-                        </div>
-                        <div class="lesson-action">
-                            <button class="btn-action start" id="plant-btn" onclick="startLesson('plant')">▷ Start</button>
-                        </div>
-                    </div>
-
-                    <!-- STORY COMPREHENSION LESSON -->
-                    <div class="lesson-card" data-subject="reading" data-difficulty="beginner" data-lesson="reading">
-                        <div class="lesson-icon reading">📖</div>
-                        <div class="lesson-info">
-                            <h3>Story Comprehension</h3>
-                            <p>Reading · Chapter 3 · 5 exercises</p>
-                            <span class="difficulty-badge beginner">Beginner</span>
-                        </div>
-                        <div class="progress-wrap">
-                            <div class="progress-label"><span>Progress</span><span id="reading-progress">0%</span></div>
-                            <div class="progress-bar"><div class="progress-fill orange" id="reading-bar" style="width:0%"></div></div>
-                        </div>
-                        <div class="lesson-action">
-                            <button class="btn-action start" id="reading-btn" onclick="startLesson('reading')">▷ Start</button>
-                        </div>
-                    </div>
-
-                    <!-- ANCIENT CIVILIZATIONS LESSON -->
-                    <div class="lesson-card" data-subject="history" data-difficulty="intermediate" data-lesson="ancient">
-                        <div class="lesson-icon history">🏛️</div>
-                        <div class="lesson-info">
-                            <h3>Ancient Civilizations</h3>
-                            <p>History · Chapter 2 · 5 exercises</p>
-                            <span class="difficulty-badge intermediate">Intermediate</span>
-                        </div>
-                        <div class="progress-wrap">
-                            <div class="progress-label"><span>Progress</span><span id="ancient-progress">0%</span></div>
-                            <div class="progress-bar"><div class="progress-fill blue" id="ancient-bar" style="width:0%"></div></div>
-                        </div>
-                        <div class="lesson-action">
-                            <button class="btn-action start" id="ancient-btn" onclick="startLesson('ancient')">▷ Start</button>
-                        </div>
-                    </div>
-                </div>
-            </main>
-
-            <aside class="right-panel">
-                <div class="card">
-                    <div class="card-title"><span class="icon">📅</span> Today's Progress</div>
-                    <div class="ring-wrap">
-                        <svg width="120" height="120" viewBox="0 0 120 120">
-                            <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(110,198,245,0.2)" stroke-width="12"/>
-                            <circle id="today-ring" cx="60" cy="60" r="50" fill="none" stroke="url(#grad)" stroke-width="12" stroke-dasharray="314" stroke-dashoffset="314" stroke-linecap="round"/>
-                            <defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" style="stop-color:#2E8C8C"/><stop offset="100%" style="stop-color:#6EC6F5"/></linearGradient></defs>
-                        </svg>
-                        <div class="ring-text" id="today-score">0/25<small>Total Questions</small></div>
-                    </div>
-                    <div class="progress-stats">
-                        <div class="stat-item"><div class="stat-val" id="total-correct">0</div><div class="stat-lbl">Correct</div></div>
-                        <div class="stat-item"><div class="stat-val" id="total-answered">0</div><div class="stat-lbl">Answered</div></div>
-                        <div class="stat-item"><div class="stat-val" id="total-completed">0</div><div class="stat-lbl">Completed</div></div>
-                        <div class="stat-item"><div class="stat-val" id="total-xp">0</div><div class="stat-lbl">XP Earned</div></div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-title"><span class="icon">🏆</span> Achievements</div>
-                    <div class="achievement-list">
-                        <div class="achievement-item"><div class="ach-icon gold">🥇</div><div class="ach-info"><h4>Math Wizard</h4><p>Complete any lesson with 100%</p></div><span class="ach-points">+50 XP</span></div>
-                        <div class="achievement-item"><div class="ach-icon silver">⭐</div><div class="ach-info"><h4>5-Day Streak</h4><p>Learn 5 days in a row</p></div><span class="ach-points">+30 XP</span></div>
-                        <div class="achievement-item"><div class="ach-icon bronze">📚</div><div class="ach-info"><h4>Quick Learner</h4><p>Finish a lesson in 5 mins</p></div><span class="ach-points">+20 XP</span></div>
-                    </div>
-                </div>
-            </aside>
+<div class="modal-overlay" id="result-modal">
+    <div class="modal-box">
+        <div class="modal-trophy" id="modal-trophy">🏆</div>
+        <h2 id="modal-title">Lesson Complete!</h2>
+        <p id="modal-msg">Great job!</p>
+        <div class="modal-stats">
+            <div class="stat-pill"><div class="val" id="modal-score">0</div><div class="lbl">Score</div></div>
+            <div class="stat-pill"><div class="val" id="modal-xp">+0</div><div class="lbl">XP Earned</div></div>
+        </div>
+        <div class="modal-btn-row">
+            <button class="btn btn-ghost" onclick="restartLesson()">↺ Retry</button>
+            <button class="btn btn-teal" onclick="goBackToSelection()">📚 All Lessons</button>
+            <a class="btn btn-teal" href="dashboard.html">Dashboard →</a>
         </div>
     </div>
+</div>
 
-    <div class="toast" id="toast"></div>
+<div class="toast" id="toast"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="supabase-config.js"></script>
-    <script src="script.js"></script>
-
-    <script>
-        // ---- HELPER: Wait for Supabase ----
-        function waitForSupabase() {
-            return new Promise((resolve) => {
-                if (typeof supabase !== 'undefined' && supabase && supabase.auth) {
-                    resolve(supabase);
-                    return;
-                }
-                if (typeof window.supabaseClient !== 'undefined' && window.supabaseClient && window.supabaseClient.auth) {
-                    resolve(window.supabaseClient);
-                    return;
-                }
-                setTimeout(() => waitForSupabase().then(resolve), 500);
-            });
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="script.js"></script>
+<script>
+    // ============================================================
+    // LESSON DATA - All 5 Lessons
+    // ============================================================
+    const LESSON_DATA = {
+        subtraction: {
+            title: "Subtraction",
+            subject: "Math · Chapter 4 · Intermediate",
+            icon: "➖",
+            iconClass: "subtraction",
+            totalQuestions: 5,
+            hint: "Start from the larger number and count down.",
+            questions: [
+                { text: '15 - 5 = ?', choices: [5, 10, 15, 20], correct: 1, hint: 'Count down 5 from 15.' },
+                { text: '20 - 8 = ?', choices: [10, 12, 14, 16], correct: 1, hint: 'Count down 8 from 20.' },
+                { text: '15 - 6 = ?', choices: [7, 8, 9, 10], correct: 2, hint: 'Count down 6 from 15.' },
+                { text: '30 - 14 = ?', choices: [14, 16, 18, 20], correct: 1, hint: 'Count down 14 from 30.' },
+                { text: '100 - 47 = ?', choices: [43, 53, 57, 63], correct: 1, hint: 'Count down 47 from 100.' }
+            ]
+        },
+        addition: {
+            title: "Addition",
+            subject: "Math · Chapter 3 · Beginner",
+            icon: "➕",
+            iconClass: "addition",
+            totalQuestions: 5,
+            hint: "Add the numbers together carefully.",
+            questions: [
+                { text: '5 + 3 = ?', choices: [6, 7, 8, 9], correct: 2, hint: 'Combine 5 and 3 together.' },
+                { text: '9 + 4 = ?', choices: [12, 13, 14, 15], correct: 1, hint: 'Combine 9 and 4 together.' },
+                { text: '12 + 7 = ?', choices: [17, 18, 19, 20], correct: 2, hint: 'Combine 12 and 7 together.' },
+                { text: '15 + 10 = ?', choices: [20, 25, 30, 35], correct: 1, hint: 'Combine 15 and 10 together.' },
+                { text: '23 + 16 = ?', choices: [37, 38, 39, 40], correct: 2, hint: 'Combine 23 and 16 together.' }
+            ]
+        },
+        plant: {
+            title: "Plant Life Cycle",
+            subject: "Science · Chapter 1 · Beginner",
+            icon: "🌱",
+            iconClass: "plant",
+            totalQuestions: 5,
+            hint: "Think about how plants grow from seeds to full-grown plants.",
+            questions: [
+                { text: 'What is the first stage of a plant\'s life cycle?', choices: ['Seed', 'Sprout', 'Flower', 'Fruit'], correct: 0, hint: 'Everything starts with a tiny packet of life.' },
+                { text: 'What does a seed need to germinate?', choices: ['Sunlight only', 'Water and warmth', 'Fertilizer only', 'Just soil'], correct: 1, hint: 'Think about what helps a seed wake up and grow.' },
+                { text: 'What comes after a sprout in the plant life cycle?', choices: ['Seed', 'Seedling', 'Flower', 'Fruit'], correct: 1, hint: 'It grows bigger and develops its first true leaves.' },
+                { text: 'What part of the plant makes food using sunlight?', choices: ['Roots', 'Stem', 'Leaves', 'Flowers'], correct: 2, hint: 'These are green and capture sunlight for photosynthesis.' },
+                { text: 'What is the final stage of a plant\'s life cycle?', choices: ['Seed', 'Sprout', 'Flower', 'Fruit and seeds'], correct: 3, hint: 'The plant reproduces to create the next generation.' }
+            ]
+        },
+        reading: {
+            title: "Story Comprehension",
+            subject: "Reading · Chapter 3 · Beginner",
+            icon: "📖",
+            iconClass: "reading",
+            totalQuestions: 5,
+            hint: "Read the story carefully and remember the details.",
+            questions: [
+                { text: 'What is the main character\'s name in the story?', choices: ['Maria', 'Juan', 'Ana', 'Pedro'], correct: 2, hint: 'Think about who the story is about.' },
+                { text: 'Where did the story take place?', choices: ['Park', 'Library', 'School', 'Home'], correct: 1, hint: 'Where would you find lots of books?' },
+                { text: 'What did the main character find in the library?', choices: ['A toy', 'A magical book', 'A friend', 'A map'], correct: 1, hint: 'It was something special and glowing.' },
+                { text: 'How did the main character feel at the end of the story?', choices: ['Sad', 'Happy', 'Scared', 'Tired'], correct: 1, hint: 'She had a big smile on her face.' },
+                { text: 'What is the moral of the story?', choices: ['Reading is boring', 'Reading can take you on adventures', 'Books are heavy', 'Reading is only for school'], correct: 1, hint: 'Think about what the story taught us about books.' }
+            ]
+        },
+        ancient: {
+            title: "Ancient Civilizations",
+            subject: "History · Chapter 2 · Intermediate",
+            icon: "🏛️",
+            iconClass: "ancient",
+            totalQuestions: 5,
+            hint: "Look for clues about rivers, leaders, inventions, and famous landmarks.",
+            questions: [
+                { text: 'Which ancient civilization built the pyramids of Giza?', choices: ['Romans', 'Egyptians', 'Greeks', 'Chinese'], correct: 1, hint: 'They lived along the Nile River in Africa.' },
+                { text: 'Mesopotamia was located between which two rivers?', choices: ['Nile and Amazon', 'Tigris and Euphrates', 'Yangtze and Yellow', 'Indus and Ganges'], correct: 1, hint: 'Its name means "land between rivers."' },
+                { text: 'Which civilization is known as the birthplace of democracy?', choices: ['Egypt', 'Rome', 'Greece', 'China'], correct: 2, hint: 'Think about Athens and ancient Greek city-states.' },
+                { text: 'The Great Wall belongs to which civilization?', choices: ['Roman', 'Chinese', 'Persian', 'Greek'], correct: 1, hint: 'It was built to defend an empire in Asia.' },
+                { text: 'Which writing system was used by Ancient Egypt?', choices: ['Latin', 'Alphabet', 'Hieroglyphics', 'Cuneiform'], correct: 2, hint: 'They used picture symbols carved on temples.' }
+            ]
         }
+    };
 
-        // Start lesson function
-        function startLesson(lessonType) {
-            localStorage.setItem('currentLesson', lessonType);
-            window.location.href = 'lesson.html';
-        }
+    const LESSON_KEYS = ['addition', 'subtraction', 'plant', 'reading', 'ancient'];
+    const LETTERS = ['A', 'B', 'C', 'D'];
 
-        // ---- LOAD PROGRESS FROM SUPABASE ----
-        async function loadLessonProgress() {
-            try {
-                const supabaseClient = await waitForSupabase();
-                if (!supabaseClient) {
-                    console.warn('⚠️ Supabase not available');
-                    resetAllProgressToZero();
-                    return;
-                }
+    let currentLessonKey = null;
+    let currentLesson = null;
+    let QUESTIONS = [];
+    let current = 0;
+    let answers = [];
+    let correctCount = 0;
+    let wrongCount = 0;
+    let timerVal = 30;
+    let timerInt = null;
+    let lessonDatabaseId = null;
+    let allLessonProgress = {};
 
-                // Get current user
-                const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-                if (userError || !user) {
-                    console.warn('⚠️ No user logged in:', userError);
-                    resetAllProgressToZero();
-                    return;
-                }
-
-                console.log('🔵 Loading progress for user:', user.id);
-
-                // Get all lessons with their keys
-                const { data: lessons, error: lessonsError } = await supabaseClient
-                    .from('lessons')
-                    .select('id, lesson_key, title, exercises_count')
-                    .order('id');
-
-                if (lessonsError) {
-                    console.error('❌ Error loading lessons:', lessonsError);
-                    resetAllProgressToZero();
-                    return;
-                }
-
-                if (!lessons || lessons.length === 0) {
-                    console.warn('⚠️ No lessons found in database');
-                    resetAllProgressToZero();
-                    return;
-                }
-
-                console.log('📚 Lessons loaded:', lessons.length);
-
-                // Get user progress for all lessons
-                const { data: progressData, error: progressError } = await supabaseClient
-                    .from('user_progress')
-                    .select('*')
-                    .eq('user_id', user.id);
-
-                if (progressError) {
-                    console.error('❌ Error loading progress:', progressError);
-                    resetAllProgressToZero();
-                    return;
-                }
-
-                console.log('📊 Progress data from Supabase:', progressData);
-                console.log('📊 Progress count:', progressData ? progressData.length : 0);
-
-                let totalCorrect = 0;
-                let totalQuestions = 0;
-                let totalAnswered = 0;
-                let totalXP = 0;
-                let completedLessons = 0;
-
-                // Update each lesson card
-                lessons.forEach(lesson => {
-                    const progress = progressData ? progressData.find(p => p.lesson_id === lesson.id) : null;
-                    const pct = progress ? Math.min(progress.progress_percentage || 0, 100) : 0;
-                    const correct = progress ? progress.correct_count || 0 : 0;
-                    let answered = 0;
-                    
-                    if (progress && progress.answers) {
-                        try {
-                            const answersData = typeof progress.answers === 'string' ? JSON.parse(progress.answers) : progress.answers;
-                            if (Array.isArray(answersData)) {
-                                answered = answersData.filter(a => a !== null).length;
-                            }
-                        } catch(e) {
-                            console.warn('Error parsing answers for lesson:', lesson.lesson_key, e);
-                            answered = 0;
-                        }
-                    }
-                    
-                    const completed = progress ? progress.status === 'completed' : false;
-                    
-                    console.log(`📊 Lesson ${lesson.lesson_key}: pct=${pct}%, correct=${correct}, answered=${answered}, completed=${completed}`);
-                    
-                    // Update progress display
-                    const progressEl = document.getElementById(`${lesson.lesson_key}-progress`);
-                    const barEl = document.getElementById(`${lesson.lesson_key}-bar`);
-                    
-                    if (progressEl) progressEl.textContent = pct + '%';
-                    if (barEl) barEl.style.width = pct + '%';
-
-                    // Update button based on progress
-                    const btn = document.getElementById(`${lesson.lesson_key}-btn`);
-                    if (btn) {
-                        if (pct === 0) {
-                            btn.textContent = '▷ Start';
-                            btn.className = 'btn-action start';
-                            btn.onclick = function() { startLesson(lesson.lesson_key); };
-                        } else if (pct < 100) {
-                            btn.textContent = '▶ Continue';
-                            btn.className = 'btn-action continue';
-                            btn.onclick = function() { startLesson(lesson.lesson_key); };
-                        } else if (pct === 100) {
-                            btn.textContent = '↺ Retake';
-                            btn.className = 'btn-action review';
-                            btn.onclick = function() {
-                                if (confirm(`Are you sure you want to retake the ${lesson.title} lesson? This will reset your progress.`)) {
-                                    resetLessonProgress(lesson.id, lesson.lesson_key);
-                                }
-                            };
-                        }
-                    }
-
-                    // Accumulate totals for Today's Progress
-                    totalCorrect += correct;
-                    totalQuestions += parseInt(lesson.exercises_count) || 5;
-                    totalAnswered += answered;
-                    totalXP += correct * 10;
-                    if (completed) completedLessons++;
-                });
-
-                console.log('📊 Today\'s Progress totals:', { totalCorrect, totalQuestions, totalAnswered, totalXP, completedLessons });
-
-                // Update Today's Progress section
-                updateTodayProgress(totalCorrect, totalQuestions, totalAnswered, totalXP, completedLessons);
-
-                // Update active lessons count
-                document.getElementById('active-lessons-count').textContent = completedLessons;
-
-                // Also save to localStorage as cache for offline
-                if (progressData && progressData.length > 0) {
-                    saveProgressToLocalStorage(lessons, progressData);
-                }
-
-            } catch (error) {
-                console.error('💥 Error loading progress:', error);
-                resetAllProgressToZero();
+    // ---- HELPER: Wait for Supabase ----
+    function waitForSupabase() {
+        return new Promise((resolve) => {
+            if (typeof supabase !== 'undefined' && supabase && supabase.auth) {
+                resolve(supabase);
+                return;
             }
-        }
-
-        // ---- RESET ALL PROGRESS TO ZERO ----
-        function resetAllProgressToZero() {
-            console.log('🔄 Resetting all progress to zero');
-            const lessonKeys = ['addition', 'subtraction', 'plant', 'reading', 'ancient'];
-            lessonKeys.forEach(key => {
-                const progressEl = document.getElementById(`${key}-progress`);
-                const barEl = document.getElementById(`${key}-bar`);
-                if (progressEl) progressEl.textContent = '0%';
-                if (barEl) barEl.style.width = '0%';
-                
-                const btn = document.getElementById(`${key}-btn`);
-                if (btn) {
-                    btn.textContent = '▷ Start';
-                    btn.className = 'btn-action start';
-                }
-            });
-            
-            updateTodayProgress(0, 25, 0, 0, 0);
-            document.getElementById('active-lessons-count').textContent = '0';
-        }
-
-        // ---- CACHE PROGRESS TO LOCALSTORAGE ----
-        function saveProgressToLocalStorage(lessons, progressData) {
-            lessons.forEach(lesson => {
-                const progress = progressData.find(p => p.lesson_id === lesson.id);
-                if (progress) {
-                    const pct = Math.min(progress.progress_percentage || 0, 100);
-                    localStorage.setItem(`progress_${lesson.lesson_key}_pct`, pct);
-                    
-                    const data = {
-                        correctCount: progress.correct_count || 0,
-                        wrongCount: progress.wrong_count || 0,
-                        completed: progress.status === 'completed',
-                        answers: typeof progress.answers === 'string' ? JSON.parse(progress.answers) : progress.answers
-                    };
-                    localStorage.setItem(`progress_${lesson.lesson_key}`, JSON.stringify(data));
-                    console.log(`💾 Cached progress for ${lesson.lesson_key}: ${pct}%`);
-                } else {
-                    localStorage.removeItem(`progress_${lesson.lesson_key}_pct`);
-                    localStorage.removeItem(`progress_${lesson.lesson_key}`);
-                }
-            });
-        }
-
-        // ---- RESET LESSON PROGRESS ----
-        async function resetLessonProgress(lessonId, lessonKey) {
-            try {
-                const supabaseClient = await waitForSupabase();
-                if (!supabaseClient) return;
-
-                const { data: { user } } = await supabaseClient.auth.getUser();
-                if (!user) return;
-
-                await supabaseClient
-                    .from('user_progress')
-                    .delete()
-                    .eq('user_id', user.id)
-                    .eq('lesson_id', lessonId);
-
-                localStorage.removeItem(`progress_${lessonKey}`);
-                localStorage.removeItem(`progress_${lessonKey}_pct`);
-
-                showToast('Progress reset! You can retake the lesson now.', '#FF8C42');
-                loadLessonProgress();
-
-            } catch (error) {
-                console.error('Error resetting progress:', error);
-                showToast('Error resetting progress. Please try again.', '#FF6B6B');
+            if (typeof window.supabaseClient !== 'undefined' && window.supabaseClient && window.supabaseClient.auth) {
+                resolve(window.supabaseClient);
+                return;
             }
-        }
-
-        // ---- UPDATE TODAY'S PROGRESS ----
-        function updateTodayProgress(correct, total, answered, xp, completed) {
-            console.log('🔄 updateTodayProgress called with:', { correct, total, answered, xp, completed });
-            
-            const ring = document.getElementById('today-ring');
-            if (ring) {
-                const pct = total > 0 ? Math.min(correct / total, 1) : 0;
-                const offset = 314 - (314 * pct);
-                ring.style.strokeDashoffset = offset;
-                console.log('🎯 Ring percentage:', (pct * 100).toFixed(1) + '%');
-            }
-
-            const scoreEl = document.getElementById('today-score');
-            if (scoreEl) {
-                scoreEl.innerHTML = `${correct}/${total}<small>Total Questions</small>`;
-            }
-
-            const correctEl = document.getElementById('total-correct');
-            const answeredEl = document.getElementById('total-answered');
-            const completedEl = document.getElementById('total-completed');
-            const xpEl = document.getElementById('total-xp');
-            
-            if (correctEl) correctEl.textContent = correct;
-            if (answeredEl) answeredEl.textContent = answered;
-            if (completedEl) completedEl.textContent = completed;
-            if (xpEl) xpEl.textContent = xp;
-        }
-
-        // ---- FILTER FUNCTIONS (Using global variables from script.js) ----
-        function filterSubject(btn, subject) {
-            document.querySelectorAll('.subject-tab').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            filterLessons(subject, currentDifficulty);
-        }
-
-        function filterDifficulty(val) {
-            currentDifficulty = val;
-            filterLessons(currentSubject, val);
-        }
-
-        // ---- Re-declaring filterLessons (overrides script.js version) ----
-        function filterLessons(subject, difficulty) {
-            currentSubject = subject;
-            const cards = document.querySelectorAll('.lesson-card');
-            cards.forEach(card => {
-                const cardSubject = card.dataset.subject;
-                const cardDifficulty = card.dataset.difficulty;
-                const matchSubject = subject === 'all' || cardSubject === subject;
-                const matchDiff = difficulty === 'all' || cardDifficulty === difficulty;
-                card.style.display = matchSubject && matchDiff ? 'flex' : 'none';
-            });
-        }
-
-        // ---- INITIALIZE ----
-        document.addEventListener('DOMContentLoaded', function() {
-            // Load user info
-            const displayName = localStorage.getItem('neurolearn_display_name') || 'Student';
-            document.getElementById('welcome-username').textContent = displayName;
-            document.getElementById('nav-username').textContent = displayName;
-            
-            // Load progress from Supabase
-            loadLessonProgress();
-            
-            if (typeof setActiveNav === 'function') setActiveNav();
-            if (typeof animateProgressBars === 'function') animateProgressBars();
-            
-            if (displayName) {
-                showToast(`Welcome back, ${displayName}! 🎉`);
-            }
+            setTimeout(() => waitForSupabase().then(resolve), 500);
         });
+    }
 
-        // Make functions global
-        window.startLesson = startLesson;
-        window.filterSubject = filterSubject;
-        window.filterDifficulty = filterDifficulty;
-        window.filterLessons = filterLessons;
-        window.loadLessonProgress = loadLessonProgress;
-    </script>
+    // ---- GET LESSON ID FROM SUPABASE ----
+    async function getLessonId(key) {
+        try {
+            const supabaseClient = await waitForSupabase();
+            if (!supabaseClient) return null;
+            
+            const { data, error } = await supabaseClient
+                .from('lessons')
+                .select('id')
+                .eq('lesson_key', key)
+                .single();
+            
+            if (error) {
+                console.error('Error getting lesson ID:', error);
+                return null;
+            }
+            return data ? data.id : null;
+        } catch (error) {
+            console.error('Error:', error);
+            return null;
+        }
+    }
 
+    // ---- TOGGLE LAYOUT MODE ----
+    function setLayoutMode(mode) {
+        const layout = document.getElementById('main-layout');
+        if (mode === 'selection') {
+            layout.classList.add('selection-mode');
+        } else {
+            layout.classList.remove('selection-mode');
+        }
+    }
+
+    // ---- LOAD ALL LESSON PROGRESS ----
+    async function loadAllLessonProgress() {
+        try {
+            const supabaseClient = await waitForSupabase();
+            if (!supabaseClient) return {};
+
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) return {};
+
+            const { data: lessons } = await supabaseClient
+                .from('lessons')
+                .select('id, lesson_key');
+
+            if (!lessons) return {};
+
+            const { data: progressData } = await supabaseClient
+                .from('user_progress')
+                .select('*')
+                .eq('user_id', user.id);
+
+            const progressMap = {};
+            if (progressData) {
+                progressData.forEach(p => {
+                    const lesson = lessons.find(l => l.id === p.lesson_id);
+                    if (lesson) {
+                        progressMap[lesson.lesson_key] = {
+                            pct: p.progress_percentage || 0,
+                            status: p.status || 'not_started',
+                            correctCount: p.correct_count || 0
+                        };
+                    }
+                });
+            }
+
+            LESSON_KEYS.forEach(key => {
+                if (!progressMap[key]) {
+                    progressMap[key] = { pct: 0, status: 'not_started', correctCount: 0 };
+                }
+            });
+
+            allLessonProgress = progressMap;
+            return progressMap;
+
+        } catch (error) {
+            console.error('Error loading progress:', error);
+            return {};
+        }
+    }
+
+    // ---- RENDER LESSON SELECTION GRID ----
+    function renderLessonGrid(progressMap) {
+        const container = document.getElementById('lesson-grid-selection');
+        if (!container) return;
+        container.innerHTML = '';
+
+        const lessonNames = {
+            addition: 'Addition',
+            subtraction: 'Subtraction',
+            plant: 'Plant Life Cycle',
+            reading: 'Story Comprehension',
+            ancient: 'Ancient Civilizations'
+        };
+
+        const lessonIcons = {
+            addition: '➕',
+            subtraction: '➖',
+            plant: '🌱',
+            reading: '📖',
+            ancient: '🏛️'
+        };
+
+        const statusLabels = {
+            'not_started': 'Not Started',
+            'in_progress': 'In Progress',
+            'completed': '✅ Completed'
+        };
+
+        const statusClasses = {
+            'not_started': 'not-started',
+            'in_progress': 'in-progress',
+            'completed': 'completed'
+        };
+
+        LESSON_KEYS.forEach(key => {
+            const progress = progressMap[key] || { pct: 0, status: 'not_started' };
+            const card = document.createElement('div');
+            card.className = 'lesson-card-selection';
+            card.onclick = () => selectLesson(key);
+            
+            card.innerHTML = `
+                <div class="ls-icon">${lessonIcons[key]}</div>
+                <h3>${lessonNames[key]}</h3>
+                <p>${LESSON_DATA[key].subject}</p>
+                <div class="ls-progress">
+                    <span class="pct">${progress.pct}%</span>
+                    <span class="status-badge ${statusClasses[progress.status]}">${statusLabels[progress.status]}</span>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    // ---- SELECT A LESSON ----
+    async function selectLesson(key) {
+        console.log('🔵 Selecting lesson:', key);
+        
+        currentLessonKey = key;
+        currentLesson = LESSON_DATA[key];
+        QUESTIONS = currentLesson.questions;
+        
+        answers = new Array(QUESTIONS.length).fill(null);
+        correctCount = 0;
+        wrongCount = 0;
+        lessonDatabaseId = null;
+        current = 0;
+
+        console.log('📊 Lesson state reset. Questions:', QUESTIONS.length);
+
+        setLayoutMode('question');
+
+        document.getElementById('lesson-title').textContent = currentLesson.title;
+        document.getElementById('lesson-desc').textContent = currentLesson.subject;
+        document.getElementById('hint-text').textContent = currentLesson.hint;
+        const iconDiv = document.getElementById('lesson-icon');
+        iconDiv.textContent = currentLesson.icon;
+        iconDiv.className = 'subject-icon ' + currentLesson.iconClass;
+
+        document.getElementById('lesson-selection-container').classList.add('hidden');
+        document.getElementById('question-area-container').classList.add('active');
+
+        buildQuestionList();
+        await loadProgressFromSupabase();
+        renderQuestion(0);
+        
+        showToast(`📚 Started ${currentLesson.title}!`, '#4CAF7D');
+    }
+
+    // ---- GO BACK TO SELECTION ----
+    function goBackToSelection() {
+        document.getElementById('result-modal').classList.remove('show');
+        document.getElementById('question-area-container').classList.remove('active');
+        document.getElementById('lesson-selection-container').classList.remove('hidden');
+        
+        setLayoutMode('selection');
+        clearInterval(timerInt);
+        
+        loadAllLessonProgress().then(renderLessonGrid);
+        showToast('📚 Back to lesson selection', '#FF8C42');
+    }
+
+    function buildQuestionList() {
+        const container = document.getElementById('q-list');
+        container.innerHTML = '';
+        QUESTIONS.forEach((q, i) => {
+            const div = document.createElement('div');
+            div.className = 'q-item';
+            div.onclick = () => goToQ(i);
+            div.innerHTML = `<div class="q-dot">${i+1}</div>${q.text.split('?')[0]}`;
+            container.appendChild(div);
+        });
+    }
+
+    // ---- LOAD PROGRESS FROM SUPABASE ----
+    async function loadProgressFromSupabase() {
+        try {
+            const supabaseClient = await waitForSupabase();
+            if (!supabaseClient) return;
+
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) return;
+
+            if (!lessonDatabaseId) {
+                lessonDatabaseId = await getLessonId(currentLessonKey);
+                if (!lessonDatabaseId) return;
+            }
+
+            const { data: progress, error } = await supabaseClient
+                .from('user_progress')
+                .select('*')
+                .eq('user_id', user.id)
+                .eq('lesson_id', lessonDatabaseId)
+                .single();
+
+            if (error && error.code !== 'PGRST116') {
+                console.error('Error loading progress:', error);
+                return;
+            }
+
+            if (progress) {
+                console.log('📊 Loaded progress from Supabase:', progress);
+                
+                let parsedAnswers = progress.answers;
+                if (typeof parsedAnswers === 'string') {
+                    try {
+                        parsedAnswers = JSON.parse(parsedAnswers);
+                    } catch(e) {
+                        parsedAnswers = [];
+                    }
+                }
+                
+                if (!Array.isArray(parsedAnswers)) {
+                    parsedAnswers = [];
+                }
+                
+                // ⭐ FIX: Ensure we have exactly QUESTIONS.length answers
+                while (parsedAnswers.length < QUESTIONS.length) {
+                    parsedAnswers.push(null);
+                }
+                parsedAnswers = parsedAnswers.slice(0, QUESTIONS.length);
+                
+                // ⭐ CRITICAL FIX: Also update correctCount and wrongCount from progress
+                if (progress.correct_count !== undefined) {
+                    correctCount = progress.correct_count || 0;
+                }
+                if (progress.wrong_count !== undefined) {
+                    wrongCount = progress.wrong_count || 0;
+                }
+                
+                answers = parsedAnswers;
+                
+                console.log('📊 Loaded state:', { 
+                    correctCount, 
+                    wrongCount, 
+                    answersLength: answers.length,
+                    answers: answers 
+                });
+                
+                updateScore();
+                
+                document.querySelectorAll('.q-item').forEach((el, i) => {
+                    el.classList.remove('done', 'wrong');
+                    if (answers[i] === true) el.classList.add('done');
+                    else if (answers[i] !== null) el.classList.add('wrong');
+                });
+            } else {
+                console.log('📊 No progress found in Supabase, starting fresh');
+            }
+        } catch (error) {
+            console.error('Error loading progress:', error);
+        }
+    }
+
+    // ============================================================
+    // ⭐ FIX: Serialized save queue - prevents race conditions
+    // ============================================================
+    let saveQueue = Promise.resolve();
+    let isSaving = false;
+
+    function queueSaveProgress() {
+        // If already saving, wait for it to finish
+        if (isSaving) {
+            console.log('⏳ Save already in progress, waiting...');
+            return saveQueue;
+        }
+        
+        isSaving = true;
+        saveQueue = saveQueue
+            .then(() => {
+                console.log('💾 Starting save...');
+                return saveProgressToSupabase();
+            })
+            .catch(err => {
+                console.error('Save error:', err);
+            })
+            .finally(() => {
+                isSaving = false;
+                console.log('✅ Save completed');
+            });
+        return saveQueue;
+    }
+
+    // ============================================================
+    // ⭐ FIX: Save to Supabase with proper error handling
+    // ============================================================
+    async function saveProgressToSupabase() {
+        try {
+            const supabaseClient = await waitForSupabase();
+            if (!supabaseClient) {
+                console.error('❌ Supabase not available');
+                return;
+            }
+
+            const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+            if (userError || !user) {
+                console.error('❌ No user logged in:', userError);
+                return;
+            }
+
+            if (!lessonDatabaseId) {
+                lessonDatabaseId = await getLessonId(currentLessonKey);
+                if (!lessonDatabaseId) {
+                    console.error('❌ Could not get lesson ID');
+                    return;
+                }
+            }
+
+            const answeredCount = answers.filter(a => a !== null).length;
+            const completed = answers.every(a => a !== null);
+            const progressPercentage = Math.round((answeredCount / QUESTIONS.length) * 100);
+
+            // ⭐ CRITICAL FIX: Deep clone the answers array
+            const answersCopy = JSON.parse(JSON.stringify(answers));
+
+            const saveData = {
+                user_id: user.id,
+                lesson_id: lessonDatabaseId,
+                progress_percentage: progressPercentage,
+                status: completed ? 'completed' : (answeredCount > 0 ? 'in_progress' : 'not_started'),
+                score: correctCount,
+                correct_count: correctCount,
+                wrong_count: wrongCount,
+                answers: answersCopy,
+                last_accessed: new Date().toISOString(),
+                completed_at: completed ? new Date().toISOString() : null
+            };
+
+            console.log('📊 Saving progress:', saveData);
+
+            const { error } = await supabaseClient
+                .from('user_progress')
+                .upsert(saveData, { onConflict: 'user_id,lesson_id' });
+
+            if (error) {
+                console.error('❌ Error saving progress:', error);
+            } else {
+                console.log('✅ Progress saved:', progressPercentage + '%');
+            }
+        } catch (error) {
+            console.error('❌ Error in saveProgressToSupabase:', error);
+        }
+    }
+
+    // ============================================================
+    // CLEAR PROGRESS FROM SUPABASE
+    // ============================================================
+    async function clearProgressFromSupabase() {
+        try {
+            const supabaseClient = await waitForSupabase();
+            if (!supabaseClient) return;
+            
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            if (!user) return;
+            
+            if (!lessonDatabaseId) {
+                lessonDatabaseId = await getLessonId(currentLessonKey);
+                if (!lessonDatabaseId) return;
+            }
+            
+            await supabaseClient
+                .from('user_progress')
+                .delete()
+                .eq('user_id', user.id)
+                .eq('lesson_id', lessonDatabaseId);
+                
+            console.log('✅ Progress cleared from Supabase');
+        } catch (error) {
+            console.error('Error clearing progress:', error);
+        }
+    }
+
+    function renderQuestion(idx) {
+        const q = QUESTIONS[idx];
+        document.getElementById('q-num').textContent = idx + 1;
+        document.getElementById('total-q').textContent = QUESTIONS.length;
+        document.getElementById('q-text').textContent = q.text;
+        document.getElementById('hint-text').textContent = q.hint;
+        
+        const grid = document.getElementById('choices-grid');
+        grid.innerHTML = '';
+        q.choices.forEach((val, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn';
+            btn.innerHTML = `<div class="choice-letter">${LETTERS[i]}</div><span>${val}</span>`;
+            if (answers[idx] !== null) {
+                btn.disabled = true;
+                if (i === q.correct) btn.classList.add('correct');
+                else if (answers[idx] === i) btn.classList.add('wrong');
+            } else {
+                btn.onclick = () => answer(i);
+            }
+            grid.appendChild(btn);
+        });
+        
+        document.getElementById('feedback').style.display = 'none';
+        
+        document.querySelectorAll('.q-item').forEach((el, i) => {
+            el.classList.remove('active', 'done', 'wrong');
+            if (i === idx) el.classList.add('active');
+            else if (answers[i] === true) el.classList.add('done');
+            else if (answers[i] !== null) el.classList.add('wrong');
+        });
+        
+        document.getElementById('btn-prev').disabled = idx === 0;
+        document.getElementById('btn-next').disabled = answers[idx] === null;
+        resetTimer();
+    }
+
+    async function answer(choiceIdx) {
+        const q = QUESTIONS[current];
+        const isCorrect = choiceIdx === q.correct;
+        answers[current] = isCorrect;
+        
+        document.querySelectorAll('.choice-btn').forEach((btn, i) => {
+            btn.disabled = true;
+            if (i === q.correct) btn.classList.add('correct');
+            else if (i === choiceIdx && !isCorrect) btn.classList.add('wrong');
+        });
+        
+        if (isCorrect) { 
+            correctCount++; 
+            showToast('✅ Correct! +10 XP');
+        } else { 
+            wrongCount++; 
+            showToast('❌ Not quite!');
+        }
+        
+        console.log('📊 Answer saved locally:', { current, isCorrect, correctCount, wrongCount, answers });
+        
+        updateScore();
+        document.getElementById('btn-next').disabled = false;
+        clearInterval(timerInt);
+        
+        const fb = document.getElementById('feedback');
+        fb.style.display = 'flex';
+        fb.className = 'feedback-banner ' + (isCorrect ? 'correct' : 'wrong');
+        document.getElementById('fb-icon').textContent = isCorrect ? '✅' : '❌';
+        document.getElementById('fb-title').textContent = isCorrect ? 'Correct!' : 'Not quite!';
+        
+        const items = document.querySelectorAll('.q-item');
+        items[current].classList.remove('active');
+        items[current].classList.add(isCorrect ? 'done' : 'wrong');
+        
+        // ⭐ FIX: Wait for save to complete before updating UI
+        await queueSaveProgress();
+        
+        // Update the lesson grid with latest progress
+        const progressMap = await loadAllLessonProgress();
+        renderLessonGrid(progressMap);
+    }
+
+    function updateScore() {
+        document.getElementById('correct-count').textContent = correctCount;
+        document.getElementById('wrong-count').textContent = wrongCount;
+        
+        document.getElementById('score-label').innerHTML = `${correctCount}/${QUESTIONS.length}<small>Score</small>`;
+        
+        const pct = correctCount / QUESTIONS.length;
+        document.getElementById('score-ring').style.strokeDashoffset = 314 - (314 * pct);
+        
+        const answered = answers.filter(a => a !== null).length;
+        let ovPct = Math.round((answered / QUESTIONS.length) * 100);
+        if (ovPct > 100) ovPct = 100;
+        document.getElementById('overall-bar').style.width = ovPct + '%';
+        document.getElementById('overall-pct').textContent = ovPct + '%';
+        
+        console.log('📊 Score updated:', { correctCount, answered, total: QUESTIONS.length, ovPct });
+    }
+
+    // ⭐ FIX: Async nextQ with queue flush
+    async function nextQ() {
+        if (current < QUESTIONS.length - 1) {
+            current++;
+            renderQuestion(current);
+        } else {
+            await finishLesson();
+        }
+    }
+
+    function prevQ() {
+        if (current > 0) {
+            current--;
+            renderQuestion(current);
+        }
+    }
+
+    function goToQ(idx) {
+        if (answers[idx-1] !== null || idx <= current) {
+            current = idx;
+            renderQuestion(current);
+        }
+    }
+
+    function resetTimer() {
+        clearInterval(timerInt);
+        timerVal = 30;
+        const pill = document.getElementById('timer-pill');
+        const val = document.getElementById('timer-val');
+        pill.classList.remove('urgent');
+        val.textContent = timerVal;
+        
+        if (answers[current] !== null) return;
+        
+        timerInt = setInterval(() => {
+            timerVal--;
+            val.textContent = timerVal;
+            if (timerVal <= 10) pill.classList.add('urgent');
+            if (timerVal <= 0) {
+                clearInterval(timerInt);
+                if (answers[current] === null) {
+                    answers[current] = false;
+                    wrongCount++;
+                    updateScore();
+                    document.getElementById('btn-next').disabled = false;
+                    document.querySelectorAll('.choice-btn').forEach((b, i) => {
+                        b.disabled = true;
+                        if (i === QUESTIONS[current].correct) b.classList.add('correct');
+                    });
+                    showToast('⏰ Time\'s up!');
+                    queueSaveProgress();
+                }
+            }
+        }, 1000);
+    }
+
+    // ⭐ FIX: Async finishLesson with final save guarantee
+    async function finishLesson() {
+        clearInterval(timerInt);
+
+        console.log('🏁 Finishing lesson...');
+        
+        // ⭐ CRITICAL FIX: Force a final save and wait for it to complete
+        await queueSaveProgress();
+        
+        // Double-check that all answers are saved
+        const allAnswered = answers.every(a => a !== null);
+        if (allAnswered) {
+            console.log('✅ All questions answered, final save completed');
+        } else {
+            console.warn('⚠️ Not all questions answered:', answers);
+        }
+
+        const pct = Math.round((correctCount / QUESTIONS.length) * 100);
+        document.getElementById('modal-trophy').textContent = pct >= 80 ? '🏆' : pct >= 50 ? '⭐' : '📚';
+        document.getElementById('modal-title').textContent = pct >= 80 ? 'Excellent Work!' : pct >= 50 ? 'Good Effort!' : 'Keep Practicing!';
+        document.getElementById('modal-msg').textContent = `You scored ${correctCount} out of ${QUESTIONS.length} on ${currentLesson.title}!`;
+        document.getElementById('modal-score').textContent = `${correctCount}/${QUESTIONS.length}`;
+        document.getElementById('modal-xp').textContent = '+' + (correctCount * 10);
+        document.getElementById('result-modal').classList.add('show');
+        
+        // ⭐ Final update to lesson grid
+        const progressMap = await loadAllLessonProgress();
+        renderLessonGrid(progressMap);
+    }
+
+    async function restartLesson() {
+        if (confirm(`Are you sure you want to restart the ${currentLesson.title} lesson? This will reset your progress.`)) {
+            document.getElementById('result-modal').classList.remove('show');
+            current = 0;
+            answers = new Array(QUESTIONS.length).fill(null);
+            correctCount = 0;
+            wrongCount = 0;
+            updateScore();
+            
+            await clearProgressFromSupabase();
+            renderQuestion(0);
+            showToast('🔄 Progress reset! Starting from the beginning.');
+            const progressMap = await loadAllLessonProgress();
+            renderLessonGrid(progressMap);
+        }
+    }
+
+    // ---- CHECK IF LESSON WAS SELECTED FROM DASHBOARD ----
+    async function checkDashboardRedirect() {
+        const lessonFromDashboard = localStorage.getItem('currentLesson');
+        if (lessonFromDashboard && LESSON_DATA[lessonFromDashboard]) {
+            localStorage.removeItem('currentLesson');
+            await selectLesson(lessonFromDashboard);
+        } else {
+            setLayoutMode('selection');
+            const progressMap = await loadAllLessonProgress();
+            renderLessonGrid(progressMap);
+        }
+    }
+
+    // ---- INITIALIZE ----
+    async function init() {
+        const displayName = localStorage.getItem('neurolearn_display_name') || 'Student';
+        document.getElementById('lesson-username').textContent = displayName;
+        await checkDashboardRedirect();
+    }
+
+    init();
+</script>
 </body>
 </html>
