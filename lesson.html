@@ -437,7 +437,9 @@
 <script src="supabase-config.js"></script>
 <script src="script.js"></script>
 <script>
+    // ============================================================
     // LESSON DATA - All 5 Lessons
+    // ============================================================
     const LESSON_DATA = {
         subtraction: {
             title: "Subtraction",
@@ -447,11 +449,11 @@
             totalQuestions: 5,
             hint: "Start from the larger number and count down.",
             questions: [
-                { text: '15 - 5 = ?', choices: [5, 10, 15, 20], correct: 1, hint: '15 minus 5 equals 10' },
-                { text: '20 - 8 = ?', choices: [10, 12, 14, 16], correct: 1, hint: '20 minus 8 equals 12' },
-                { text: '15 - 6 = ?', choices: [7, 8, 9, 10], correct: 2, hint: '15 minus 6 equals 9' },
-                { text: '30 - 14 = ?', choices: [14, 16, 18, 20], correct: 1, hint: '30 minus 14 equals 16' },
-                { text: '100 - 47 = ?', choices: [43, 53, 57, 63], correct: 1, hint: '100 minus 47 equals 53' }
+                { text: '15 - 5 = ?', choices: [5, 10, 15, 20], correct: 1, hint: 'Count down 5 from 15.' },
+                { text: '20 - 8 = ?', choices: [10, 12, 14, 16], correct: 1, hint: 'Count down 8 from 20.' },
+                { text: '15 - 6 = ?', choices: [7, 8, 9, 10], correct: 2, hint: 'Count down 6 from 15.' },
+                { text: '30 - 14 = ?', choices: [14, 16, 18, 20], correct: 1, hint: 'Count down 14 from 30.' },
+                { text: '100 - 47 = ?', choices: [43, 53, 57, 63], correct: 1, hint: 'Count down 47 from 100.' }
             ]
         },
         addition: {
@@ -462,11 +464,11 @@
             totalQuestions: 5,
             hint: "Add the numbers together carefully.",
             questions: [
-                { text: '5 + 3 = ?', choices: [6, 7, 8, 9], correct: 2, hint: '5 + 3 = 8' },
-                { text: '9 + 4 = ?', choices: [12, 13, 14, 15], correct: 1, hint: '9 + 4 = 13' },
-                { text: '12 + 7 = ?', choices: [17, 18, 19, 20], correct: 2, hint: '12 + 7 = 19' },
-                { text: '15 + 10 = ?', choices: [20, 25, 30, 35], correct: 1, hint: '15 + 10 = 25' },
-                { text: '23 + 16 = ?', choices: [37, 38, 39, 40], correct: 2, hint: '23 + 16 = 39' }
+                { text: '5 + 3 = ?', choices: [6, 7, 8, 9], correct: 2, hint: 'Combine 5 and 3 together.' },
+                { text: '9 + 4 = ?', choices: [12, 13, 14, 15], correct: 1, hint: 'Combine 9 and 4 together.' },
+                { text: '12 + 7 = ?', choices: [17, 18, 19, 20], correct: 2, hint: 'Combine 12 and 7 together.' },
+                { text: '15 + 10 = ?', choices: [20, 25, 30, 35], correct: 1, hint: 'Combine 15 and 10 together.' },
+                { text: '23 + 16 = ?', choices: [37, 38, 39, 40], correct: 2, hint: 'Combine 23 and 16 together.' }
             ]
         },
         plant: {
@@ -477,11 +479,11 @@
             totalQuestions: 5,
             hint: "Think about how plants grow from seeds to full-grown plants.",
             questions: [
-                { text: 'What is the first stage of a plant\'s life cycle?', choices: ['Seed', 'Sprout', 'Flower', 'Fruit'], correct: 0, hint: 'It all starts with a tiny packet of life.' },
-                { text: 'What does a seed need to germinate?', choices: ['Sunlight only', 'Water and warmth', 'Fertilizer only', 'Just soil'], correct: 1, hint: 'Plants need water and the right temperature to start growing.' },
-                { text: 'What comes after a sprout in the plant life cycle?', choices: ['Seed', 'Seedling', 'Flower', 'Fruit'], correct: 1, hint: 'It grows bigger and develops leaves.' },
-                { text: 'What part of the plant makes food using sunlight?', choices: ['Roots', 'Stem', 'Leaves', 'Flowers'], correct: 2, hint: 'They are green and capture sunlight for photosynthesis.' },
-                { text: 'What is the final stage of a plant\'s life cycle?', choices: ['Seed', 'Sprout', 'Flower', 'Fruit and seeds'], correct: 3, hint: 'The plant reproduces and creates new seeds to start the cycle again.' }
+                { text: 'What is the first stage of a plant\'s life cycle?', choices: ['Seed', 'Sprout', 'Flower', 'Fruit'], correct: 0, hint: 'Everything starts with a tiny packet of life.' },
+                { text: 'What does a seed need to germinate?', choices: ['Sunlight only', 'Water and warmth', 'Fertilizer only', 'Just soil'], correct: 1, hint: 'Think about what helps a seed wake up and grow.' },
+                { text: 'What comes after a sprout in the plant life cycle?', choices: ['Seed', 'Seedling', 'Flower', 'Fruit'], correct: 1, hint: 'It grows bigger and develops its first true leaves.' },
+                { text: 'What part of the plant makes food using sunlight?', choices: ['Roots', 'Stem', 'Leaves', 'Flowers'], correct: 2, hint: 'These are green and capture sunlight for photosynthesis.' },
+                { text: 'What is the final stage of a plant\'s life cycle?', choices: ['Seed', 'Sprout', 'Flower', 'Fruit and seeds'], correct: 3, hint: 'The plant reproduces to create the next generation.' }
             ]
         },
         reading: {
@@ -492,11 +494,11 @@
             totalQuestions: 5,
             hint: "Read the story carefully and remember the details.",
             questions: [
-                { text: 'What is the main character\'s name in the story?', choices: ['Maria', 'Juan', 'Ana', 'Pedro'], correct: 2, hint: 'The story starts with "Ana loved to read..."' },
-                { text: 'Where did the story take place?', choices: ['Park', 'Library', 'School', 'Home'], correct: 1, hint: 'It was a quiet place filled with books.' },
-                { text: 'What did the main character find in the library?', choices: ['A toy', 'A magical book', 'A friend', 'A map'], correct: 1, hint: 'It was a special book that glowed.' },
-                { text: 'How did the main character feel at the end of the story?', choices: ['Sad', 'Happy', 'Scared', 'Tired'], correct: 1, hint: 'She smiled and couldn\'t wait to read more.' },
-                { text: 'What is the moral of the story?', choices: ['Reading is boring', 'Reading can take you on adventures', 'Books are heavy', 'Reading is only for school'], correct: 1, hint: 'The story showed how books can transport you to new worlds.' }
+                { text: 'What is the main character\'s name in the story?', choices: ['Maria', 'Juan', 'Ana', 'Pedro'], correct: 2, hint: 'Think about who the story is about.' },
+                { text: 'Where did the story take place?', choices: ['Park', 'Library', 'School', 'Home'], correct: 1, hint: 'Where would you find lots of books?' },
+                { text: 'What did the main character find in the library?', choices: ['A toy', 'A magical book', 'A friend', 'A map'], correct: 1, hint: 'It was something special and glowing.' },
+                { text: 'How did the main character feel at the end of the story?', choices: ['Sad', 'Happy', 'Scared', 'Tired'], correct: 1, hint: 'She had a big smile on her face.' },
+                { text: 'What is the moral of the story?', choices: ['Reading is boring', 'Reading can take you on adventures', 'Books are heavy', 'Reading is only for school'], correct: 1, hint: 'Think about what the story taught us about books.' }
             ]
         },
         ancient: {
@@ -507,11 +509,11 @@
             totalQuestions: 5,
             hint: "Look for clues about rivers, leaders, inventions, and famous landmarks.",
             questions: [
-                { text: 'Which ancient civilization built the pyramids of Giza?', choices: ['Romans', 'Egyptians', 'Greeks', 'Chinese'], correct: 1, hint: 'They lived along the Nile River.' },
-                { text: 'Mesopotamia was located between which two rivers?', choices: ['Nile and Amazon', 'Tigris and Euphrates', 'Yangtze and Yellow', 'Indus and Ganges'], correct: 1, hint: "Its name means 'land between rivers.'" },
-                { text: 'Which civilization is known as the birthplace of democracy?', choices: ['Egypt', 'Rome', 'Greece', 'China'], correct: 2, hint: 'Athens was one of its famous city-states.' },
-                { text: 'The Great Wall belongs to which civilization?', choices: ['Roman', 'Chinese', 'Persian', 'Greek'], correct: 1, hint: 'It was built to defend the empire.' },
-                { text: 'Which writing system was used by Ancient Egypt?', choices: ['Latin', 'Alphabet', 'Hieroglyphics', 'Cuneiform'], correct: 2, hint: 'Picture symbols carved on temples.' }
+                { text: 'Which ancient civilization built the pyramids of Giza?', choices: ['Romans', 'Egyptians', 'Greeks', 'Chinese'], correct: 1, hint: 'They lived along the Nile River in Africa.' },
+                { text: 'Mesopotamia was located between which two rivers?', choices: ['Nile and Amazon', 'Tigris and Euphrates', 'Yangtze and Yellow', 'Indus and Ganges'], correct: 1, hint: 'Its name means "land between rivers."' },
+                { text: 'Which civilization is known as the birthplace of democracy?', choices: ['Egypt', 'Rome', 'Greece', 'China'], correct: 2, hint: 'Think about Athens and ancient Greek city-states.' },
+                { text: 'The Great Wall belongs to which civilization?', choices: ['Roman', 'Chinese', 'Persian', 'Greek'], correct: 1, hint: 'It was built to defend an empire in Asia.' },
+                { text: 'Which writing system was used by Ancient Egypt?', choices: ['Latin', 'Alphabet', 'Hieroglyphics', 'Cuneiform'], correct: 2, hint: 'They used picture symbols carved on temples.' }
             ]
         }
     };
@@ -689,7 +691,6 @@
         currentLesson = LESSON_DATA[key];
         QUESTIONS = currentLesson.questions;
         
-        // Reset all state when selecting a new lesson
         answers = new Array(QUESTIONS.length).fill(null);
         correctCount = 0;
         wrongCount = 0;
@@ -698,10 +699,8 @@
 
         console.log('📊 Lesson state reset. Questions:', QUESTIONS.length);
 
-        // Switch to question mode
         setLayoutMode('question');
 
-        // Update sidebar
         document.getElementById('lesson-title').textContent = currentLesson.title;
         document.getElementById('lesson-desc').textContent = currentLesson.subject;
         document.getElementById('hint-text').textContent = currentLesson.hint;
@@ -709,11 +708,9 @@
         iconDiv.textContent = currentLesson.icon;
         iconDiv.className = 'subject-icon ' + currentLesson.iconClass;
 
-        // Show question area, hide selection
         document.getElementById('lesson-selection-container').classList.add('hidden');
         document.getElementById('question-area-container').classList.add('active');
 
-        // Build question list and render
         buildQuestionList();
         await loadProgressFromSupabase();
         renderQuestion(0);
@@ -775,7 +772,6 @@
             if (progress) {
                 console.log('📊 Loaded progress from Supabase:', progress);
                 
-                // ✅ FIX: Properly parse answers and ensure length matches QUESTIONS.length
                 let parsedAnswers = progress.answers;
                 if (typeof parsedAnswers === 'string') {
                     try {
@@ -785,25 +781,37 @@
                     }
                 }
                 
-                // ✅ FIX: Ensure answers array is the correct length
                 if (!Array.isArray(parsedAnswers)) {
                     parsedAnswers = [];
                 }
                 
-                // Pad or trim to match QUESTIONS.length
+                // ⭐ FIX: Ensure we have exactly QUESTIONS.length answers
                 while (parsedAnswers.length < QUESTIONS.length) {
                     parsedAnswers.push(null);
                 }
                 parsedAnswers = parsedAnswers.slice(0, QUESTIONS.length);
                 
-                answers = parsedAnswers;
-                correctCount = progress.correct_count || 0;
-                wrongCount = progress.wrong_count || 0;
+                // ⭐ CRITICAL FIX: Also update correctCount and wrongCount from progress
+                if (progress.correct_count !== undefined) {
+                    correctCount = progress.correct_count || 0;
+                }
+                if (progress.wrong_count !== undefined) {
+                    wrongCount = progress.wrong_count || 0;
+                }
                 
-                console.log('📊 Loaded state:', { correctCount, wrongCount, answersLength: answers.length });
+                answers = parsedAnswers;
+                
+                console.log('📊 Loaded state:', { 
+                    correctCount, 
+                    wrongCount, 
+                    answersLength: answers.length,
+                    answers: answers 
+                });
+                
                 updateScore();
                 
                 document.querySelectorAll('.q-item').forEach((el, i) => {
+                    el.classList.remove('done', 'wrong');
                     if (answers[i] === true) el.classList.add('done');
                     else if (answers[i] !== null) el.classList.add('wrong');
                 });
@@ -815,69 +823,99 @@
         }
     }
 
-    // ---- SAVE PROGRESS TO SUPABASE ----
+    // ============================================================
+    // ⭐ FIX: Serialized save queue - prevents race conditions
+    // ============================================================
+    let saveQueue = Promise.resolve();
+    let isSaving = false;
+
+    function queueSaveProgress() {
+        // If already saving, wait for it to finish
+        if (isSaving) {
+            console.log('⏳ Save already in progress, waiting...');
+            return saveQueue;
+        }
+        
+        isSaving = true;
+        saveQueue = saveQueue
+            .then(() => {
+                console.log('💾 Starting save...');
+                return saveProgressToSupabase();
+            })
+            .catch(err => {
+                console.error('Save error:', err);
+            })
+            .finally(() => {
+                isSaving = false;
+                console.log('✅ Save completed');
+            });
+        return saveQueue;
+    }
+
+    // ============================================================
+    // ⭐ FIX: Save to Supabase with proper error handling
+    // ============================================================
     async function saveProgressToSupabase() {
         try {
             const supabaseClient = await waitForSupabase();
-            if (!supabaseClient) return;
+            if (!supabaseClient) {
+                console.error('❌ Supabase not available');
+                return;
+            }
 
-            const { data: { user } } = await supabaseClient.auth.getUser();
-            if (!user) return;
+            const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+            if (userError || !user) {
+                console.error('❌ No user logged in:', userError);
+                return;
+            }
 
             if (!lessonDatabaseId) {
                 lessonDatabaseId = await getLessonId(currentLessonKey);
-                if (!lessonDatabaseId) return;
+                if (!lessonDatabaseId) {
+                    console.error('❌ Could not get lesson ID');
+                    return;
+                }
             }
 
             const answeredCount = answers.filter(a => a !== null).length;
             const completed = answers.every(a => a !== null);
-            
-            // Calculate percentage based on total questions (5)
-            const progressPercentage = Math.round((correctCount / QUESTIONS.length) * 100);
-            
-            console.log('📊 Saving progress:', {
-                correctCount,
-                totalQuestions: QUESTIONS.length,
-                progressPercentage,
-                completed,
-                answersLength: answers.length
-            });
-            
-            const progressData = {
+            const progressPercentage = Math.round((answeredCount / QUESTIONS.length) * 100);
+
+            // ⭐ CRITICAL FIX: Deep clone the answers array
+            const answersCopy = JSON.parse(JSON.stringify(answers));
+
+            const saveData = {
+                user_id: user.id,
+                lesson_id: lessonDatabaseId,
                 progress_percentage: progressPercentage,
                 status: completed ? 'completed' : (answeredCount > 0 ? 'in_progress' : 'not_started'),
                 score: correctCount,
                 correct_count: correctCount,
                 wrong_count: wrongCount,
-                answers: answers,
+                answers: answersCopy,
                 last_accessed: new Date().toISOString(),
                 completed_at: completed ? new Date().toISOString() : null
             };
 
-            const { data: existingProgress } = await supabaseClient
-                .from('user_progress')
-                .select('id')
-                .eq('user_id', user.id)
-                .eq('lesson_id', lessonDatabaseId)
-                .single();
+            console.log('📊 Saving progress:', saveData);
 
-            if (existingProgress) {
-                await supabaseClient.from('user_progress').update(progressData).eq('id', existingProgress.id);
-                console.log('✅ Updated progress in Supabase');
+            const { error } = await supabaseClient
+                .from('user_progress')
+                .upsert(saveData, { onConflict: 'user_id,lesson_id' });
+
+            if (error) {
+                console.error('❌ Error saving progress:', error);
             } else {
-                await supabaseClient.from('user_progress').insert({
-                    user_id: user.id,
-                    lesson_id: lessonDatabaseId,
-                    ...progressData
-                });
-                console.log('✅ Inserted new progress in Supabase');
+                console.log('✅ Progress saved:', progressPercentage + '%');
             }
         } catch (error) {
-            console.error('Error saving progress:', error);
+            console.error('❌ Error in saveProgressToSupabase:', error);
         }
     }
 
-    // ---- CLEAR PROGRESS FROM SUPABASE ----
+    // ============================================================
+    // CLEAR PROGRESS FROM SUPABASE
+    // ============================================================
     async function clearProgressFromSupabase() {
         try {
             const supabaseClient = await waitForSupabase();
@@ -959,7 +997,7 @@
             showToast('❌ Not quite!');
         }
         
-        console.log('📊 Answer saved:', { current, isCorrect, correctCount, wrongCount });
+        console.log('📊 Answer saved locally:', { current, isCorrect, correctCount, wrongCount, answers });
         
         updateScore();
         document.getElementById('btn-next').disabled = false;
@@ -975,15 +1013,18 @@
         items[current].classList.remove('active');
         items[current].classList.add(isCorrect ? 'done' : 'wrong');
         
-        await saveProgressToSupabase();
-        loadAllLessonProgress().then(renderLessonGrid);
+        // ⭐ FIX: Wait for save to complete before updating UI
+        await queueSaveProgress();
+        
+        // Update the lesson grid with latest progress
+        const progressMap = await loadAllLessonProgress();
+        renderLessonGrid(progressMap);
     }
 
     function updateScore() {
         document.getElementById('correct-count').textContent = correctCount;
         document.getElementById('wrong-count').textContent = wrongCount;
         
-        // Always show correctCount / totalQuestions
         document.getElementById('score-label').innerHTML = `${correctCount}/${QUESTIONS.length}<small>Score</small>`;
         
         const pct = correctCount / QUESTIONS.length;
@@ -995,15 +1036,16 @@
         document.getElementById('overall-bar').style.width = ovPct + '%';
         document.getElementById('overall-pct').textContent = ovPct + '%';
         
-        console.log('📊 Score updated:', { correctCount, total: QUESTIONS.length, pct: (pct * 100) + '%' });
+        console.log('📊 Score updated:', { correctCount, answered, total: QUESTIONS.length, ovPct });
     }
 
-    function nextQ() {
+    // ⭐ FIX: Async nextQ with queue flush
+    async function nextQ() {
         if (current < QUESTIONS.length - 1) {
             current++;
             renderQuestion(current);
         } else {
-            finishLesson();
+            await finishLesson();
         }
     }
 
@@ -1047,14 +1089,29 @@
                         if (i === QUESTIONS[current].correct) b.classList.add('correct');
                     });
                     showToast('⏰ Time\'s up!');
-                    saveProgressToSupabase();
+                    queueSaveProgress();
                 }
             }
         }, 1000);
     }
 
-    function finishLesson() {
+    // ⭐ FIX: Async finishLesson with final save guarantee
+    async function finishLesson() {
         clearInterval(timerInt);
+
+        console.log('🏁 Finishing lesson...');
+        
+        // ⭐ CRITICAL FIX: Force a final save and wait for it to complete
+        await queueSaveProgress();
+        
+        // Double-check that all answers are saved
+        const allAnswered = answers.every(a => a !== null);
+        if (allAnswered) {
+            console.log('✅ All questions answered, final save completed');
+        } else {
+            console.warn('⚠️ Not all questions answered:', answers);
+        }
+
         const pct = Math.round((correctCount / QUESTIONS.length) * 100);
         document.getElementById('modal-trophy').textContent = pct >= 80 ? '🏆' : pct >= 50 ? '⭐' : '📚';
         document.getElementById('modal-title').textContent = pct >= 80 ? 'Excellent Work!' : pct >= 50 ? 'Good Effort!' : 'Keep Practicing!';
@@ -1062,6 +1119,10 @@
         document.getElementById('modal-score').textContent = `${correctCount}/${QUESTIONS.length}`;
         document.getElementById('modal-xp').textContent = '+' + (correctCount * 10);
         document.getElementById('result-modal').classList.add('show');
+        
+        // ⭐ Final update to lesson grid
+        const progressMap = await loadAllLessonProgress();
+        renderLessonGrid(progressMap);
     }
 
     async function restartLesson() {
@@ -1076,7 +1137,8 @@
             await clearProgressFromSupabase();
             renderQuestion(0);
             showToast('🔄 Progress reset! Starting from the beginning.');
-            loadAllLessonProgress().then(renderLessonGrid);
+            const progressMap = await loadAllLessonProgress();
+            renderLessonGrid(progressMap);
         }
     }
 
