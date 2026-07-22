@@ -17,9 +17,7 @@
             <div class="nav-center">
                 <a class="nav-tab active" href="dashboard.html">🏠 Dashboard</a>
                 <a class="nav-tab" href="lesson.html">📐 Lesson</a>
-                <a class="nav-tab" href="student-profile.html">👤 Student Profile</a>
-                <a class="nav-tab" href="parent-profile.html">👩 Parent Profile</a>
-                <a class="nav-tab" href="report.html">📋 Report</a>
+                <a class="nav-tab" href="student-profile.html">👤 Profile</a>
             </div>
             <div class="nav-right">
                 <button class="icon-btn" title="Notifications" onclick="showToast('Notifications coming soon!')">🔔</button>
@@ -69,11 +67,11 @@
                 <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
                     <div>
                         <h2 style="font-family:'Baloo 2',cursive;font-size:1.6rem;color:var(--text-dark);">Select a Lesson to begin</h2>
-                        <p style="color:var(--text-mid);font-size:0.9rem;font-weight:600;margin-top:2px;">You have <strong style="color:var(--teal);" id="active-lessons-count">5 active</strong> lessons today</p>
+                        <p style="color:var(--text-mid);font-size:0.9rem;font-weight:600;margin-top:2px;">You have <strong style="color:var(--teal);" id="active-lessons-count">0</strong> lessons completed</p>
                     </div>
                     <div id="subject-tabs" class="subject-tabs">
-                        <button class="subject-tab" onclick="filterSubject(this,'all')">📚 All</button>
-                        <button class="subject-tab active" onclick="filterSubject(this,'math')">📐 Math</button>
+                        <button class="subject-tab active" onclick="filterSubject(this,'all')">📚 All</button>
+                        <button class="subject-tab" onclick="filterSubject(this,'math')">📐 Math</button>
                         <button class="subject-tab" onclick="filterSubject(this,'science')">🔬 Science</button>
                         <button class="subject-tab" onclick="filterSubject(this,'reading')">📖 Reading</button>
                         <button class="subject-tab" onclick="filterSubject(this,'history')">🏛️ History</button>
@@ -242,27 +240,40 @@
             try {
                 const supabaseClient = await waitForSupabase();
                 if (!supabaseClient) {
-                    loadFromLocalStorage();
+                    console.warn('⚠️ Supabase not available');
+                    resetAllProgressToZero();
                     return;
                 }
 
                 // Get current user
-                const { data: { user } } = await supabaseClient.auth.getUser();
-                if (!user) {
-                    loadFromLocalStorage();
+                const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+                if (userError || !user) {
+                    console.warn('⚠️ No user logged in:', userError);
+                    resetAllProgressToZero();
                     return;
                 }
+
+                console.log('🔵 Loading progress for user:', user.id);
 
                 // Get all lessons with their keys
                 const { data: lessons, error: lessonsError } = await supabaseClient
                     .from('lessons')
-                    .select('id, lesson_key, title');
+                    .select('id, lesson_key, title, exercises_count')
+                    .order('id');
 
                 if (lessonsError) {
-                    console.error('Error loading lessons:', lessonsError);
-                    loadFromLocalStorage();
+                    console.error('❌ Error loading lessons:', lessonsError);
+                    resetAllProgressToZero();
                     return;
                 }
+
+                if (!lessons || lessons.length === 0) {
+                    console.warn('⚠️ No lessons found in database');
+                    resetAllProgressToZero();
+                    return;
+                }
+
+                console.log('📚 Lessons loaded:', lessons.length);
 
                 // Get user progress for all lessons
                 const { data: progressData, error: progressError } = await supabaseClient
@@ -271,10 +282,13 @@
                     .eq('user_id', user.id);
 
                 if (progressError) {
-                    console.error('Error loading progress:', progressError);
-                    loadFromLocalStorage();
+                    console.error('❌ Error loading progress:', progressError);
+                    resetAllProgressToZero();
                     return;
                 }
+
+                console.log('📊 Progress data from Supabase:', progressData);
+                console.log('📊 Progress count:', progressData ? progressData.length : 0);
 
                 let totalCorrect = 0;
                 let totalQuestions = 0;
@@ -284,11 +298,26 @@
 
                 // Update each lesson card
                 lessons.forEach(lesson => {
-                    const progress = progressData.find(p => p.lesson_id === lesson.id);
+                    const progress = progressData ? progressData.find(p => p.lesson_id === lesson.id) : null;
                     const pct = progress ? Math.min(progress.progress_percentage || 0, 100) : 0;
                     const correct = progress ? progress.correct_count || 0 : 0;
-                    const answered = progress && progress.answers ? JSON.parse(progress.answers).filter(a => a !== null).length : 0;
+                    let answered = 0;
+                    
+                    if (progress && progress.answers) {
+                        try {
+                            const answersData = typeof progress.answers === 'string' ? JSON.parse(progress.answers) : progress.answers;
+                            if (Array.isArray(answersData)) {
+                                answered = answersData.filter(a => a !== null).length;
+                            }
+                        } catch(e) {
+                            console.warn('Error parsing answers for lesson:', lesson.lesson_key, e);
+                            answered = 0;
+                        }
+                    }
+                    
                     const completed = progress ? progress.status === 'completed' : false;
+                    
+                    console.log(`📊 Lesson ${lesson.lesson_key}: pct=${pct}%, correct=${correct}, answered=${answered}, completed=${completed}`);
                     
                     // Update progress display
                     const progressEl = document.getElementById(`${lesson.lesson_key}-progress`);
@@ -321,11 +350,13 @@
 
                     // Accumulate totals for Today's Progress
                     totalCorrect += correct;
-                    totalQuestions += 5;
+                    totalQuestions += parseInt(lesson.exercises_count) || 5;
                     totalAnswered += answered;
                     totalXP += correct * 10;
                     if (completed) completedLessons++;
                 });
+
+                console.log('📊 Today\'s Progress totals:', { totalCorrect, totalQuestions, totalAnswered, totalXP, completedLessons });
 
                 // Update Today's Progress section
                 updateTodayProgress(totalCorrect, totalQuestions, totalAnswered, totalXP, completedLessons);
@@ -333,10 +364,59 @@
                 // Update active lessons count
                 document.getElementById('active-lessons-count').textContent = completedLessons;
 
+                // Also save to localStorage as cache for offline
+                if (progressData && progressData.length > 0) {
+                    saveProgressToLocalStorage(lessons, progressData);
+                }
+
             } catch (error) {
-                console.error('Error loading progress:', error);
-                loadFromLocalStorage();
+                console.error('💥 Error loading progress:', error);
+                resetAllProgressToZero();
             }
+        }
+
+        // ---- RESET ALL PROGRESS TO ZERO ----
+        function resetAllProgressToZero() {
+            console.log('🔄 Resetting all progress to zero');
+            const lessonKeys = ['addition', 'subtraction', 'plant', 'reading', 'ancient'];
+            lessonKeys.forEach(key => {
+                const progressEl = document.getElementById(`${key}-progress`);
+                const barEl = document.getElementById(`${key}-bar`);
+                if (progressEl) progressEl.textContent = '0%';
+                if (barEl) barEl.style.width = '0%';
+                
+                const btn = document.getElementById(`${key}-btn`);
+                if (btn) {
+                    btn.textContent = '▷ Start';
+                    btn.className = 'btn-action start';
+                }
+            });
+            
+            updateTodayProgress(0, 25, 0, 0, 0);
+            document.getElementById('active-lessons-count').textContent = '0';
+        }
+
+        // ---- CACHE PROGRESS TO LOCALSTORAGE ----
+        function saveProgressToLocalStorage(lessons, progressData) {
+            lessons.forEach(lesson => {
+                const progress = progressData.find(p => p.lesson_id === lesson.id);
+                if (progress) {
+                    const pct = Math.min(progress.progress_percentage || 0, 100);
+                    localStorage.setItem(`progress_${lesson.lesson_key}_pct`, pct);
+                    
+                    const data = {
+                        correctCount: progress.correct_count || 0,
+                        wrongCount: progress.wrong_count || 0,
+                        completed: progress.status === 'completed',
+                        answers: typeof progress.answers === 'string' ? JSON.parse(progress.answers) : progress.answers
+                    };
+                    localStorage.setItem(`progress_${lesson.lesson_key}`, JSON.stringify(data));
+                    console.log(`💾 Cached progress for ${lesson.lesson_key}: ${pct}%`);
+                } else {
+                    localStorage.removeItem(`progress_${lesson.lesson_key}_pct`);
+                    localStorage.removeItem(`progress_${lesson.lesson_key}`);
+                }
+            });
         }
 
         // ---- RESET LESSON PROGRESS ----
@@ -348,20 +428,16 @@
                 const { data: { user } } = await supabaseClient.auth.getUser();
                 if (!user) return;
 
-                // Delete from Supabase
                 await supabaseClient
                     .from('user_progress')
                     .delete()
                     .eq('user_id', user.id)
                     .eq('lesson_id', lessonId);
 
-                // Clear localStorage
                 localStorage.removeItem(`progress_${lessonKey}`);
                 localStorage.removeItem(`progress_${lessonKey}_pct`);
 
                 showToast('Progress reset! You can retake the lesson now.', '#FF8C42');
-                
-                // Reload progress
                 loadLessonProgress();
 
             } catch (error) {
@@ -372,51 +448,33 @@
 
         // ---- UPDATE TODAY'S PROGRESS ----
         function updateTodayProgress(correct, total, answered, xp, completed) {
+            console.log('🔄 updateTodayProgress called with:', { correct, total, answered, xp, completed });
+            
             const ring = document.getElementById('today-ring');
             if (ring) {
                 const pct = total > 0 ? Math.min(correct / total, 1) : 0;
                 const offset = 314 - (314 * pct);
                 ring.style.strokeDashoffset = offset;
+                console.log('🎯 Ring percentage:', (pct * 100).toFixed(1) + '%');
             }
 
-            document.getElementById('today-score').innerHTML = `${correct}/${total}<small>Total Questions</small>`;
-            document.getElementById('total-correct').textContent = correct;
-            document.getElementById('total-answered').textContent = answered;
-            document.getElementById('total-completed').textContent = completed;
-            document.getElementById('total-xp').textContent = xp;
-        }
+            const scoreEl = document.getElementById('today-score');
+            if (scoreEl) {
+                scoreEl.innerHTML = `${correct}/${total}<small>Total Questions</small>`;
+            }
 
-        // ---- LOAD FROM LOCALSTORAGE (FALLBACK) ----
-        function loadFromLocalStorage() {
-            const lessonKeys = ['addition', 'subtraction', 'plant', 'reading', 'ancient'];
+            const correctEl = document.getElementById('total-correct');
+            const answeredEl = document.getElementById('total-answered');
+            const completedEl = document.getElementById('total-completed');
+            const xpEl = document.getElementById('total-xp');
             
-            lessonKeys.forEach(key => {
-                let pct = parseInt(localStorage.getItem(`progress_${key}_pct`)) || 0;
-                if (pct > 100) pct = 100;
-
-                const progressEl = document.getElementById(`${key}-progress`);
-                const barEl = document.getElementById(`${key}-bar`);
-                
-                if (progressEl) progressEl.textContent = pct + '%';
-                if (barEl) barEl.style.width = pct + '%';
-
-                const btn = document.getElementById(`${key}-btn`);
-                if (btn) {
-                    if (pct === 0) {
-                        btn.textContent = '▷ Start';
-                        btn.className = 'btn-action start';
-                    } else if (pct < 100) {
-                        btn.textContent = '▶ Continue';
-                        btn.className = 'btn-action continue';
-                    } else if (pct === 100) {
-                        btn.textContent = '↺ Retake';
-                        btn.className = 'btn-action review';
-                    }
-                }
-            });
+            if (correctEl) correctEl.textContent = correct;
+            if (answeredEl) answeredEl.textContent = answered;
+            if (completedEl) completedEl.textContent = completed;
+            if (xpEl) xpEl.textContent = xp;
         }
 
-        // ---- FILTER FUNCTIONS ----
+        // ---- FILTER FUNCTIONS (Using global variables from script.js) ----
         function filterSubject(btn, subject) {
             document.querySelectorAll('.subject-tab').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
@@ -428,9 +486,7 @@
             filterLessons(currentSubject, val);
         }
 
-        let currentDifficulty = 'all';
-        let currentSubject = 'math';
-
+        // ---- Re-declaring filterLessons (overrides script.js version) ----
         function filterLessons(subject, difficulty) {
             currentSubject = subject;
             const cards = document.querySelectorAll('.lesson-card');
@@ -456,17 +512,17 @@
             if (typeof setActiveNav === 'function') setActiveNav();
             if (typeof animateProgressBars === 'function') animateProgressBars();
             
-            // Show welcome toast
             if (displayName) {
                 showToast(`Welcome back, ${displayName}! 🎉`);
             }
         });
 
-        // Make functions global for onclick
+        // Make functions global
         window.startLesson = startLesson;
         window.filterSubject = filterSubject;
         window.filterDifficulty = filterDifficulty;
         window.filterLessons = filterLessons;
+        window.loadLessonProgress = loadLessonProgress;
     </script>
 
 </body>
