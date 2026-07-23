@@ -318,7 +318,15 @@ async function handleSignup() {
     const password = document.getElementById('signup-password').value;
     const confirmPassword = document.getElementById('signup-confirm-password').value;
     const btn = document.getElementById('signup-btn');
-
+         // ============================================
+      // VERIFY GOOGLE reCAPTCHA
+      // ============================================
+      const captchaResponse = grecaptcha.getResponse();
+      
+      if (!captchaResponse) {
+          showToast('Please complete the reCAPTCHA.', '#FF6B6B');
+          return;
+      }
     const activeRoleBtn = document.querySelector('.role-btn.active');
     const role = activeRoleBtn ? activeRoleBtn.dataset.role : 'student';
 
