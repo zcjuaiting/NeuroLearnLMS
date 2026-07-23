@@ -64,12 +64,15 @@
             margin-top: 2px;
         }
         .learner-card {
-            display: flex; align-items: center; gap: 14px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
             padding: 16px 18px;
             background: linear-gradient(135deg, rgba(110,198,245,0.12), rgba(76,175,125,0.08));
             border: 1.5px solid rgba(110,198,245,0.3);
             border-radius: var(--radius-sm);
-            cursor: pointer; transition: all 0.2s;
+            cursor: pointer;
+            transition: all 0.2s;
             text-decoration: none;
             margin-top: 8px;
         }
@@ -301,7 +304,6 @@
             box-shadow: 0 3px 10px rgba(46,140,140,0.3);
         }
 
-        /* ---- Logout Button ---- */
         .logout-btn {
             display: flex;
             align-items: center;
@@ -325,7 +327,6 @@
             box-shadow: 0 4px 14px rgba(255,107,107,0.3);
         }
 
-        /* ---- Child Settings ---- */
         .child-settings-info {
             padding: 12px 16px;
             background: rgba(46,140,140,0.08);
@@ -346,6 +347,54 @@
         }
         .child-settings-info .info-text strong {
             color: var(--teal);
+        }
+
+        /* ---- Link Child Button ---- */
+        .link-child-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 14px 20px;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--teal);
+            background: transparent;
+            color: var(--teal);
+            font-family: 'Baloo 2', cursive;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            margin-top: 8px;
+        }
+        .link-child-btn:hover {
+            background: var(--teal);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(46,140,140,0.3);
+        }
+
+        /* ---- Empty State (No Child) ---- */
+        .empty-state {
+            text-align: center;
+            padding: 24px 16px;
+        }
+        .empty-state .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 8px;
+        }
+        .empty-state h4 {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+        .empty-state p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: 600;
         }
 
         @media (max-width: 768px) {
@@ -415,20 +464,11 @@
             </table>
         </div>
 
+        <!-- ⭐ LINKED LEARNER CARD -->
         <div class="card">
             <div class="card-title"><span class="icon">🧒</span> Linked Learner</div>
             <div id="linked-learner-container">
-                <a class="learner-card" href="student-profile.html" id="learner-link">
-                    <div class="lc-avatar">🧒</div>
-                    <div class="lc-info">
-                        <h4 id="learner-name">No learner linked</h4>
-                        <p id="learner-stats">Create a child account to track progress</p>
-                    </div>
-                    <span class="lc-arrow">→</span>
-                </a>
-                <a class="btn btn-teal btn-sm mt-12" href="create-child.html" style="width:100%;justify-content:center;">
-                    ✨ Create Child Account
-                </a>
+                <!-- This will be populated by JavaScript -->
             </div>
         </div>
 
@@ -442,7 +482,6 @@
                 <button class="profile-tab active" onclick="switchParentTab('preferences', this)">⚙️ Preferences</button>
                 <button class="profile-tab" onclick="switchParentTab('notifications', this)">🔔 Notifications</button>
                 <button class="profile-tab" onclick="switchParentTab('account', this)">🔐 Account</button>
-                <!-- ⭐ NEW: Child Settings Tab -->
                 <button class="profile-tab" onclick="switchParentTab('child-settings', this)">🧒 Child Settings</button>
             </div>
         </div>
@@ -457,15 +496,6 @@
                         <option value="Small">Small</option>
                         <option value="Medium">Medium</option>
                         <option value="Large" selected>Large</option>
-                    </select>
-                </div>
-                <div class="pref-row">
-                    <div><div class="pref-label">Daily Time Limit</div><div class="pref-desc">Max learning time per day</div></div>
-                    <select id="time-limit-select" class="nl-select">
-                        <option value="30 min">30 min</option>
-                        <option value="1 hour" selected>1 hour</option>
-                        <option value="2 hours">2 hours</option>
-                        <option value="No limit">No limit</option>
                     </select>
                 </div>
                 <div class="pref-row">
@@ -550,12 +580,11 @@
             </div>
         </div>
 
-        <!-- ⭐ NEW: CHILD SETTINGS TAB -->
+        <!-- ⭐ CHILD SETTINGS TAB -->
         <div id="tab-child-settings" class="tab-panel">
             <div class="card">
                 <div class="card-title"><span class="icon">🧒</span> Child's Accessibility Settings</div>
                 
-                <!-- Info Notice -->
                 <div class="child-settings-info">
                     <span class="info-icon">👩‍👧</span>
                     <div class="info-text">
@@ -564,7 +593,7 @@
                     </div>
                 </div>
 
-                <!-- Child Selector (if multiple children) -->
+                <!-- Child Selector -->
                 <div class="form-group" id="child-selector-container" style="display:none;">
                     <label style="font-size:0.8rem;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:0.5px;">
                         Select Child
@@ -628,13 +657,11 @@
                     <label class="toggle-switch"><input type="checkbox" id="child-adaptive-toggle" checked><span class="toggle-slider"></span></label>
                 </div>
 
-                <!-- Save Button -->
                 <div class="save-bar">
                     <button class="btn btn-ghost btn-sm" onclick="discardChildSettings()">Discard</button>
                     <button class="btn btn-teal btn-sm" id="child-settings-save-btn" onclick="saveChildSettings()">💾 Save Child Settings</button>
                 </div>
 
-                <!-- Save Status -->
                 <div id="child-settings-status" style="margin-top:12px;font-size:0.85rem;font-weight:600;display:none;"></div>
             </div>
         </div>
@@ -683,7 +710,7 @@
         window._toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
     }
 
-    // ---- ⭐ LOGOUT FUNCTION ----
+    // ---- LOGOUT ----
     async function handleLogout() {
         try {
             const supabaseClient = await waitForSupabase();
@@ -716,7 +743,44 @@
         setTimeout(() => { window.location.href = 'index.html'; }, 800);
     }
 
-    // ---- LOAD PARENT DATA FROM SUPABASE ----
+    // ---- UPDATE LINKED LEARNER UI ----
+    function updateLinkedLearnerUI() {
+        const container = document.getElementById('linked-learner-container');
+        
+        if (linkedChildData) {
+            const childName = linkedChildData.full_name || linkedChildData.display_name || 'Child';
+            const grade = linkedChildData.grade || 'Grade 3';
+            const level = linkedChildData.level || 1;
+            const xp = linkedChildData.xp || 0;
+            
+            container.innerHTML = `
+                <a class="learner-card" href="student-profile.html?id=${linkedChildData.id}">
+                    <div class="lc-avatar">🧒</div>
+                    <div class="lc-info">
+                        <h4>${childName}</h4>
+                        <p>${grade} · Level ${level} · ${xp} XP</p>
+                    </div>
+                    <span class="lc-arrow">→</span>
+                </a>
+                <button class="link-child-btn" onclick="window.location.href='parent-onboarding.html'">
+                    🔗 Link Another Learner
+                </button>
+            `;
+        } else {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">🧒</div>
+                    <h4>No learner linked</h4>
+                    <p>Connect a learner to track their progress</p>
+                </div>
+                <button class="link-child-btn" onclick="window.location.href='parent-onboarding.html'">
+                    🔗 Link a Learner
+                </button>
+            `;
+        }
+    }
+
+    // ---- LOAD PARENT DATA ----
     async function loadParentData() {
         try {
             const supabaseClient = await waitForSupabase();
@@ -809,18 +873,12 @@
                 linkedChildData = child;
                 currentChildId = child.id;
                 
-                const childName = child.full_name || child.display_name || 'Child';
-                document.getElementById('learner-name').textContent = childName;
-                document.getElementById('pref-learner-name').textContent = childName;
-                
-                const level = child.level || 1;
-                const xp = child.xp || 0;
-                document.getElementById('learner-stats').textContent = `Grade ${child.grade || '3'} · Level ${level} · ${xp} XP`;
+                // Update child settings tab
+                document.getElementById('pref-learner-name').textContent = child.full_name || child.display_name || 'Child';
                 document.getElementById('stat-children').textContent = children.length;
 
                 document.getElementById('learner-link').href = `student-profile.html?id=${child.id}`;
 
-                // Populate child selector if multiple children
                 if (children.length > 1) {
                     const selector = document.getElementById('child-selector-container');
                     selector.style.display = 'block';
@@ -835,10 +893,8 @@
                     });
                 }
 
-                // Load child settings into the child settings tab
                 loadChildSettings(child);
 
-                // Calculate avg progress
                 let totalProgress = 0;
                 let completedLessons = 0;
                 for (const c of children) {
@@ -860,22 +916,26 @@
                 updateRecentNotifications(child.id);
 
             } else {
-                document.getElementById('learner-name').textContent = 'No learner linked';
-                document.getElementById('learner-stats').textContent = 'Create a child account to track progress';
+                linkedChildData = null;
+                currentChildId = null;
                 document.getElementById('stat-children').textContent = '0';
                 document.getElementById('stat-avg-score').textContent = '0%';
+                document.getElementById('pref-learner-name').textContent = 'Child';
+                document.getElementById('child-selector-container').style.display = 'none';
                 document.getElementById('child-settings-name').textContent = 'No child linked';
                 document.getElementById('child-settings-grade').textContent = '--';
                 document.getElementById('child-settings-code').textContent = '--';
-                document.getElementById('child-selector-container').style.display = 'none';
             }
+
+            // Update the Linked Learner UI
+            updateLinkedLearnerUI();
 
         } catch (error) {
             console.error('Error loading linked children:', error);
         }
     }
 
-    // ---- LOAD CHILD SETTINGS INTO THE CHILD SETTINGS TAB ----
+    // ---- LOAD CHILD SETTINGS ----
     function loadChildSettings(child) {
         if (!child) return;
         
@@ -884,26 +944,14 @@
         document.getElementById('child-settings-grade').textContent = child.grade || 'Grade 3';
         document.getElementById('child-settings-code').textContent = child.child_code || '--';
 
-        // Font Size
-        const fontSize = child.font_size || 'Medium';
-        document.getElementById('child-font-size').value = fontSize;
-
-        // Color Mode
-        const colorMode = child.color_mode || 'Standard';
-        document.getElementById('child-color-mode').value = colorMode;
-
-        // Font Type
-        const fontType = child.font_type || 'Nunito';
-        document.getElementById('child-font-type').value = fontType;
-
-        // Text-to-Speech
+        document.getElementById('child-font-size').value = child.font_size || 'Medium';
+        document.getElementById('child-color-mode').value = child.color_mode || 'Standard';
+        document.getElementById('child-font-type').value = child.font_type || 'Nunito';
         document.getElementById('child-tts-toggle').checked = child.text_to_speech || false;
-
-        // Adaptive Pacing
         document.getElementById('child-adaptive-toggle').checked = child.adaptive_pacing !== false;
     }
 
-    // ---- SWITCH CHILD SETTINGS (for multiple children) ----
+    // ---- SWITCH CHILD ----
     async function switchChildSettings() {
         const select = document.getElementById('child-selector');
         const childId = select.value;
@@ -915,21 +963,20 @@
             linkedChildData = child;
             loadChildSettings(child);
             
-            // Update the linked learner card on the left
             const childName = child.full_name || child.display_name || 'Child';
-            document.getElementById('learner-name').textContent = childName;
             document.getElementById('pref-learner-name').textContent = childName;
-            document.getElementById('learner-stats').textContent = `Grade ${child.grade || '3'} · Level ${child.level || 1} · ${child.xp || 0} XP`;
-            document.getElementById('learner-link').href = `student-profile.html?id=${child.id}`;
+            
+            // Update the linked learner card
+            updateLinkedLearnerUI();
             
             showToast(`Switched to ${childName}`, '#4CAF7D');
         }
     }
 
-    // ---- SAVE CHILD SETTINGS TO SUPABASE ----
+    // ---- SAVE CHILD SETTINGS ----
     async function saveChildSettings() {
         if (!currentChildId) {
-            showToast('No child linked. Please create a child account first.', '#FF8C42');
+            showToast('No child linked. Please link a child first.', '#FF8C42');
             return;
         }
 
@@ -939,7 +986,6 @@
         btn.disabled = true;
         btn.innerHTML = '<span class="loading-spinner"></span> Saving...';
         statusEl.style.display = 'block';
-        statusEl.style.color = 'var(--text-mid)';
         statusEl.textContent = 'Saving child settings...';
 
         try {
@@ -971,7 +1017,6 @@
                 statusEl.textContent = '❌ Error saving: ' + error.message;
                 showToast('Error saving child settings', '#FF6B6B');
             } else {
-                // Update local data
                 if (linkedChildData) {
                     Object.assign(linkedChildData, updates);
                 }
@@ -983,13 +1028,6 @@
                 statusEl.style.color = 'var(--green-dark)';
                 statusEl.textContent = '✅ Child settings saved successfully!';
                 showToast('✅ Child settings saved!', '#4CAF7D');
-                
-                // Also save to localStorage for the child's session
-                localStorage.setItem('neurolearn_child_font_size', updates.font_size);
-                localStorage.setItem('neurolearn_child_color_mode', updates.color_mode);
-                localStorage.setItem('neurolearn_child_font_type', updates.font_type);
-                localStorage.setItem('neurolearn_child_tts', updates.text_to_speech);
-                localStorage.setItem('neurolearn_child_adaptive', updates.adaptive_pacing);
             }
 
         } catch (error) {
@@ -1100,7 +1138,6 @@
 
             const updates = {
                 font_size: document.getElementById('font-size-select').value,
-                time_limit: document.getElementById('time-limit-select').value,
                 color_mode: document.getElementById('color-mode-select').value,
                 text_to_speech: document.getElementById('tts-toggle').checked,
                 adaptive_pacing: document.getElementById('adaptive-toggle').checked,
@@ -1253,7 +1290,7 @@
     function discardNotifications() { loadParentData(); showToast('Changes discarded.', '#FF8C42'); }
     function discardAccount() { loadParentData(); showToast('Changes discarded.', '#FF8C42'); }
 
-    // ---- LOAD FROM LOCALSTORAGE (FALLBACK) ----
+    // ---- LOAD FROM LOCALSTORAGE ----
     function loadFromLocalStorage() {
         const savedName = localStorage.getItem('neurolearn_full_name') || 'Parent';
         const savedEmail = localStorage.getItem('parent_email') || 'parent@email.com';
@@ -1271,8 +1308,6 @@
 
         const savedFontSize = localStorage.getItem('pref_font_size');
         if (savedFontSize) document.getElementById('font-size-select').value = savedFontSize;
-        const savedTimeLimit = localStorage.getItem('pref_time_limit');
-        if (savedTimeLimit) document.getElementById('time-limit-select').value = savedTimeLimit;
         const savedColorMode = localStorage.getItem('pref_color_mode');
         if (savedColorMode) document.getElementById('color-mode-select').value = savedColorMode;
         const savedTTS = localStorage.getItem('pref_tts');
@@ -1286,7 +1321,6 @@
     // ---- UPDATE LEARNER STATS FROM LOCAL ----
     function updateLearnerStatsFromLocal() {
         const displayName = localStorage.getItem('neurolearn_display_name') || 'Student';
-        document.getElementById('learner-name').textContent = displayName;
         document.getElementById('pref-learner-name').textContent = displayName;
 
         const additionProgress = localStorage.getItem('progress_addition');
@@ -1305,7 +1339,6 @@
         });
 
         const level = Math.floor(totalXP / 100) + 1;
-        document.getElementById('learner-stats').textContent = `Grade 3 · Level ${level} · ${totalXP} XP`;
         document.getElementById('stat-children').textContent = completed > 0 ? 1 : 0;
         document.getElementById('stat-avg-score').textContent = completed > 0 ? '100%' : '0%';
     }
