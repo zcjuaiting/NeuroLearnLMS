@@ -301,16 +301,65 @@
             box-shadow: 0 3px 10px rgba(46,140,140,0.3);
         }
 
+        /* ---- Logout Button ---- */
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border-radius: 30px;
+            border: 2px solid var(--red);
+            background: transparent;
+            color: var(--red);
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .logout-btn:hover {
+            background: var(--red);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(255,107,107,0.3);
+        }
+
+        /* ---- Child Settings ---- */
+        .child-settings-info {
+            padding: 12px 16px;
+            background: rgba(46,140,140,0.08);
+            border-radius: var(--radius-sm);
+            border-left: 4px solid var(--teal);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .child-settings-info .info-icon {
+            font-size: 1.2rem;
+        }
+        .child-settings-info .info-text {
+            font-size: 0.85rem;
+            color: var(--text-mid);
+            font-weight: 600;
+        }
+        .child-settings-info .info-text strong {
+            color: var(--teal);
+        }
+
         @media (max-width: 768px) {
             .profile-layout { grid-template-columns: 1fr; padding: 20px; }
             .parent-stats { grid-template-columns: 1fr 1fr; }
+            .topnav { flex-wrap: wrap; height: auto; padding: 10px 20px; gap: 10px; }
+            .nav-center { flex-wrap: wrap; }
         }
     </style>
 </head>
 <body>
 
 <!-- ============================================ -->
-<!-- TOP NAVIGATION                               -->
+<!-- TOP NAVIGATION WITH LOGOUT                   -->
 <!-- ============================================ -->
 <nav class="topnav">
     <a class="nav-logo" href="parent-dashboard.html">NeuroLearn</a>
@@ -324,6 +373,9 @@
             <div class="avatar-circle parent">👩</div>
             <span id="parent-name-display">Parent</span>
         </a>
+        <button class="logout-btn" onclick="handleLogout()">
+            🚪 Logout
+        </button>
     </div>
 </nav>
 
@@ -390,6 +442,8 @@
                 <button class="profile-tab active" onclick="switchParentTab('preferences', this)">⚙️ Preferences</button>
                 <button class="profile-tab" onclick="switchParentTab('notifications', this)">🔔 Notifications</button>
                 <button class="profile-tab" onclick="switchParentTab('account', this)">🔐 Account</button>
+                <!-- ⭐ NEW: Child Settings Tab -->
+                <button class="profile-tab" onclick="switchParentTab('child-settings', this)">🧒 Child Settings</button>
             </div>
         </div>
 
@@ -495,6 +549,95 @@
                 </div>
             </div>
         </div>
+
+        <!-- ⭐ NEW: CHILD SETTINGS TAB -->
+        <div id="tab-child-settings" class="tab-panel">
+            <div class="card">
+                <div class="card-title"><span class="icon">🧒</span> Child's Accessibility Settings</div>
+                
+                <!-- Info Notice -->
+                <div class="child-settings-info">
+                    <span class="info-icon">👩‍👧</span>
+                    <div class="info-text">
+                        Adjust your child's <strong>accessibility and learning preferences</strong>. 
+                        Changes will be saved to their profile.
+                    </div>
+                </div>
+
+                <!-- Child Selector (if multiple children) -->
+                <div class="form-group" id="child-selector-container" style="display:none;">
+                    <label style="font-size:0.8rem;font-weight:700;color:var(--text-mid);text-transform:uppercase;letter-spacing:0.5px;">
+                        Select Child
+                    </label>
+                    <select id="child-selector" class="nl-select" style="width:100%;margin-top:4px;" onchange="switchChildSettings()">
+                        <!-- Populated by JavaScript -->
+                    </select>
+                </div>
+
+                <!-- Child Name Display -->
+                <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(110,198,245,0.15);margin-bottom:16px;">
+                    <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--sky-light),var(--green-light));display:flex;align-items:center;justify-content:center;font-size:1.3rem;border:2px solid white;flex-shrink:0;">🧒</div>
+                    <div>
+                        <div style="font-weight:800;font-size:1rem;color:var(--text-dark);" id="child-settings-name">No child linked</div>
+                        <div style="font-size:0.78rem;color:var(--text-light);font-weight:600;" id="child-settings-grade">--</div>
+                    </div>
+                    <div style="margin-left:auto;font-size:0.75rem;color:var(--text-light);font-weight:600;">
+                        <span id="child-settings-code">--</span>
+                    </div>
+                </div>
+
+                <!-- Font Size -->
+                <div class="pref-row">
+                    <div><div class="pref-label">Font Size</div><div class="pref-desc">Adjust text size for easier reading</div></div>
+                    <select id="child-font-size" class="nl-select">
+                        <option value="Small">Small</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="Large">Large</option>
+                    </select>
+                </div>
+
+                <!-- Color Mode -->
+                <div class="pref-row">
+                    <div><div class="pref-label">Color Mode</div><div class="pref-desc">Screen display contrast</div></div>
+                    <select id="child-color-mode" class="nl-select">
+                        <option value="Standard" selected>Standard</option>
+                        <option value="High Contrast">High Contrast</option>
+                        <option value="Pastel">Pastel</option>
+                    </select>
+                </div>
+
+                <!-- Font Type -->
+                <div class="pref-row">
+                    <div><div class="pref-label">Font Type</div><div class="pref-desc">Dyslexia-friendly fonts</div></div>
+                    <select id="child-font-type" class="nl-select">
+                        <option value="Nunito" selected>Nunito (Standard)</option>
+                        <option value="OpenDyslexic">OpenDyslexic</option>
+                        <option value="Large Print">Large Print</option>
+                    </select>
+                </div>
+
+                <!-- Text-to-Speech -->
+                <div class="pref-row">
+                    <div><div class="pref-label">Text-to-Speech</div><div class="pref-desc">Read questions aloud</div></div>
+                    <label class="toggle-switch"><input type="checkbox" id="child-tts-toggle"><span class="toggle-slider"></span></label>
+                </div>
+
+                <!-- Adaptive Pacing -->
+                <div class="pref-row">
+                    <div><div class="pref-label">Adaptive Pacing</div><div class="pref-desc">Auto-adjust difficulty based on performance</div></div>
+                    <label class="toggle-switch"><input type="checkbox" id="child-adaptive-toggle" checked><span class="toggle-slider"></span></label>
+                </div>
+
+                <!-- Save Button -->
+                <div class="save-bar">
+                    <button class="btn btn-ghost btn-sm" onclick="discardChildSettings()">Discard</button>
+                    <button class="btn btn-teal btn-sm" id="child-settings-save-btn" onclick="saveChildSettings()">💾 Save Child Settings</button>
+                </div>
+
+                <!-- Save Status -->
+                <div id="child-settings-status" style="margin-top:12px;font-size:0.85rem;font-weight:600;display:none;"></div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -510,6 +653,8 @@
 <script>
     let currentUserId = null;
     let linkedChildData = null;
+    let allChildrenData = [];
+    let currentChildId = null;
 
     // ---- HELPER: Wait for Supabase ----
     function waitForSupabase() {
@@ -538,27 +683,56 @@
         window._toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
     }
 
+    // ---- ⭐ LOGOUT FUNCTION ----
+    async function handleLogout() {
+        try {
+            const supabaseClient = await waitForSupabase();
+            if (supabaseClient && supabaseClient.auth) {
+                const { error } = await supabaseClient.auth.signOut();
+                if (error) console.error('Logout error:', error);
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
+        
+        localStorage.removeItem('neurolearn_display_name');
+        localStorage.removeItem('neurolearn_user_email');
+        localStorage.removeItem('neurolearn_user_id');
+        localStorage.removeItem('neurolearn_user_role');
+        localStorage.removeItem('neurolearn_level');
+        localStorage.removeItem('neurolearn_xp');
+        localStorage.removeItem('neurolearn_full_name');
+        localStorage.removeItem('neurolearn_birthday');
+        localStorage.removeItem('neurolearn_grade');
+        localStorage.removeItem('neurolearn_child_code');
+        localStorage.removeItem('neurolearn_linked_child_id');
+        localStorage.removeItem('neurolearn_linked_child_name');
+        localStorage.removeItem('parent_email');
+        localStorage.removeItem('parent_relationship');
+        localStorage.removeItem('parent_fullname');
+        localStorage.removeItem('parent_display_name');
+        
+        showToast('Logged out successfully 👋', '#FF8C42');
+        setTimeout(() => { window.location.href = 'index.html'; }, 800);
+    }
+
     // ---- LOAD PARENT DATA FROM SUPABASE ----
     async function loadParentData() {
         try {
             const supabaseClient = await waitForSupabase();
             if (!supabaseClient) {
-                console.warn('Supabase not available, loading from localStorage');
                 loadFromLocalStorage();
                 return;
             }
 
             const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
             if (userError || !user) {
-                console.warn('No user logged in');
                 loadFromLocalStorage();
                 return;
             }
 
             currentUserId = user.id;
-            console.log('🔵 Loading parent data for user:', user.id);
 
-            // Get parent user data
             const { data: userData, error: userError2 } = await supabaseClient
                 .from('users')
                 .select('*')
@@ -566,15 +740,11 @@
                 .single();
 
             if (userError2) {
-                console.error('Error loading user data:', userError2);
                 loadFromLocalStorage();
                 return;
             }
 
             if (userData) {
-                console.log('✅ Parent data loaded:', userData);
-
-                // Update parent info
                 const displayName = userData.display_name || userData.email?.split('@')[0] || 'Parent';
                 const fullName = userData.full_name || displayName;
 
@@ -595,30 +765,23 @@
 
                 if (userData.created_at) {
                     document.getElementById('info-joined').textContent = 
-                        new Date(userData.created_at).toLocaleDateString('en-US', { 
-                            month: 'long', 
-                            year: 'numeric' 
-                        });
+                        new Date(userData.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
                 }
 
-                // Update preferences
                 if (userData.font_size) document.getElementById('font-size-select').value = userData.font_size;
                 if (userData.color_mode) document.getElementById('color-mode-select').value = userData.color_mode;
                 if (userData.text_to_speech !== undefined) document.getElementById('tts-toggle').checked = userData.text_to_speech;
                 if (userData.adaptive_pacing !== undefined) document.getElementById('adaptive-toggle').checked = userData.adaptive_pacing;
 
-                // Save to localStorage
                 localStorage.setItem('neurolearn_display_name', displayName);
                 localStorage.setItem('neurolearn_full_name', fullName);
                 localStorage.setItem('parent_email', userData.email || '');
                 localStorage.setItem('parent_relationship', userData.relationship || 'Mother');
 
-                // Look for children linked to this parent
                 await loadLinkedChildren(user.id);
             }
 
         } catch (error) {
-            console.error('Error loading parent data:', error);
             loadFromLocalStorage();
         }
     }
@@ -631,7 +794,7 @@
 
             const { data: children, error } = await supabaseClient
                 .from('users')
-                .select('id, display_name, full_name, grade, level, xp, child_code')
+                .select('id, display_name, full_name, grade, level, xp, child_code, font_size, color_mode, text_to_speech, adaptive_pacing, font_type')
                 .eq('parent_id', parentId);
 
             if (error) {
@@ -639,9 +802,12 @@
                 return;
             }
 
+            allChildrenData = children || [];
+
             if (children && children.length > 0) {
                 const child = children[0];
                 linkedChildData = child;
+                currentChildId = child.id;
                 
                 const childName = child.full_name || child.display_name || 'Child';
                 document.getElementById('learner-name').textContent = childName;
@@ -653,6 +819,24 @@
                 document.getElementById('stat-children').textContent = children.length;
 
                 document.getElementById('learner-link').href = `student-profile.html?id=${child.id}`;
+
+                // Populate child selector if multiple children
+                if (children.length > 1) {
+                    const selector = document.getElementById('child-selector-container');
+                    selector.style.display = 'block';
+                    const select = document.getElementById('child-selector');
+                    select.innerHTML = '';
+                    children.forEach(c => {
+                        const opt = document.createElement('option');
+                        opt.value = c.id;
+                        opt.textContent = c.full_name || c.display_name || 'Child';
+                        if (c.id === child.id) opt.selected = true;
+                        select.appendChild(opt);
+                    });
+                }
+
+                // Load child settings into the child settings tab
+                loadChildSettings(child);
 
                 // Calculate avg progress
                 let totalProgress = 0;
@@ -680,10 +864,153 @@
                 document.getElementById('learner-stats').textContent = 'Create a child account to track progress';
                 document.getElementById('stat-children').textContent = '0';
                 document.getElementById('stat-avg-score').textContent = '0%';
+                document.getElementById('child-settings-name').textContent = 'No child linked';
+                document.getElementById('child-settings-grade').textContent = '--';
+                document.getElementById('child-settings-code').textContent = '--';
+                document.getElementById('child-selector-container').style.display = 'none';
             }
 
         } catch (error) {
             console.error('Error loading linked children:', error);
+        }
+    }
+
+    // ---- LOAD CHILD SETTINGS INTO THE CHILD SETTINGS TAB ----
+    function loadChildSettings(child) {
+        if (!child) return;
+        
+        const childName = child.full_name || child.display_name || 'Child';
+        document.getElementById('child-settings-name').textContent = childName;
+        document.getElementById('child-settings-grade').textContent = child.grade || 'Grade 3';
+        document.getElementById('child-settings-code').textContent = child.child_code || '--';
+
+        // Font Size
+        const fontSize = child.font_size || 'Medium';
+        document.getElementById('child-font-size').value = fontSize;
+
+        // Color Mode
+        const colorMode = child.color_mode || 'Standard';
+        document.getElementById('child-color-mode').value = colorMode;
+
+        // Font Type
+        const fontType = child.font_type || 'Nunito';
+        document.getElementById('child-font-type').value = fontType;
+
+        // Text-to-Speech
+        document.getElementById('child-tts-toggle').checked = child.text_to_speech || false;
+
+        // Adaptive Pacing
+        document.getElementById('child-adaptive-toggle').checked = child.adaptive_pacing !== false;
+    }
+
+    // ---- SWITCH CHILD SETTINGS (for multiple children) ----
+    async function switchChildSettings() {
+        const select = document.getElementById('child-selector');
+        const childId = select.value;
+        if (!childId) return;
+
+        const child = allChildrenData.find(c => c.id === childId);
+        if (child) {
+            currentChildId = childId;
+            linkedChildData = child;
+            loadChildSettings(child);
+            
+            // Update the linked learner card on the left
+            const childName = child.full_name || child.display_name || 'Child';
+            document.getElementById('learner-name').textContent = childName;
+            document.getElementById('pref-learner-name').textContent = childName;
+            document.getElementById('learner-stats').textContent = `Grade ${child.grade || '3'} · Level ${child.level || 1} · ${child.xp || 0} XP`;
+            document.getElementById('learner-link').href = `student-profile.html?id=${child.id}`;
+            
+            showToast(`Switched to ${childName}`, '#4CAF7D');
+        }
+    }
+
+    // ---- SAVE CHILD SETTINGS TO SUPABASE ----
+    async function saveChildSettings() {
+        if (!currentChildId) {
+            showToast('No child linked. Please create a child account first.', '#FF8C42');
+            return;
+        }
+
+        const btn = document.getElementById('child-settings-save-btn');
+        const statusEl = document.getElementById('child-settings-status');
+        
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> Saving...';
+        statusEl.style.display = 'block';
+        statusEl.style.color = 'var(--text-mid)';
+        statusEl.textContent = 'Saving child settings...';
+
+        try {
+            const supabaseClient = await waitForSupabase();
+            if (!supabaseClient) {
+                showToast('Supabase not available', '#FF6B6B');
+                btn.disabled = false;
+                btn.innerHTML = '💾 Save Child Settings';
+                return;
+            }
+
+            const updates = {
+                font_size: document.getElementById('child-font-size').value,
+                color_mode: document.getElementById('child-color-mode').value,
+                font_type: document.getElementById('child-font-type').value,
+                text_to_speech: document.getElementById('child-tts-toggle').checked,
+                adaptive_pacing: document.getElementById('child-adaptive-toggle').checked,
+                updated_at: new Date()
+            };
+
+            const { error } = await supabaseClient
+                .from('users')
+                .update(updates)
+                .eq('id', currentChildId);
+
+            if (error) {
+                console.error('Error saving child settings:', error);
+                statusEl.style.color = 'var(--red)';
+                statusEl.textContent = '❌ Error saving: ' + error.message;
+                showToast('Error saving child settings', '#FF6B6B');
+            } else {
+                // Update local data
+                if (linkedChildData) {
+                    Object.assign(linkedChildData, updates);
+                }
+                const child = allChildrenData.find(c => c.id === currentChildId);
+                if (child) {
+                    Object.assign(child, updates);
+                }
+                
+                statusEl.style.color = 'var(--green-dark)';
+                statusEl.textContent = '✅ Child settings saved successfully!';
+                showToast('✅ Child settings saved!', '#4CAF7D');
+                
+                // Also save to localStorage for the child's session
+                localStorage.setItem('neurolearn_child_font_size', updates.font_size);
+                localStorage.setItem('neurolearn_child_color_mode', updates.color_mode);
+                localStorage.setItem('neurolearn_child_font_type', updates.font_type);
+                localStorage.setItem('neurolearn_child_tts', updates.text_to_speech);
+                localStorage.setItem('neurolearn_child_adaptive', updates.adaptive_pacing);
+            }
+
+        } catch (error) {
+            console.error('Error:', error);
+            statusEl.style.color = 'var(--red)';
+            statusEl.textContent = '❌ An error occurred';
+            showToast('An error occurred', '#FF6B6B');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '💾 Save Child Settings';
+            setTimeout(() => {
+                statusEl.style.display = 'none';
+            }, 4000);
+        }
+    }
+
+    // ---- DISCARD CHILD SETTINGS ----
+    function discardChildSettings() {
+        if (linkedChildData) {
+            loadChildSettings(linkedChildData);
+            showToast('Changes discarded.', '#FF8C42');
         }
     }
 
@@ -786,14 +1113,12 @@
                 .eq('id', user.id);
 
             if (error) {
-                console.error('Error saving preferences:', error);
                 showToast('Error saving preferences: ' + error.message, '#FF6B6B');
             } else {
                 showToast('Preferences saved successfully! ✅', '#4CAF7D');
             }
 
         } catch (error) {
-            console.error('Error:', error);
             showToast('An error occurred', '#FF6B6B');
         } finally {
             btn.disabled = false;
@@ -838,14 +1163,12 @@
                 .eq('id', user.id);
 
             if (error) {
-                console.error('Error saving notifications:', error);
                 showToast('Error saving notifications', '#FF6B6B');
             } else {
                 showToast('Notification settings saved! ✅', '#4CAF7D');
             }
 
         } catch (error) {
-            console.error('Error:', error);
             showToast('An error occurred', '#FF6B6B');
         } finally {
             btn.disabled = false;
@@ -901,10 +1224,8 @@
                 .eq('id', user.id);
 
             if (error) {
-                console.error('Error saving account:', error);
                 showToast('Error updating account: ' + error.message, '#FF6B6B');
             } else {
-                // Update local storage
                 localStorage.setItem('neurolearn_display_name', fullname.split(' ')[0]);
                 localStorage.setItem('neurolearn_full_name', fullname);
                 localStorage.setItem('parent_email', email);
@@ -920,7 +1241,6 @@
             }
 
         } catch (error) {
-            console.error('Error:', error);
             showToast('An error occurred', '#FF6B6B');
         } finally {
             btn.disabled = false;
@@ -960,7 +1280,6 @@
         const savedAdaptive = localStorage.getItem('pref_adaptive');
         if (savedAdaptive) document.getElementById('adaptive-toggle').checked = savedAdaptive === 'true';
 
-        // Load learner stats from localStorage
         updateLearnerStatsFromLocal();
     }
 
@@ -1004,6 +1323,14 @@
         loadParentData();
         if (typeof setActiveNav === 'function') setActiveNav();
     });
+
+    // Make functions global
+    window.switchChildSettings = switchChildSettings;
+    window.saveChildSettings = saveChildSettings;
+    window.discardChildSettings = discardChildSettings;
+    window.switchParentTab = switchParentTab;
+    window.handleLogout = handleLogout;
+    window.showToast = showToast;
 </script>
 
 </body>
