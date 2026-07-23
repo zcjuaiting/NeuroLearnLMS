@@ -5,34 +5,56 @@
 // ---- CHECK IF SUPABASE IS LOADED ----
 console.log("🔵 script.js loaded");
 
-// Wait for supabase to be available
+// ============================================================
+// ⭐ SINGLETON: Wait for supabase to be available
+// ============================================================
 function waitForSupabase() {
     return new Promise((resolve) => {
-        if (typeof supabase !== 'undefined' && supabase && supabase.auth) {
-            resolve(supabase);
+        // Check singleton first
+        if (window.__supabaseClient && window.__supabaseClient.auth) {
+            resolve(window.__supabaseClient);
             return;
         }
+        
+        // Check window.supabaseClient
         if (typeof window.supabaseClient !== 'undefined' && window.supabaseClient && window.supabaseClient.auth) {
-            // Use the client from window
-            var supabase = window.supabaseClient;
+            window.__supabaseClient = window.supabaseClient;
+            resolve(window.supabaseClient);
+            return;
+        }
+        
+        // Check global supabase
+        if (typeof supabase !== 'undefined' && supabase && supabase.auth) {
+            window.__supabaseClient = supabase;
             resolve(supabase);
             return;
         }
-        // Check again in 500ms (max 10 retries)
+        
         let retries = 0;
         const maxRetries = 10;
         const interval = setInterval(() => {
             retries++;
-            if (typeof supabase !== 'undefined' && supabase && supabase.auth) {
+            
+            if (window.__supabaseClient && window.__supabaseClient.auth) {
                 clearInterval(interval);
-                resolve(supabase);
+                resolve(window.__supabaseClient);
                 return;
             }
+            
             if (typeof window.supabaseClient !== 'undefined' && window.supabaseClient && window.supabaseClient.auth) {
+                window.__supabaseClient = window.supabaseClient;
                 clearInterval(interval);
                 resolve(window.supabaseClient);
                 return;
             }
+            
+            if (typeof supabase !== 'undefined' && supabase && supabase.auth) {
+                window.__supabaseClient = supabase;
+                clearInterval(interval);
+                resolve(supabase);
+                return;
+            }
+            
             if (retries >= maxRetries) {
                 clearInterval(interval);
                 resolve(null);
@@ -54,6 +76,90 @@ function showToast(msg, color) {
     clearTimeout(_toastTimer);
     _toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
 }
+
+// ============================================================
+// ⭐ ACCESSIBILITY SETTINGS - APPLIES TO ALL PAGES ⭐
+// ============================================================
+
+/**
+ * Load and apply accessibility settings from localStorage
+ * This runs on EVERY page load
+ */
+function loadAccessibilitySettings() {
+    console.log('🔵 loadAccessibilitySettings() called');
+    const saved = localStorage.getItem('neurolearn_accessibility');
+    console.log('📦 localStorage data:', saved);
+    
+    if (saved) {
+        try {
+            const settings = JSON.parse(saved);
+            console.log('✅ Parsed settings:', settings);
+            
+            // === FONT SIZE ===
+            const sizeMap = { Small: '14px', Medium: '16px', Large: '18px' };
+            if (settings.fontSize && sizeMap[settings.fontSize]) {
+                document.documentElement.style.fontSize = sizeMap[settings.fontSize];
+                document.body.style.fontSize = sizeMap[settings.fontSize];
+                console.log('✅ Font size applied:', settings.fontSize, '→', sizeMap[settings.fontSize]);
+            }
+            
+            // === FONT TYPE ===
+            if (settings.fontType) {
+                if (settings.fontType === 'OpenDyslexic') {
+                    // Load OpenDyslexic font if not already loaded
+                    if (!document.querySelector('#opendyslexic-font')) {
+                        const link = document.createElement('link');
+                        link.id = 'opendyslexic-font';
+                        link.rel = 'stylesheet';
+                        link.href = 'https://fonts.googleapis.com/css2?family=OpenDyslexic&display=swap';
+                        document.head.appendChild(link);
+                        console.log('✅ OpenDyslexic font loaded');
+                    }
+                    document.body.style.fontFamily = '"OpenDyslexic", "Nunito", sans-serif';
+                } else if (settings.fontType === 'Large Print') {
+                    document.body.style.fontFamily = '"Nunito", sans-serif';
+                    document.documentElement.style.fontSize = '20px';
+                    document.body.style.fontSize = '20px';
+                } else {
+                    document.body.style.fontFamily = '"Nunito", sans-serif';
+                }
+                console.log('✅ Font type applied:', settings.fontType);
+            }
+            
+            // === COLOR THEME ===
+            // Remove existing theme classes
+            document.body.classList.remove('high-contrast-mode', 'pastel-mode');
+            
+            if (settings.colorTheme === 'High Contrast') {
+                document.body.classList.add('high-contrast-mode');
+                console.log('✅ High Contrast mode applied');
+            } else if (settings.colorTheme === 'Pastel') {
+                document.body.classList.add('pastel-mode');
+                console.log('✅ Pastel mode applied');
+            } else {
+                console.log('✅ Standard theme applied');
+            }
+            
+            return settings;
+        } catch (e) {
+            console.error('Error loading accessibility settings:', e);
+        }
+    } else {
+        console.log('ℹ️ No accessibility settings found, using defaults');
+        // Reset to defaults if no settings
+        document.body.classList.remove('high-contrast-mode', 'pastel-mode');
+        document.body.style.fontFamily = '"Nunito", sans-serif';
+        document.documentElement.style.fontSize = '16px';
+        document.body.style.fontSize = '16px';
+    }
+    return null;
+}
+
+// ⭐ Auto-load accessibility settings on EVERY page
+document.addEventListener('DOMContentLoaded', function() {
+    // Small delay to ensure DOM is ready
+    setTimeout(loadAccessibilitySettings, 50);
+});
 
 // ============================================
 // SUPABASE AUTHENTICATION FUNCTIONS
@@ -146,19 +252,21 @@ async function handleLogin() {
                 localStorage.setItem('neurolearn_xp', '0');
             } else {
                 const displayName = userData.display_name || email.split('@')[0];
+                const role = userData.role || 'student';
+                
                 localStorage.setItem('neurolearn_display_name', displayName);
-                localStorage.setItem('neurolearn_user_role', userData.role || 'student');
+                localStorage.setItem('neurolearn_user_role', role);
                 localStorage.setItem('neurolearn_level', userData.level || 1);
                 localStorage.setItem('neurolearn_xp', userData.xp || 0);
                 
-                // Store profile data for student profile page
+                // Store profile data
                 if (userData.full_name) localStorage.setItem('neurolearn_full_name', userData.full_name);
                 if (userData.birthday) localStorage.setItem('neurolearn_birthday', userData.birthday);
                 if (userData.grade) localStorage.setItem('neurolearn_grade', userData.grade);
                 if (userData.child_code) localStorage.setItem('neurolearn_child_code', userData.child_code);
                 
                 // Check if user is a parent with linked children
-                if (userData.role === 'parent') {
+                if (role === 'parent') {
                     const { data: children } = await supabaseClient
                         .from('users')
                         .select('id, full_name, display_name')
@@ -655,6 +763,320 @@ function setActiveNav() {
 }
 
 // ============================================
+// ADMIN DASHBOARD FUNCTIONS
+// ============================================
+
+/**
+ * Safely set text content of an element by ID.
+ */
+function adminSetText(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = (text === null || text === undefined) ? '0' : String(text);
+}
+
+/**
+ * Safely set innerHTML of an element by ID.
+ */
+function adminSetHTML(id, html) {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = html;
+}
+
+/**
+ * Escape HTML special characters for safe innerHTML usage.
+ */
+function escapeHtml(str) {
+    if (!str) return '';
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+/**
+ * Check Supabase connection status and return the client.
+ */
+async function adminCheckConnection() {
+    try {
+        const client = await waitForSupabase();
+        if (client && client.auth) {
+            const { data: { session } } = await client.auth.getSession();
+            if (session) {
+                return client;
+            }
+        }
+        return null;
+    } catch (e) {
+        console.error('Connection check error:', e);
+        return null;
+    }
+}
+
+/**
+ * Load admin dashboard analytics from Supabase.
+ */
+async function adminLoadDashboard() {
+    const client = await adminCheckConnection();
+    if (!client) {
+        ['stat-total-students','stat-total-parents','stat-total-lessons',
+         'stat-completed-lessons','stat-avg-score','stat-daily-xp'].forEach(id => adminSetText(id, 'Disconnected'));
+        return;
+    }
+
+    try {
+        // Total Students
+        const { count: studentCount } = await client
+            .from('users')
+            .select('*', { count: 'exact', head: true })
+            .eq('role', 'student');
+        adminSetText('stat-total-students', studentCount || 0);
+
+        // Total Parents
+        const { count: parentCount } = await client
+            .from('users')
+            .select('*', { count: 'exact', head: true })
+            .eq('role', 'parent');
+        adminSetText('stat-total-parents', parentCount || 0);
+
+        // Total Lessons
+        const { count: lessonCount } = await client
+            .from('lessons')
+            .select('*', { count: 'exact', head: true });
+        adminSetText('stat-total-lessons', lessonCount || 0);
+
+        // Completed Lessons
+        const { count: completedCount } = await client
+            .from('user_progress')
+            .select('*', { count: 'exact', head: true })
+            .eq('status', 'completed');
+        adminSetText('stat-completed-lessons', completedCount || 0);
+
+        // Average Score
+        const { data: scoreData } = await client
+            .from('user_progress')
+            .select('score')
+            .not('score', 'is', null);
+        let avgScore = 0;
+        if (scoreData && scoreData.length > 0) {
+            const total = scoreData.reduce((sum, row) => sum + (row.score || 0), 0);
+            avgScore = Math.round(total / scoreData.length);
+        }
+        adminSetText('stat-avg-score', avgScore > 0 ? avgScore + '%' : '0%');
+
+        // Daily XP
+        const today = new Date().toISOString().slice(0, 10);
+        const { data: dailyData } = await client
+            .from('daily_stats')
+            .select('xp_earned')
+            .eq('date', today);
+        let dailyXP = 0;
+        if (dailyData && dailyData.length > 0) {
+            dailyXP = dailyData.reduce((sum, row) => sum + (row.xp_earned || 0), 0);
+        }
+        adminSetText('stat-daily-xp', dailyXP > 0 ? dailyXP + ' XP' : '0 XP');
+
+        // Update storage display
+        const lCount = parseInt(document.getElementById('stat-total-lessons')?.textContent || '0');
+        const storageEl = document.getElementById('storage-used-display');
+        const storageBar = document.getElementById('storage-bar');
+        const storageDetail = document.getElementById('storage-detail');
+        if (storageEl) storageEl.textContent = (lCount * 0.05).toFixed(2) + ' GB';
+        if (storageBar) storageBar.style.width = Math.min(100, lCount * 5) + '%';
+        if (storageDetail) storageDetail.textContent = (lCount * 0.05).toFixed(2) + ' GB of 1 GB';
+
+    } catch (e) {
+        console.error('adminLoadDashboard error:', e);
+        ['stat-total-students','stat-total-parents','stat-total-lessons',
+         'stat-completed-lessons','stat-avg-score','stat-daily-xp'].forEach(id => adminSetText(id, 'Error'));
+    }
+}
+
+/**
+ * Load students table.
+ */
+async function adminLoadStudents() {
+    const client = await adminCheckConnection();
+    if (!client) {
+        adminSetHTML('students-table-body', '<tr><td colspan="7" style="text-align:center;padding:30px;">No data available.</td></tr>');
+        return;
+    }
+
+    try {
+        const { data: students } = await client
+            .from('users')
+            .select('id, display_name, email, level, xp, adaptive_pacing, text_to_speech')
+            .eq('role', 'student');
+
+        if (!students || students.length === 0) {
+            adminSetHTML('students-table-body', '<tr><td colspan="7" style="text-align:center;padding:30px;">No students found.</td></tr>');
+            return;
+        }
+
+        const rows = await Promise.all(students.map(async (s) => {
+            let lessonName = '—';
+            let progressPct = 0;
+            try {
+                const { data: prog } = await client
+                    .from('user_progress')
+                    .select('lesson_id, progress_percentage, lessons(title)')
+                    .eq('user_id', s.id)
+                    .order('last_accessed', { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
+                if (prog) {
+                    progressPct = prog.progress_percentage || 0;
+                    if (prog.lessons?.title) lessonName = prog.lessons.title;
+                }
+            } catch (e) {}
+
+            return `
+                <tr>
+                    <td data-label="Student"><strong>${escapeHtml(s.display_name || '—')}</strong></td>
+                    <td data-label="Email">${escapeHtml(s.email || '—')}</td>
+                    <td data-label="Level">${s.level || 0}</td>
+                    <td data-label="XP">${s.xp || 0} XP</td>
+                    <td data-label="Adaptive Pacing"><span class="badge ${s.adaptive_pacing ? 'green' : 'teal'}">${s.adaptive_pacing ? 'On' : 'Off'}</span></td>
+                    <td data-label="TTS"><span class="badge ${s.text_to_speech ? 'green' : 'teal'}">${s.text_to_speech ? 'On' : 'Off'}</span></td>
+                    <td data-label="Progress">${escapeHtml(lessonName)} (${progressPct}%)</td>
+                </tr>
+            `;
+        }));
+
+        adminSetHTML('students-table-body', rows.join(''));
+    } catch (e) {
+        console.error('adminLoadStudents error:', e);
+        adminSetHTML('students-table-body', '<tr><td colspan="7" style="text-align:center;padding:30px;">Error loading data.</td></tr>');
+    }
+}
+
+/**
+ * Load parents table.
+ */
+async function adminLoadParents() {
+    const client = await adminCheckConnection();
+    if (!client) {
+        adminSetHTML('parents-table-body', '<tr><td colspan="4" style="text-align:center;padding:30px;">No data available.</td></tr>');
+        return;
+    }
+
+    try {
+        const { data: parents } = await client
+            .from('users')
+            .select('id, display_name, email')
+            .eq('role', 'parent');
+
+        if (!parents || parents.length === 0) {
+            adminSetHTML('parents-table-body', '<tr><td colspan="4" style="text-align:center;padding:30px;">No parents found.</td></tr>');
+            return;
+        }
+
+        const rows = parents.map(p => `
+            <tr>
+                <td data-label="Parent"><strong>${escapeHtml(p.display_name || '—')}</strong></td>
+                <td data-label="Email">${escapeHtml(p.email || '—')}</td>
+                <td data-label="Linked Learners"><span class="badge teal">0 learners</span></td>
+                <td data-label="Actions"><button class="btn btn-ghost btn-sm" onclick="showToast('View parent: ${escapeHtml(p.display_name || '')}', '#2E8C8C')">👁 View</button></td>
+            </tr>
+        `);
+
+        adminSetHTML('parents-table-body', rows.join(''));
+    } catch (e) {
+        console.error('adminLoadParents error:', e);
+        adminSetHTML('parents-table-body', '<tr><td colspan="4" style="text-align:center;padding:30px;">Error loading data.</td></tr>');
+    }
+}
+
+/**
+ * Load lessons list.
+ */
+async function adminLoadLessons() {
+    const client = await adminCheckConnection();
+    if (!client) {
+        adminSetHTML('lessons-list-container', '<p style="text-align:center;padding:20px;">No data available.</p>');
+        return;
+    }
+
+    try {
+        const { data: lessons } = await client
+            .from('lessons')
+            .select('id, title, subject, difficulty, description, lesson_key');
+
+        if (!lessons || lessons.length === 0) {
+            adminSetHTML('lessons-list-container', '<p style="text-align:center;padding:20px;">No lessons found.</p>');
+            return;
+        }
+
+        const html = lessons.map(lesson => {
+            const diffClass = lesson.difficulty === 'beginner' ? 'beginner' : 
+                             lesson.difficulty === 'intermediate' ? 'intermediate' : 'advanced';
+            return `
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(110,198,245,0.1);flex-wrap:wrap;gap:8px;">
+                    <div>
+                        <strong style="font-size:0.92rem;color:var(--text-dark);">${escapeHtml(lesson.title)}</strong>
+                        <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap;">
+                            <span class="badge blue">${escapeHtml(lesson.subject || '—')}</span>
+                            <span class="badge ${diffClass}">${escapeHtml(lesson.difficulty || '—')}</span>
+                            <span class="badge teal">${escapeHtml(lesson.lesson_key || '—')}</span>
+                        </div>
+                        ${lesson.description ? '<p style="font-size:0.82rem;color:var(--text-light);margin-top:4px;">' + escapeHtml(lesson.description) + '</p>' : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        adminSetHTML('lessons-list-container', html);
+    } catch (e) {
+        console.error('adminLoadLessons error:', e);
+        adminSetHTML('lessons-list-container', '<p style="text-align:center;padding:20px;">Error loading data.</p>');
+    }
+}
+
+/**
+ * Load recent activity.
+ */
+async function adminLoadRecentActivity() {
+    const client = await adminCheckConnection();
+    if (!client) {
+        adminSetHTML('recent-activity-list', '<p style="text-align:center;padding:20px;">No data available.</p>');
+        return;
+    }
+
+    try {
+        const { data: activities } = await client
+            .from('user_progress')
+            .select('id, score, completed_at, user_id, lesson_id, users(display_name), lessons(title)')
+            .eq('status', 'completed')
+            .not('completed_at', 'is', null)
+            .order('completed_at', { ascending: false })
+            .limit(10);
+
+        if (!activities || activities.length === 0) {
+            adminSetHTML('recent-activity-list', '<p style="text-align:center;padding:20px;">No recent activity.</p>');
+            return;
+        }
+
+        const html = activities.map(a => {
+            const studentName = a.users?.display_name || '—';
+            const lessonTitle = a.lessons?.title || '—';
+            const date = a.completed_at ? new Date(a.completed_at).toLocaleDateString() : '—';
+            return `
+                <div class="recent-upload-item">
+                    <div class="ru-icon">✅</div>
+                    <div class="ru-info">
+                        <h4>${escapeHtml(studentName)} completed "${escapeHtml(lessonTitle)}"</h4>
+                        <p>${date} · Score: ${a.score || 0}%</p>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        adminSetHTML('recent-activity-list', html);
+    } catch (e) {
+        console.error('adminLoadRecentActivity error:', e);
+        adminSetHTML('recent-activity-list', '<p style="text-align:center;padding:20px;">Error loading data.</p>');
+    }
+}
+
+// ============================================
 // PAGE INITIALIZATION
 // ============================================
 
@@ -723,7 +1145,6 @@ if (document.querySelector('.setup-container')) {
 if (document.querySelector('.report-layout')) {
     window.addEventListener('DOMContentLoaded', () => {
         loadUserInfo();
-        // Check if child is linked
         const childName = localStorage.getItem('neurolearn_linked_child_name');
         if (childName) {
             const childInfo = document.querySelector('.rh-info p');
@@ -731,6 +1152,18 @@ if (document.querySelector('.report-layout')) {
                 childInfo.textContent = `Linked to ${childName}`;
             }
         }
+    });
+}
+
+// ---- Admin Dashboard Page ----
+if (document.querySelector('.admin-dashboard') || document.getElementById('admin-dashboard-screen')) {
+    window.addEventListener('DOMContentLoaded', () => {
+        loadUserInfo();
+        adminLoadDashboard();
+        adminLoadStudents();
+        adminLoadParents();
+        adminLoadLessons();
+        adminLoadRecentActivity();
     });
 }
 
