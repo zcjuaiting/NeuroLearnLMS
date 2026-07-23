@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroLearn – Create Child Account</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .create-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .create-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            padding: 48px 56px;
+            max-width: 720px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.8);
+            animation: slideUp 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+        }
+        .create-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .create-header .icon-big {
+            font-size: 3.5rem;
+            margin-bottom: 8px;
+        }
+        .create-header h2 {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.8rem;
+            color: var(--teal);
+        }
+        .create-header p {
+            color: var(--text-mid);
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        .form-section {
+            margin-bottom: 28px;
+        }
+        .form-section-title {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .form-section-title .badge {
+            font-size: 0.65rem;
+            background: var(--sky-light);
+            color: var(--sky-dark);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-mid);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .form-group label .optional {
+            text-transform: none;
+            font-weight: 400;
+            color: var(--text-light);
+            font-size: 0.7rem;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--sky-light);
+            border-radius: var(--radius-sm);
+            font-family: 'Nunito', sans-serif;
+            font-size: 1rem;
+            color: var(--text-dark);
+            background: rgba(232,248,255,0.5);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--sky-dark);
+            box-shadow: 0 0 0 3px rgba(110,198,245,0.25);
+            background: #fff;
+        }
+        .password-hint {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            margin-top: 4px;
+            display: block;
+        }
+        .condition-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .condition-option {
+            padding: 12px 16px;
+            border: 2px solid rgba(110,198,245,0.2);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.5);
+        }
+        .condition-option:hover {
+            border-color: var(--sky);
+            background: rgba(110,198,245,0.05);
+        }
+        .condition-option.selected {
+            border-color: var(--teal);
+            background: rgba(46,140,140,0.08);
+        }
+        .condition-option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--teal);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .condition-option .cond-label {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+        }
+        .condition-option .cond-desc {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+        .accessibility-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+        }
+        .accessibility-item {
+            padding: 12px;
+            border: 2px solid rgba(110,198,245,0.2);
+            border-radius: var(--radius-sm);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: rgba(255,255,255,0.5);
+        }
+        .accessibility-item:hover {
+            border-color: var(--sky);
+        }
+        .accessibility-item.selected {
+            border-color: var(--teal);
+            background: rgba(46,140,140,0.08);
+        }
+        .accessibility-item .a-icon {
+            font-size: 1.6rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .accessibility-item .a-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        .accessibility-item .a-desc {
+            font-size: 0.6rem;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(110,198,245,0.15);
+        }
+        .toggle-row:last-child {
+            border-bottom: none;
+        }
+        .toggle-row .toggle-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .toggle-row .toggle-info .t-icon {
+            font-size: 1.2rem;
+        }
+        .toggle-row .toggle-info .t-label {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+        .toggle-row .toggle-info .t-desc {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+        .relationship-selector {
+            display: flex;
+            gap: 12px;
+            margin-top: 4px;
+            flex-wrap: wrap;
+        }
+        .relationship-btn {
+            padding: 8px 20px;
+            border: 2px solid rgba(110,198,245,0.3);
+            border-radius: var(--radius-sm);
+            background: transparent;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            font-size: 0.88rem;
+            color: var(--text-mid);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .relationship-btn:hover {
+            border-color: var(--sky);
+            color: var(--teal);
+        }
+        .relationship-btn.active {
+            background: var(--teal);
+            border-color: var(--teal);
+            color: white;
+            box-shadow: 0 2px 8px rgba(46,140,140,0.3);
+        }
+        .child-code-display {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: rgba(46,140,140,0.08);
+            border-radius: var(--radius-sm);
+            border: 2px dashed var(--teal);
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+        .child-code-display .code-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-mid);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .child-code-display .code-value {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.8rem;
+            color: var(--teal);
+            font-weight: 800;
+            letter-spacing: 2px;
+            flex: 1;
+            min-width: 120px;
+        }
+        .child-code-display .code-copy {
+            padding: 6px 16px;
+            border-radius: 8px;
+            border: none;
+            background: var(--teal);
+            color: white;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .child-code-display .code-copy:hover {
+            background: var(--sky-dark);
+            transform: scale(1.02);
+        }
+        .privacy-notice {
+            padding: 12px 16px;
+            background: rgba(255,140,66,0.08);
+            border-radius: var(--radius-sm);
+            border-left: 4px solid var(--orange);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .privacy-notice .privacy-text {
+            font-size: 0.8rem;
+            color: var(--text-mid);
+            font-weight: 600;
+        }
+        .create-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+        .btn-secondary {
+            padding: 12px 28px;
+            border-radius: var(--radius-sm);
+            border: 2px solid rgba(110,198,245,0.4);
+            background: transparent;
+            font-family: 'Baloo 2', cursive;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-mid);
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+        }
+        .btn-secondary:hover {
+            background: rgba(110,198,245,0.1);
+            border-color: var(--teal);
+            color: var(--teal);
+        }
+        .btn-primary {
+            padding: 12px 28px;
+            border-radius: var(--radius-sm);
+            border: none;
+            background: linear-gradient(135deg, var(--teal), var(--sky-dark));
+            color: white;
+            font-family: 'Baloo 2', cursive;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 14px rgba(46,140,140,0.35);
+            flex: 2;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(46,140,140,0.4);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s ease-in-out infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 640px) {
+            .create-card { padding: 32px 24px; }
+            .form-row { grid-template-columns: 1fr; }
+            .condition-grid { grid-template-columns: 1fr; }
+            .accessibility-grid { grid-template-columns: 1fr 1fr; }
+            .relationship-selector { flex-wrap: wrap; }
+            .child-code-display { flex-direction: column; text-align: center; }
+            .create-actions { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- NO NAVIGATION BAR - Clean focused page       -->
+<!-- ============================================ -->
+
+<div class="create-container">
+    <div class="create-card">
+        <div class="create-header">
+            <div class="icon-big">✨</div>
+            <h2>Create a Learner Account</h2>
+            <p>Set up a profile for your child to start learning!</p>
+        </div>
+
+        <!-- ===== CHILD INFORMATION ===== -->
+        <div class="form-section">
+            <div class="form-section-title">📋 Child Information <span class="badge">Required</span></div>
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label>Child's Full Name</label>
+                    <input type="text" id="child-fullname" placeholder="Enter child's full name" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Birthday</label>
+                    <input type="date" id="child-birthday" required>
+                </div>
+                <div class="form-group">
+                    <label>Grade Level</label>
+                    <select id="child-grade" required>
+                        <option value="">Select grade</option>
+                        <option value="Grade 1">Grade 1</option>
+                        <option value="Grade 2">Grade 2</option>
+                        <option value="Grade 3">Grade 3</option>
+                        <option value="Grade 4">Grade 4</option>
+                        <option value="Grade 5">Grade 5</option>
+                        <option value="Grade 6">Grade 6</option>
+                        <option value="Grade 7">Grade 7</option>
+                        <option value="Grade 8">Grade 8</option>
+                        <option value="Grade 9">Grade 9</option>
+                        <option value="Grade 10">Grade 10</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ACCOUNT CREDENTIALS ===== -->
+        <div class="form-section">
+            <div class="form-section-title">🔐 Account Credentials <span class="badge">Required</span></div>
+            <p style="font-size:0.8rem;color:var(--text-light);font-weight:600;margin-bottom:12px;">
+                This email and password will be used by your child to log in.
+            </p>
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label>Email Address</label>
+                    <input type="email" id="child-email" placeholder="Enter child's email address" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="child-password" placeholder="Create a password" required minlength="6">
+                    <small class="password-hint">🔒 Password must be at least 6 characters</small>
+                </div>
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="child-confirm-password" placeholder="Confirm password" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== PARENT INFORMATION ===== -->
+        <div class="form-section">
+            <div class="form-section-title">👨‍👩‍👦 Your Information <span class="badge">Required</span></div>
+            <p style="font-size:0.8rem;color:var(--text-light);font-weight:600;margin-bottom:12px;">
+                This information identifies you as the parent or guardian.
+            </p>
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label>Your Full Name</label>
+                    <input type="text" id="parent-fullname" placeholder="Enter your full name" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Your Email</label>
+                    <input type="email" id="parent-email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label>Your Relationship</label>
+                    <div class="relationship-selector" style="margin-top:6px;">
+                        <button class="relationship-btn active" onclick="selectRelationship(this, 'Mother')">👩 Mother</button>
+                        <button class="relationship-btn" onclick="selectRelationship(this, 'Father')">👨 Father</button>
+                        <button class="relationship-btn" onclick="selectRelationship(this, 'Guardian')">👨‍👩‍👦 Guardian</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== LEARNING PROFILE ===== -->
+        <div class="form-section">
+            <div class="form-section-title">🧠 Learning Preferences <span class="badge">Optional</span></div>
+            <div class="form-group">
+                <p style="font-size:0.8rem;color:var(--text-light);font-weight:600;margin-bottom:10px;">
+                    This helps us personalize your child's learning experience.
+                </p>
+                <div class="condition-grid">
+                    <div class="condition-option" onclick="toggleCondition(this)">
+                        <input type="checkbox" value="adhd">
+                        <div><div class="cond-label">🧠 ADHD</div><div class="cond-desc">Focus & attention support</div></div>
+                    </div>
+                    <div class="condition-option" onclick="toggleCondition(this)">
+                        <input type="checkbox" value="dyslexia">
+                        <div><div class="cond-label">📖 Dyslexia</div><div class="cond-desc">Reading & font support</div></div>
+                    </div>
+                    <div class="condition-option" onclick="toggleCondition(this)">
+                        <input type="checkbox" value="sensory">
+                        <div><div class="cond-label">🌈 Sensory Processing</div><div class="cond-desc">Visual & audio support</div></div>
+                    </div>
+                    <div class="condition-option" onclick="toggleCondition(this)">
+                        <input type="checkbox" value="none">
+                        <div><div class="cond-label">💪 None / Prefer not to say</div><div class="cond-desc">Just me!</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== ACCESSIBILITY ===== -->
+        <div class="form-section">
+            <div class="form-section-title">🎨 Accessibility Preferences</div>
+            <div class="form-group">
+                <label>Font Size</label>
+                <div class="accessibility-grid">
+                    <div class="accessibility-item" onclick="selectAccessibility(this, 'font-size', 'Small')"><span class="a-icon">🔤</span><div class="a-label">Small</div><div class="a-desc">14px</div></div>
+                    <div class="accessibility-item selected" onclick="selectAccessibility(this, 'font-size', 'Medium')"><span class="a-icon">🔤</span><div class="a-label">Medium</div><div class="a-desc">16px</div></div>
+                    <div class="accessibility-item" onclick="selectAccessibility(this, 'font-size', 'Large')"><span class="a-icon">🔤</span><div class="a-label">Large</div><div class="a-desc">18px</div></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Color Theme</label>
+                <div class="accessibility-grid">
+                    <div class="accessibility-item selected" onclick="selectAccessibility(this, 'color-theme', 'Standard')"><span class="a-icon">🎨</span><div class="a-label">Standard</div><div class="a-desc">Default colors</div></div>
+                    <div class="accessibility-item" onclick="selectAccessibility(this, 'color-theme', 'High Contrast')"><span class="a-icon">🌓</span><div class="a-label">High Contrast</div><div class="a-desc">Easier to read</div></div>
+                    <div class="accessibility-item" onclick="selectAccessibility(this, 'color-theme', 'Pastel')"><span class="a-icon">🌈</span><div class="a-label">Pastel</div><div class="a-desc">Calming colors</div></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Font Type</label>
+                <div class="accessibility-grid">
+                    <div class="accessibility-item selected" onclick="selectAccessibility(this, 'font-type', 'Nunito')"><span class="a-icon">📝</span><div class="a-label">Nunito</div><div class="a-desc">Standard</div></div>
+                    <div class="accessibility-item" onclick="selectAccessibility(this, 'font-type', 'OpenDyslexic')"><span class="a-icon">📝</span><div class="a-label">OpenDyslexic</div><div class="a-desc">Dyslexia-friendly</div></div>
+                    <div class="accessibility-item" onclick="selectAccessibility(this, 'font-type', 'Large Print')"><span class="a-icon">📝</span><div class="a-label">Large Print</div><div class="a-desc">Easy reading</div></div>
+                </div>
+            </div>
+            <div class="toggle-row">
+                <div class="toggle-info"><span class="t-icon">🔊</span><div><div class="t-label">Text-to-Speech</div><div class="t-desc">Read questions aloud</div></div></div>
+                <label class="toggle-switch"><input type="checkbox" id="tts-toggle" checked><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-row">
+                <div class="toggle-info"><span class="t-icon">🎙️</span><div><div class="t-label">Speech-to-Text</div><div class="t-desc">Answer using voice</div></div></div>
+                <label class="toggle-switch"><input type="checkbox" id="stt-toggle"><span class="toggle-slider"></span></label>
+            </div>
+            <div class="toggle-row">
+                <div class="toggle-info"><span class="t-icon">🧩</span><div><div class="t-label">Adaptive Pacing</div><div class="t-desc">Adjust based on performance</div></div></div>
+                <label class="toggle-switch"><input type="checkbox" id="adaptive-toggle" checked><span class="toggle-slider"></span></label>
+            </div>
+        </div>
+
+        <!-- ===== CHILD CODE ===== -->
+        <div class="form-section">
+            <div class="form-section-title">🔗 Child Code <span class="badge">Auto-generated</span></div>
+            <p style="font-size:0.85rem;color:var(--text-mid);font-weight:600;margin-bottom:10px;">
+                This code will be used to link your child's account. Save it for reference.
+            </p>
+            <div class="child-code-display">
+                <span class="code-label">Child Code:</span>
+                <span class="code-value" id="child-code-display">----</span>
+                <button class="code-copy" onclick="copyChildCode()">📋 Copy</button>
+            </div>
+        </div>
+
+        <!-- ===== PRIVACY NOTICE ===== -->
+        <div class="privacy-notice">
+            <span class="privacy-icon">🔒</span>
+            <div class="privacy-text">
+                <strong>Privacy Note:</strong> All data is stored securely. The child will be able to log in using their email and password. Your information is only used for account management.
+            </div>
+        </div>
+
+        <!-- ===== ACTIONS ===== -->
+        <div class="create-actions">
+            <button class="btn-secondary" onclick="goBack()">← Back</button>
+            <button class="btn-primary" id="create-btn" onclick="createChild()">✨ Create Account</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="script.js"></script>
+
+<script>
+    let childCode = '';
+    let selectedRelationship = 'Mother';
+    let parentSession = null;
+
+    // ---- HELPER: Wait for Supabase ----
+    function waitForSupabase() {
+        return new Promise((resolve) => {
+            if (typeof supabase !== 'undefined' && supabase && supabase.auth) {
+                resolve(supabase);
+                return;
+            }
+            if (typeof window.supabaseClient !== 'undefined' && window.supabaseClient && window.supabaseClient.auth) {
+                resolve(window.supabaseClient);
+                return;
+            }
+            setTimeout(() => waitForSupabase().then(resolve), 500);
+        });
+    }
+
+    // ---- GENERATE UNIQUE CHILD CODE ----
+    function generateChildCode() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        const prefix = 'NL';
+        let code = prefix + '-';
+        
+        for (let i = 0; i < 3; i++) {
+            code += chars[Math.floor(Math.random() * chars.length)];
+        }
+        code += '-';
+        
+        for (let i = 0; i < 2; i++) {
+            code += chars[Math.floor(Math.random() * chars.length)];
+        }
+        
+        return code;
+    }
+
+    async function generateUniqueChildCode() {
+        let code = generateChildCode();
+        let isUnique = false;
+        let attempts = 0;
+        while (!isUnique && attempts < 10) {
+            const supabaseClient = await waitForSupabase();
+            if (!supabaseClient) break;
+            const { data, error } = await supabaseClient
+                .from('users')
+                .select('child_code')
+                .eq('child_code', code)
+                .single();
+            if (error && error.code === 'PGRST116') {
+                isUnique = true;
+            } else {
+                code = generateChildCode();
+                attempts++;
+            }
+        }
+        return code;
+    }
+
+    // ---- CONDITION SELECTION ----
+    function toggleCondition(el) {
+        const checkbox = el.querySelector('input[type="checkbox"]');
+        checkbox.checked = !checkbox.checked;
+        el.classList.toggle('selected', checkbox.checked);
+        if (checkbox.value === 'none' && checkbox.checked) {
+            document.querySelectorAll('.condition-option').forEach(opt => {
+                const cb = opt.querySelector('input[type="checkbox"]');
+                if (cb.value !== 'none') { cb.checked = false; opt.classList.remove('selected'); }
+            });
+        } else if (checkbox.checked) {
+            const noneOption = document.querySelector('.condition-option input[value="none"]');
+            if (noneOption) { noneOption.checked = false; noneOption.closest('.condition-option').classList.remove('selected'); }
+        }
+    }
+
+    // ---- ACCESSIBILITY SELECTION ----
+    function selectAccessibility(el, group, value) {
+        const parent = el.closest('.form-group');
+        const items = parent.querySelectorAll('.accessibility-item');
+        items.forEach(item => item.classList.remove('selected'));
+        el.classList.add('selected');
+    }
+
+    // ---- RELATIONSHIP SELECTION ----
+    function selectRelationship(el, relationship) {
+        document.querySelectorAll('.relationship-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        selectedRelationship = relationship;
+    }
+
+    // ---- COPY CHILD CODE ----
+    function copyChildCode() {
+        const code = document.getElementById('child-code-display').textContent;
+        if (code && code !== '----') {
+            navigator.clipboard.writeText(code).then(() => {
+                showToast('📋 Child code copied!', '#4CAF7D');
+            }).catch(() => {
+                const input = document.createElement('input');
+                input.value = code;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                input.remove();
+                showToast('📋 Child code copied!', '#4CAF7D');
+            });
+        } else {
+            showToast('Generating code... please wait.', '#FF8C42');
+        }
+    }
+
+    // ---- GO BACK ----
+    function goBack() {
+        window.location.href = 'parent-onboarding.html';
+    }
+
+    // ============================================================
+    // ⭐ FIXED: CREATE CHILD - Save parent session first
+    // ============================================================
+    async function createChild() {
+        // CHILD INFO
+        const childFullName = document.getElementById('child-fullname').value.trim();
+        const childBirthday = document.getElementById('child-birthday').value;
+        const childGrade = document.getElementById('child-grade').value;
+        
+        // ACCOUNT CREDENTIALS
+        const childEmail = document.getElementById('child-email').value.trim();
+        const password = document.getElementById('child-password').value;
+        const confirmPassword = document.getElementById('child-confirm-password').value;
+        
+        // PARENT INFO
+        const parentFullName = document.getElementById('parent-fullname').value.trim();
+        const parentEmail = document.getElementById('parent-email').value.trim();
+        
+        const btn = document.getElementById('create-btn');
+
+        // ---- VALIDATION ----
+        if (!childFullName) {
+            showToast('Please enter your child\'s full name!', '#FF6B6B');
+            document.getElementById('child-fullname').focus();
+            return;
+        }
+        if (!childBirthday) {
+            showToast('Please select your child\'s birthday!', '#FF6B6B');
+            return;
+        }
+        if (!childGrade) {
+            showToast('Please select your child\'s grade!', '#FF6B6B');
+            return;
+        }
+        if (!childEmail) {
+            showToast('Please enter your child\'s email address!', '#FF6B6B');
+            document.getElementById('child-email').focus();
+            return;
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(childEmail)) {
+            showToast('Please enter a valid email address!', '#FF6B6B');
+            document.getElementById('child-email').focus();
+            return;
+        }
+        if (!password) {
+            showToast('Please create a password!', '#FF6B6B');
+            document.getElementById('child-password').focus();
+            return;
+        }
+        if (password.length < 6) {
+            showToast('Password must be at least 6 characters!', '#FF6B6B');
+            document.getElementById('child-password').focus();
+            return;
+        }
+        if (password !== confirmPassword) {
+            showToast('Passwords do not match!', '#FF6B6B');
+            document.getElementById('child-confirm-password').focus();
+            return;
+        }
+        if (!parentFullName) {
+            showToast('Please enter your full name!', '#FF6B6B');
+            document.getElementById('parent-fullname').focus();
+            return;
+        }
+        if (!parentEmail) {
+            showToast('Please enter your email address!', '#FF6B6B');
+            document.getElementById('parent-email').focus();
+            return;
+        }
+        if (!emailRegex.test(parentEmail)) {
+            showToast('Please enter a valid email address for yourself!', '#FF6B6B');
+            document.getElementById('parent-email').focus();
+            return;
+        }
+
+        // Get conditions and preferences
+        const conditions = [];
+        document.querySelectorAll('.condition-option input[type="checkbox"]:checked').forEach(cb => {
+            if (cb.value !== 'none') conditions.push(cb.value);
+        });
+
+        const fontSize = document.querySelectorAll('.accessibility-grid')[0]?.querySelector('.accessibility-item.selected .a-label')?.textContent || 'Medium';
+        const colorTheme = document.querySelectorAll('.accessibility-grid')[1]?.querySelector('.accessibility-item.selected .a-label')?.textContent || 'Standard';
+        const fontType = document.querySelectorAll('.accessibility-grid')[2]?.querySelector('.accessibility-item.selected .a-label')?.textContent || 'Nunito';
+        const ttsEnabled = document.getElementById('tts-toggle').checked;
+        const sttEnabled = document.getElementById('stt-toggle').checked;
+        const adaptivePacing = document.getElementById('adaptive-toggle').checked;
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> Creating...';
+
+        try {
+            const supabaseClient = await waitForSupabase();
+            if (!supabaseClient) {
+                showToast('Supabase not available. Please refresh.', '#FF6B6B');
+                btn.disabled = false;
+                btn.innerHTML = '✨ Create Account';
+                return;
+            }
+
+            // ⭐ STEP 1: Get current parent user (logged in)
+            const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+            if (userError || !user) {
+                showToast('Please login first!', '#FF6B6B');
+                btn.disabled = false;
+                btn.innerHTML = '✨ Create Account';
+                return;
+            }
+
+            console.log('👤 Current parent user ID:', user.id);
+
+            // ⭐ STEP 2: Save parent session data before creating child
+            const parentId = user.id;
+            const parentDisplayName = user.user_metadata?.display_name || parentFullName.split(' ')[0];
+
+            // ⭐ STEP 3: Check if email already exists
+            const { data: existingUser, error: checkError } = await supabaseClient
+                .from('users')
+                .select('email')
+                .eq('email', childEmail)
+                .maybeSingle();
+
+            if (existingUser) {
+                showToast('This email is already registered. Please use a different email.', '#FF6B6B');
+                btn.disabled = false;
+                btn.innerHTML = '✨ Create Account';
+                return;
+            }
+
+            // ⭐ STEP 4: Create the child auth user
+            const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+                email: childEmail,
+                password: password,
+                options: {
+                    data: {
+                        display_name: childFullName.split(' ')[0],
+                        full_name: childFullName,
+                        role: 'student'
+                    }
+                }
+            });
+
+            if (authError) {
+                console.error('SignUp error:', authError);
+                if (authError.message.includes('already registered')) {
+                    showToast('This email is already registered. Please use a different email.', '#FF6B6B');
+                } else {
+                    showToast('Error creating account: ' + authError.message, '#FF6B6B');
+                }
+                btn.disabled = false;
+                btn.innerHTML = '✨ Create Account';
+                return;
+            }
+
+            if (!authData.user) {
+                showToast('Error creating account. Please try again.', '#FF6B6B');
+                btn.disabled = false;
+                btn.innerHTML = '✨ Create Account';
+                return;
+            }
+
+            const childUserId = authData.user.id;
+            console.log('✅ Child auth user created:', childUserId);
+
+            // ⭐ STEP 5: Generate unique child code
+            childCode = await generateUniqueChildCode();
+            if (!childCode) {
+                showToast('Error generating child code. Please try again.', '#FF6B6B');
+                btn.disabled = false;
+                btn.innerHTML = '✨ Create Account';
+                return;
+            }
+
+            document.getElementById('child-code-display').textContent = childCode;
+
+            // ⭐ STEP 6: Update child's user profile with all details
+            const { error: childUpdateError } = await supabaseClient
+                .from('users')
+                .update({
+                    full_name: childFullName,
+                    display_name: childFullName.split(' ')[0],
+                    birthday: childBirthday,
+                    grade: childGrade,
+                    child_code: childCode,
+                    diagnosed_condition: conditions,
+                    parent_id: parentId,  // ⭐ Link to parent
+                    font_size: fontSize,
+                    color_mode: colorTheme,
+                    font_type: fontType,
+                    text_to_speech: ttsEnabled,
+                    adaptive_pacing: adaptivePacing,
+                    updated_at: new Date()
+                })
+                .eq('id', childUserId);
+
+            if (childUpdateError) {
+                console.error('Error updating child profile:', childUpdateError);
+                showToast('Account created but profile update failed. Please contact support.', '#FF8C42');
+            } else {
+                console.log('✅ Child profile updated with parent link');
+            }
+
+            // ⭐ STEP 7: Update parent's profile
+            const { error: parentUpdateError } = await supabaseClient
+                .from('users')
+                .update({
+                    full_name: parentFullName,
+                    display_name: parentFullName.split(' ')[0],
+                    email: parentEmail,
+                    relationship: selectedRelationship,
+                    updated_at: new Date()
+                })
+                .eq('id', parentId);
+
+            if (parentUpdateError) {
+                console.error('Error updating parent profile:', parentUpdateError);
+            } else {
+                console.log('✅ Parent profile updated');
+            }
+
+            // ⭐ STEP 8: CRITICAL - Restore parent session
+            // The signUp() auto-logged in the child, so we need to sign back in as parent
+            try {
+                // Get parent email from localStorage
+                const parentEmailLocal = localStorage.getItem('neurolearn_user_email');
+                const parentPassword = localStorage.getItem('neurolearn_user_password');
+                
+                if (parentEmailLocal && parentPassword) {
+                    // Sign back in as parent
+                    const { error: signInError } = await supabaseClient.auth.signInWithPassword({
+                        email: parentEmailLocal,
+                        password: parentPassword
+                    });
+                    
+                    if (signInError) {
+                        console.warn('Could not auto-login parent:', signInError);
+                        // Don't show error, just redirect
+                    } else {
+                        console.log('✅ Parent session restored');
+                    }
+                } else {
+                    console.warn('Parent credentials not found in localStorage');
+                }
+            } catch (e) {
+                console.warn('Error restoring parent session:', e);
+            }
+
+            // ⭐ STEP 9: Store in localStorage
+            localStorage.setItem('neurolearn_linked_child_id', childUserId);
+            localStorage.setItem('neurolearn_linked_child_name', childFullName);
+            localStorage.setItem('neurolearn_child_code', childCode);
+            localStorage.setItem('neurolearn_parent_fullname', parentFullName);
+            localStorage.setItem('neurolearn_parent_email', parentEmail);
+            
+            // ⭐ CRITICAL: Keep parent display name
+            localStorage.setItem('neurolearn_display_name', parentFullName.split(' ')[0]);
+            localStorage.setItem('neurolearn_user_role', 'parent');
+
+            showToast(`✅ Child account created for ${childFullName}!`, '#4CAF7D');
+
+            // ⭐ STEP 10: Redirect to parent dashboard
+            setTimeout(() => {
+                window.location.href = 'parent-dashboard.html';
+            }, 1500);
+
+        } catch (error) {
+            console.error('Error creating child:', error);
+            showToast('An error occurred. Please try again.', '#FF6B6B');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '✨ Create Account';
+        }
+    }
+
+    // ---- INITIALIZE ----
+    document.addEventListener('DOMContentLoaded', function() {
+        const parentName = localStorage.getItem('neurolearn_display_name') || '';
+        const parentEmail = localStorage.getItem('neurolearn_user_email') || '';
+        
+        if (parentName) {
+            document.getElementById('parent-fullname').value = parentName;
+        }
+        if (parentEmail) {
+            document.getElementById('parent-email').value = parentEmail;
+        }
+
+        generateUniqueChildCode().then(code => {
+            if (code) {
+                childCode = code;
+                document.getElementById('child-code-display').textContent = code;
+            }
+        });
+
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('child-birthday').max = today;
+    });
+</script>
+
+</body>
+</html>

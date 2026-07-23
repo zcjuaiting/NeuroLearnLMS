@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroLearn - Accessibility Settings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* ============================================================
+           PAGE LAYOUT
+           ============================================================ */
+        .settings-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .settings-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            padding: 48px 56px;
+            max-width: 720px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.8);
+            animation: slideUp 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* ============================================================
+           HEADER
+           ============================================================ */
+        .settings-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .settings-header .icon-big {
+            font-size: 3.5rem;
+            margin-bottom: 8px;
+        }
+        .settings-header h2 {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.8rem;
+            color: var(--teal);
+        }
+        .settings-header p {
+            color: var(--text-mid);
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        /* ============================================================
+           SETTING GROUPS
+           ============================================================ */
+        .setting-group {
+            margin-bottom: 28px;
+        }
+        .setting-group-title {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1rem;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ============================================================
+           OPTION GRID
+           ============================================================ */
+        .option-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        .option-item {
+            padding: 16px 12px;
+            border: 2px solid rgba(110,198,245,0.2);
+            border-radius: var(--radius-sm);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: rgba(255,255,255,0.5);
+        }
+        .option-item:hover {
+            border-color: var(--sky);
+            transform: translateY(-2px);
+        }
+        .option-item.selected {
+            border-color: var(--teal);
+            background: rgba(46,140,140,0.08);
+            box-shadow: 0 2px 8px rgba(46,140,140,0.1);
+        }
+        .option-item .o-icon {
+            font-size: 1.6rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .option-item .o-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        .option-item .o-desc {
+            font-size: 0.65rem;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        /* ============================================================
+           BUTTONS
+           ============================================================ */
+        .save-bar {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .btn-secondary {
+            padding: 12px 28px;
+            border-radius: var(--radius-sm);
+            border: 2px solid rgba(110,198,245,0.4);
+            background: transparent;
+            font-family: 'Baloo 2', cursive;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-mid);
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+        }
+        .btn-secondary:hover {
+            background: rgba(110,198,245,0.1);
+            border-color: var(--teal);
+            color: var(--teal);
+        }
+        .btn-primary {
+            padding: 12px 28px;
+            border-radius: var(--radius-sm);
+            border: none;
+            background: linear-gradient(135deg, var(--teal), var(--sky-dark));
+            color: white;
+            font-family: 'Baloo 2', cursive;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 14px rgba(46,140,140,0.35);
+            flex: 2;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(46,140,140,0.4);
+        }
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s ease-in-out infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ============================================================
+           ⭐ BACK LINK - FIXED
+           ============================================================ */
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(110,198,245,0.15);
+        }
+        .back-link a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-mid);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: color 0.2s;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+        }
+        .back-link a:hover {
+            color: var(--teal);
+            background: rgba(110,198,245,0.1);
+        }
+        .back-link a .back-arrow {
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+        }
+        .back-link a:hover .back-arrow {
+            transform: translateX(-4px);
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 640px) {
+            .settings-card { padding: 32px 24px; }
+            .option-grid { grid-template-columns: 1fr; }
+            .save-bar { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============================================================
+    NO NAVIGATION - Clean focused page
+    ============================================================ -->
+<div class="settings-container">
+    <div class="settings-card" id="settings-card">
+
+        <!-- HEADER -->
+        <div class="settings-header">
+            <div class="icon-big">🎨</div>
+            <h2>Accessibility & Learning Style</h2>
+            <p>Customize your learning experience to suit your needs.</p>
+        </div>
+
+        <!-- ============================================================
+            FONT SIZE
+            ============================================================ -->
+        <div class="setting-group">
+            <div class="setting-group-title">🔤 Font Size</div>
+            <div class="option-grid" id="font-size-options">
+                <div class="option-item" data-value="Small" onclick="selectOption(this, 'font-size')">
+                    <span class="o-icon">🔤</span>
+                    <div class="o-label">Small</div>
+                    <div class="o-desc">14px</div>
+                </div>
+                <div class="option-item selected" data-value="Medium" onclick="selectOption(this, 'font-size')">
+                    <span class="o-icon">🔤</span>
+                    <div class="o-label">Medium</div>
+                    <div class="o-desc">16px</div>
+                </div>
+                <div class="option-item" data-value="Large" onclick="selectOption(this, 'font-size')">
+                    <span class="o-icon">🔤</span>
+                    <div class="o-label">Large</div>
+                    <div class="o-desc">18px</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+            COLOR THEME
+            ============================================================ -->
+        <div class="setting-group">
+            <div class="setting-group-title">🎨 Color Theme</div>
+            <div class="option-grid" id="color-theme-options">
+                <div class="option-item selected" data-value="Standard" onclick="selectOption(this, 'color-theme')">
+                    <span class="o-icon">🎨</span>
+                    <div class="o-label">Standard</div>
+                    <div class="o-desc">Default colors</div>
+                </div>
+                <div class="option-item" data-value="High Contrast" onclick="selectOption(this, 'color-theme')">
+                    <span class="o-icon">🌓</span>
+                    <div class="o-label">High Contrast</div>
+                    <div class="o-desc">Easier to read</div>
+                </div>
+                <div class="option-item" data-value="Pastel" onclick="selectOption(this, 'color-theme')">
+                    <span class="o-icon">🌈</span>
+                    <div class="o-label">Pastel</div>
+                    <div class="o-desc">Calming colors</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+            FONT TYPE
+            ============================================================ -->
+        <div class="setting-group">
+            <div class="setting-group-title">📝 Font Type</div>
+            <div class="option-grid" id="font-type-options">
+                <div class="option-item selected" data-value="Nunito" onclick="selectOption(this, 'font-type')">
+                    <span class="o-icon">📝</span>
+                    <div class="o-label">Nunito</div>
+                    <div class="o-desc">Standard</div>
+                </div>
+                <div class="option-item" data-value="OpenDyslexic" onclick="selectOption(this, 'font-type')">
+                    <span class="o-icon">📝</span>
+                    <div class="o-label">OpenDyslexic</div>
+                    <div class="o-desc">Dyslexia-friendly</div>
+                </div>
+                <div class="option-item" data-value="Large Print" onclick="selectOption(this, 'font-type')">
+                    <span class="o-icon">📝</span>
+                    <div class="o-label">Large Print</div>
+                    <div class="o-desc">Easy reading</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+            SAVE BUTTONS
+            ============================================================ -->
+        <div class="save-bar">
+            <button class="btn-secondary" onclick="resetSettings()">Reset</button>
+            <button class="btn-primary" id="save-btn" onclick="saveSettings()">💾 Save Preferences</button>
+        </div>
+
+        <!-- ============================================================
+            ⭐ BACK TO PROFILE - FIXED
+            ============================================================ -->
+        <div class="back-link">
+            <a onclick="goBackToProfile()">
+                <span class="back-arrow">←</span>
+                Back to Profile
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast"></div>
+
+<!-- ============================================================
+    SCRIPTS
+    ============================================================ -->
+<script>
+    // ============================================================
+    // TOAST NOTIFICATION
+    // ============================================================
+    function showToast(msg, color) {
+        const t = document.getElementById('toast');
+        if (!t) return;
+        t.textContent = msg;
+        t.style.background = color || '#2E8C8C';
+        t.style.color = '#FFFFFF';
+        t.classList.add('show');
+        clearTimeout(window._toastTimer);
+        window._toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // ============================================================
+    // ⭐ GO BACK TO PROFILE
+    // ============================================================
+    function goBackToProfile() {
+        // Check if we came from student-profile or elsewhere
+        if (document.referrer && document.referrer.includes('student-profile.html')) {
+            window.history.back();
+        } else {
+            window.location.href = 'student-profile.html';
+        }
+    }
+
+    // ============================================================
+    // SELECT OPTION
+    // ============================================================
+    function selectOption(el, group) {
+        // Find the parent container
+        const parent = el.closest('.option-grid');
+        // Remove selected class from all siblings
+        parent.querySelectorAll('.option-item').forEach(item => {
+            item.classList.remove('selected');
+        });
+        // Add selected class to clicked item
+        el.classList.add('selected');
+        
+        // Live preview
+        applySettings(getSelectedValues());
+    }
+
+    // ============================================================
+    // GET SELECTED VALUES
+    // ============================================================
+    function getSelectedValues() {
+        const fontSize = document.querySelector('#font-size-options .option-item.selected')?.dataset.value || 'Medium';
+        const colorTheme = document.querySelector('#color-theme-options .option-item.selected')?.dataset.value || 'Standard';
+        const fontType = document.querySelector('#font-type-options .option-item.selected')?.dataset.value || 'Nunito';
+        return { fontSize, colorTheme, fontType };
+    }
+
+    // ============================================================
+    // APPLY SETTINGS (Live Preview)
+    // ============================================================
+    function applySettings(settings) {
+        // Font Size
+        const sizeMap = { Small: '14px', Medium: '16px', Large: '18px' };
+        document.documentElement.style.fontSize = sizeMap[settings.fontSize] || '16px';
+        
+        // Font Type - Load OpenDyslexic if needed
+        if (settings.fontType === 'OpenDyslexic') {
+            if (!document.querySelector('#opendyslexic-font')) {
+                const link = document.createElement('link');
+                link.id = 'opendyslexic-font';
+                link.rel = 'stylesheet';
+                link.href = 'https://fonts.googleapis.com/css2?family=OpenDyslexic&display=swap';
+                document.head.appendChild(link);
+            }
+        }
+        
+        const fontMap = {
+            'Nunito': '"Nunito", sans-serif',
+            'OpenDyslexic': '"OpenDyslexic", "Nunito", sans-serif',
+            'Large Print': '"Nunito", sans-serif'
+        };
+        document.body.style.fontFamily = fontMap[settings.fontType] || '"Nunito", sans-serif';
+
+        // Color Theme
+        document.body.classList.remove('high-contrast-mode', 'pastel-mode');
+        if (settings.colorTheme === 'High Contrast') {
+            document.body.classList.add('high-contrast-mode');
+        } else if (settings.colorTheme === 'Pastel') {
+            document.body.classList.add('pastel-mode');
+        }
+
+        // Update the card background for preview
+        const card = document.getElementById('settings-card');
+        if (settings.colorTheme === 'High Contrast') {
+            card.style.background = '#1a1a2e';
+            card.style.color = '#ffffff';
+            card.style.borderColor = 'rgba(255,255,255,0.2)';
+        } else if (settings.colorTheme === 'Pastel') {
+            card.style.background = 'rgba(255, 240, 245, 0.95)';
+            card.style.color = '#4a4a6a';
+            card.style.borderColor = 'rgba(255, 240, 245, 0.8)';
+        } else {
+            card.style.background = 'var(--card-bg)';
+            card.style.color = 'var(--text-dark)';
+            card.style.borderColor = 'rgba(255,255,255,0.8)';
+        }
+    }
+
+    // ============================================================
+    // LOAD SETTINGS FROM STORAGE
+    // ============================================================
+    function loadSettings() {
+        const saved = localStorage.getItem('neurolearn_accessibility');
+        if (saved) {
+            try {
+                const settings = JSON.parse(saved);
+                
+                // Update UI to match saved settings
+                document.querySelectorAll('.option-item').forEach(item => {
+                    const group = item.closest('.option-grid');
+                    const groupName = group.id;
+                    const value = item.dataset.value;
+                    
+                    if (groupName === 'font-size-options' && value === settings.fontSize) {
+                        selectOption(item, 'font-size');
+                    } else if (groupName === 'color-theme-options' && value === settings.colorTheme) {
+                        selectOption(item, 'color-theme');
+                    } else if (groupName === 'font-type-options' && value === settings.fontType) {
+                        selectOption(item, 'font-type');
+                    }
+                });
+                
+                applySettings(settings);
+                return settings;
+            } catch (e) {
+                console.error('Error loading settings:', e);
+            }
+        }
+        return null;
+    }
+
+    // ============================================================
+    // SAVE SETTINGS TO STORAGE
+    // ============================================================
+    function saveSettings() {
+        const settings = getSelectedValues();
+        const btn = document.getElementById('save-btn');
+        
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> Saving...';
+        
+        // Save to localStorage
+        localStorage.setItem('neurolearn_accessibility', JSON.stringify(settings));
+        
+        // Apply settings
+        applySettings(settings);
+        
+        showToast('✅ Preferences saved successfully!', '#4CAF7D');
+        
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.innerHTML = '💾 Save Preferences';
+        }, 1500);
+    }
+
+    // ============================================================
+    // RESET SETTINGS
+    // ============================================================
+    function resetSettings() {
+        if (confirm('Reset all accessibility settings to default?')) {
+            localStorage.removeItem('neurolearn_accessibility');
+            
+            // Reset UI
+            document.querySelectorAll('.option-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Set defaults
+            document.querySelector('#font-size-options .option-item[data-value="Medium"]')?.classList.add('selected');
+            document.querySelector('#color-theme-options .option-item[data-value="Standard"]')?.classList.add('selected');
+            document.querySelector('#font-type-options .option-item[data-value="Nunito"]')?.classList.add('selected');
+            
+            const defaultSettings = { fontSize: 'Medium', colorTheme: 'Standard', fontType: 'Nunito' };
+            applySettings(defaultSettings);
+            
+            showToast('🔄 Settings reset to default', '#FF8C42');
+        }
+    }
+
+    // ============================================================
+    // LOAD SETTINGS ON PAGE LOAD
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        loadSettings();
+    });
+
+    // ============================================================
+    // EXPOSE GLOBALLY
+    // ============================================================
+    window.selectOption = selectOption;
+    window.saveSettings = saveSettings;
+    window.resetSettings = resetSettings;
+    window.loadSettings = loadSettings;
+    window.getSelectedValues = getSelectedValues;
+    window.applySettings = applySettings;
+    window.goBackToProfile = goBackToProfile;
+    window.showToast = showToast;
+</script>
+
+</body>
+</html>

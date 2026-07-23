@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroLearn - Complete Your Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* ---- Setup Page Layout ---- */
+        .setup-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .setup-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            padding: 48px 56px;
+            max-width: 720px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        /* ---- Progress Steps ---- */
+        .setup-progress {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            padding: 0 8px;
+        }
+
+        .step-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: var(--text-light);
+            background: rgba(110, 198, 245, 0.15);
+            border: 2px solid rgba(110, 198, 245, 0.3);
+            transition: all 0.3s;
+        }
+
+        .step-circle.active {
+            background: var(--teal);
+            color: white;
+            border-color: var(--teal);
+            box-shadow: 0 4px 14px rgba(46, 140, 140, 0.35);
+        }
+
+        .step-circle.completed {
+            background: var(--green);
+            color: white;
+            border-color: var(--green);
+            box-shadow: 0 4px 14px rgba(76, 175, 125, 0.35);
+        }
+
+        .step-line {
+            flex: 1;
+            height: 3px;
+            background: rgba(110, 198, 245, 0.2);
+            margin: 0 8px;
+            border-radius: 10px;
+            transition: background 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .step-line.completed {
+            background: var(--green);
+        }
+
+        .step-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-light);
+            text-align: center;
+            margin-top: 2px;
+        }
+
+        /* ---- Header ---- */
+        .setup-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .setup-header .icon-big {
+            font-size: 3.5rem;
+            margin-bottom: 8px;
+        }
+
+        .setup-header h2 {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.8rem;
+            color: var(--teal);
+        }
+
+        .setup-header p {
+            color: var(--text-mid);
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        /* ---- Form Sections ---- */
+        .form-section {
+            margin-bottom: 28px;
+        }
+
+        .form-section-title {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-section-title .badge {
+            font-size: 0.65rem;
+            background: var(--sky-light);
+            color: var(--sky-dark);
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-mid);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group label .optional {
+            text-transform: none;
+            font-weight: 400;
+            color: var(--text-light);
+            font-size: 0.7rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--sky-light);
+            border-radius: var(--radius-sm);
+            font-family: 'Nunito', sans-serif;
+            font-size: 1rem;
+            color: var(--text-dark);
+            background: rgba(232, 248, 255, 0.5);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--sky-dark);
+            box-shadow: 0 0 0 3px rgba(110, 198, 245, 0.25);
+            background: #fff;
+        }
+
+        .form-group input:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* ---- Condition Checkboxes ---- */
+        .condition-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .condition-option {
+            padding: 12px 16px;
+            border: 2px solid rgba(110, 198, 245, 0.2);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .condition-option:hover {
+            border-color: var(--sky);
+            background: rgba(110, 198, 245, 0.05);
+        }
+
+        .condition-option.selected {
+            border-color: var(--teal);
+            background: rgba(46, 140, 140, 0.08);
+            box-shadow: 0 2px 8px rgba(46, 140, 140, 0.1);
+        }
+
+        .condition-option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--teal);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .condition-option .cond-icon {
+            font-size: 1.2rem;
+        }
+
+        .condition-option .cond-label {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+        }
+
+        .condition-option .cond-desc {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        /* ---- Accessibility Grid ---- */
+        .accessibility-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+        }
+
+        .accessibility-item {
+            padding: 12px;
+            border: 2px solid rgba(110, 198, 245, 0.2);
+            border-radius: var(--radius-sm);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .accessibility-item:hover {
+            border-color: var(--sky);
+        }
+
+        .accessibility-item.selected {
+            border-color: var(--teal);
+            background: rgba(46, 140, 140, 0.08);
+            box-shadow: 0 2px 8px rgba(46, 140, 140, 0.1);
+        }
+
+        .accessibility-item .a-icon {
+            font-size: 1.6rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .accessibility-item .a-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .accessibility-item .a-desc {
+            font-size: 0.6rem;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        /* ---- Toggle ---- */
+        .toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(110, 198, 245, 0.15);
+        }
+
+        .toggle-row:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-row .toggle-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .toggle-row .toggle-info .t-icon {
+            font-size: 1.2rem;
+        }
+
+        .toggle-row .toggle-info .t-label {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+        }
+
+        .toggle-row .toggle-info .t-desc {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        /* ---- Child Code ---- */
+        .child-code-display {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: rgba(46, 140, 140, 0.08);
+            border-radius: var(--radius-sm);
+            border: 2px dashed var(--teal);
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .child-code-display .code-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-mid);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .child-code-display .code-value {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.8rem;
+            color: var(--teal);
+            font-weight: 800;
+            letter-spacing: 2px;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .child-code-display .code-copy {
+            padding: 6px 16px;
+            border-radius: 8px;
+            border: none;
+            background: var(--teal);
+            color: white;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .child-code-display .code-copy:hover {
+            background: var(--sky-dark);
+            transform: scale(1.02);
+        }
+
+        /* ---- Privacy Notice ---- */
+        .privacy-notice {
+            padding: 12px 16px;
+            background: rgba(255, 140, 66, 0.08);
+            border-radius: var(--radius-sm);
+            border-left: 4px solid var(--orange);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .privacy-notice .privacy-icon {
+            font-size: 1.2rem;
+        }
+
+        .privacy-notice .privacy-text {
+            font-size: 0.8rem;
+            color: var(--text-mid);
+            font-weight: 600;
+        }
+
+        /* ---- Buttons ---- */
+        .setup-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .btn-secondary {
+            padding: 12px 28px;
+            border-radius: var(--radius-sm);
+            border: 2px solid rgba(110, 198, 245, 0.4);
+            background: transparent;
+            font-family: 'Baloo 2', cursive;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-mid);
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(110, 198, 245, 0.1);
+            border-color: var(--teal);
+            color: var(--teal);
+        }
+
+        .btn-primary {
+            padding: 12px 28px;
+            border-radius: var(--radius-sm);
+            border: none;
+            background: linear-gradient(135deg, var(--teal), var(--sky-dark));
+            color: white;
+            font-family: 'Baloo 2', cursive;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 14px rgba(46, 140, 140, 0.35);
+            flex: 2;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(46, 140, 140, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ---- Responsive ---- */
+        @media (max-width: 640px) {
+            .setup-card {
+                padding: 32px 24px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .condition-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .accessibility-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .child-code-display {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .setup-actions {
+                flex-direction: column;
+            }
+
+            .step-label {
+                font-size: 0.55rem;
+            }
+
+            .step-circle {
+                width: 32px;
+                height: 32px;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="setup-container">
+    <div class="setup-card">
+
+        <!-- ===== PROGRESS STEPS ===== -->
+        <div class="setup-progress">
+            <div class="step-indicator">
+                <div class="step-circle active">1</div>
+                <div class="step-label">Profile</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-indicator">
+                <div class="step-circle">2</div>
+                <div class="step-label">Learning</div>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-indicator">
+                <div class="step-circle">3</div>
+                <div class="step-label">Accessibility</div>
+            </div>
+        </div>
+
+        <!-- ===== HEADER ===== -->
+        <div class="setup-header">
+            <div class="icon-big">🌟</div>
+            <h2>Let's get to know you!</h2>
+            <p>Tell us a little about yourself so we can make learning fun and personalized.</p>
+        </div>
+
+        <!-- ===== STEP 1: BASIC INFORMATION ===== -->
+        <div id="step-1" class="form-section">
+            <div class="form-section-title">
+                📋 Basic Information
+                <span class="badge">Step 1 of 3</span>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label>Full Name</label>
+                    <input type="text" id="full-name" placeholder="Enter your full name" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Birthday</label>
+                    <input type="date" id="birthday" required>
+                </div>
+                <div class="form-group">
+                    <label>Grade Level</label>
+                    <select id="grade" required>
+                        <option value="">Select your grade</option>
+                        <option value="1">Grade 1</option>
+                        <option value="2">Grade 2</option>
+                        <option value="3">Grade 3</option>
+                        <option value="4">Grade 4</option>
+                        <option value="5">Grade 5</option>
+                        <option value="6">Grade 6</option>
+                        <option value="7">Grade 7</option>
+                        <option value="8">Grade 8</option>
+                        <option value="9">Grade 9</option>
+                        <option value="10">Grade 10</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== STEP 2: LEARNING PROFILE ===== -->
+        <div id="step-2" class="form-section" style="display:none;">
+            <div class="form-section-title">
+                🧠 Learning Preferences
+                <span class="badge">Step 2 of 3</span>
+            </div>
+
+            <div class="form-group">
+                <label>Do you have any learning preferences? <span class="optional">(optional)</span></label>
+                <p style="font-size:0.8rem;color:var(--text-light);font-weight:600;margin-bottom:10px;">
+                    This helps us personalize your learning experience. You can skip this if you prefer.
+                </p>
+                <div class="condition-grid">
+                    <div class="condition-option" onclick="toggleCondition(this)">
+                        <input type="checkbox" value="adhd">
+                        <span class="cond-icon">🧠</span>
+                        <div>
+                            <div class="cond-label">ADHD</div>
+                            <div class="cond-desc">Focus & attention support</div>
+                        </div>
+                    </div>
+                    <div class="condition-option" onclick="toggleCondition(this)">
+                        <input type="checkbox" value="dyslexia">
+                        <span class="cond-icon">📖</span>
+                        <div>
+                            <div class="cond-label">Dyslexia</div>
+                            <div class="cond-desc">Reading & font support</div>
+                        </div>
+                    </div>
+                    <div class="condition-option" onclick="toggleCondition(this)">
+                        <input type="checkbox" value="sensory">
+                        <span class="cond-icon">🌈</span>
+                        <div>
+                            <div class="cond-label">Sensory Processing</div>
+                            <div class="cond-desc">Visual & audio support</div>
+                        </div>
+                    </div>
+                    <div class="condition-option" onclick="toggleCondition(this)">
+                        <input type="checkbox" value="none">
+                        <span class="cond-icon">💪</span>
+                        <div>
+                            <div class="cond-label">None / Prefer not to say</div>
+                            <div class="cond-desc">Just me!</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="privacy-notice">
+                <span class="privacy-icon">🔒</span>
+                <div class="privacy-text">
+                    <strong>Privacy Note:</strong> This information is only used to personalize your learning experience.
+                    Your data is private and secure.
+                </div>
+            </div>
+
+            <!-- Continue to Step 3 Button -->
+            <button class="btn-primary" style="width:100%;" onclick="goToStep(3)">
+                Continue to Accessibility → 
+            </button>
+        </div>
+
+        <!-- ===== STEP 3: ACCESSIBILITY ===== -->
+        <div id="step-3" class="form-section" style="display:none;">
+            <div class="form-section-title">
+                🎨 Accessibility & Learning Style
+                <span class="badge">Step 3 of 3</span>
+            </div>
+
+            <!-- Font Size -->
+            <div class="form-group">
+                <label>Font Size</label>
+                <div class="accessibility-grid">
+                    <div class="accessibility-item" onclick="selectAccessibility(this, 'font-size', 'Small')">
+                        <span class="a-icon">🔤</span>
+                        <div class="a-label">Small</div>
+                        <div class="a-desc">14px</div>
+                    </div>
+                    <div class="accessibility-item selected" onclick="selectAccessibility(this, 'font-size', 'Medium')">
+                        <span class="a-icon">🔤</span>
+                        <div class="a-label">Medium</div>
+                        <div class="a-desc">16px</div>
+                    </div>
+                    <div class="accessibility-item" onclick="selectAccessibility(this, 'font-size', 'Large')">
+                        <span class="a-icon">🔤</span>
+                        <div class="a-label">Large</div>
+                        <div class="a-desc">18px</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Color Theme -->
+            <div class="form-group">
+                <label>Color Theme</label>
+                <div class="accessibility-grid">
+                    <div class="accessibility-item selected" onclick="selectAccessibility(this, 'color-theme', 'Standard')">
+                        <span class="a-icon">🎨</span>
+                        <div class="a-label">Standard</div>
+                        <div class="a-desc">Default colors</div>
+                    </div>
+                    <div class="accessibility-item" onclick="selectAccessibility(this, 'color-theme', 'High Contrast')">
+                        <span class="a-icon">🌓</span>
+                        <div class="a-label">High Contrast</div>
+                        <div class="a-desc">Easier to read</div>
+                    </div>
+                    <div class="accessibility-item" onclick="selectAccessibility(this, 'color-theme', 'Pastel')">
+                        <span class="a-icon">🌈</span>
+                        <div class="a-label">Pastel</div>
+                        <div class="a-desc">Calming colors</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Font Type -->
+            <div class="form-group">
+                <label>Font Type</label>
+                <div class="accessibility-grid">
+                    <div class="accessibility-item selected" onclick="selectAccessibility(this, 'font-type', 'Nunito')">
+                        <span class="a-icon">📝</span>
+                        <div class="a-label">Nunito</div>
+                        <div class="a-desc">Standard</div>
+                    </div>
+                    <div class="accessibility-item" onclick="selectAccessibility(this, 'font-type', 'OpenDyslexic')">
+                        <span class="a-icon">📝</span>
+                        <div class="a-label">OpenDyslexic</div>
+                        <div class="a-desc">Dyslexia-friendly</div>
+                    </div>
+                    <div class="accessibility-item" onclick="selectAccessibility(this, 'font-type', 'Large Print')">
+                        <span class="a-icon">📝</span>
+                        <div class="a-label">Large Print</div>
+                        <div class="a-desc">Easy reading</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Toggle Options -->
+            <div class="form-group">
+                <label>Features</label>
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <span class="t-icon">🔊</span>
+                        <div>
+                            <div class="t-label">Text-to-Speech</div>
+                            <div class="t-desc">Read questions aloud</div>
+                        </div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="tts-toggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <span class="t-icon">🎙️</span>
+                        <div>
+                            <div class="t-label">Speech-to-Text</div>
+                            <div class="t-desc">Answer using your voice</div>
+                        </div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="stt-toggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <span class="t-icon">🧩</span>
+                        <div>
+                            <div class="t-label">Adaptive Pacing</div>
+                            <div class="t-desc">Adjust speed based on performance</div>
+                        </div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="adaptive-toggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== CHILD CODE (Auto-generated) ===== -->
+        <div class="form-section" style="margin-top:12px;">
+            <div class="form-section-title">
+                🔗 Your Child Code
+                <span class="badge">For Parent Linking</span>
+            </div>
+            <p style="font-size:0.85rem;color:var(--text-mid);font-weight:600;margin-bottom:10px;">
+                Share this code with your parent or guardian so they can link your account and track your progress.
+            </p>
+            <div class="child-code-display">
+                <span class="code-label">Your Code:</span>
+                <span class="code-value" id="child-code-display">----</span>
+                <button class="code-copy" onclick="copyChildCode()">📋 Copy</button>
+            </div>
+        </div>
+
+        <!-- ===== ACTIONS ===== -->
+        <div class="setup-actions">
+            <button class="btn-secondary" id="back-btn" onclick="goToStep(1)" style="display:none;">
+                ← Back
+            </button>
+            <button class="btn-primary" id="next-btn" onclick="nextStep()">
+                Continue →
+            </button>
+            <button class="btn-primary" id="save-btn" onclick="saveProfile()" style="display:none;flex:2;">
+                🎉 Complete Profile
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast"></div>
+
+<!-- ============================================ -->
+<!-- SCRIPTS -->
+<!-- ============================================ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="script.js"></script>
+
+<script>
+    // ============================================
+    // HELPER: Wait for Supabase
+    // ============================================
+    function waitForSupabase() {
+        return new Promise((resolve) => {
+            if (typeof supabase !== 'undefined' && supabase && supabase.auth) {
+                resolve(supabase);
+                return;
+            }
+            if (typeof window.supabaseClient !== 'undefined' && window.supabaseClient && window.supabaseClient.auth) {
+                resolve(window.supabaseClient);
+                return;
+            }
+            setTimeout(() => waitForSupabase().then(resolve), 500);
+        });
+    }
+
+    // ============================================
+    // STEP NAVIGATION
+    // ============================================
+
+    let currentStep = 1;
+    const totalSteps = 3;
+
+    function goToStep(step) {
+        currentStep = step;
+        
+        // Show/hide sections
+        for (let i = 1; i <= totalSteps; i++) {
+            document.getElementById(`step-${i}`).style.display = i === step ? 'block' : 'none';
+        }
+
+        // Update progress circles
+        const circles = document.querySelectorAll('.step-circle');
+        const lines = document.querySelectorAll('.step-line');
+        
+        circles.forEach((circle, index) => {
+            const stepNum = index + 1;
+            circle.classList.remove('active', 'completed');
+            if (stepNum === step) circle.classList.add('active');
+            else if (stepNum < step) circle.classList.add('completed');
+        });
+
+        lines.forEach((line, index) => {
+            const stepNum = index + 1;
+            line.classList.toggle('completed', stepNum < step);
+        });
+
+        // Update buttons
+        document.getElementById('back-btn').style.display = step > 1 ? 'inline-block' : 'none';
+        document.getElementById('next-btn').style.display = step < totalSteps ? 'inline-block' : 'none';
+        document.getElementById('save-btn').style.display = step === totalSteps ? 'inline-block' : 'none';
+    }
+
+    function nextStep() {
+        if (currentStep < totalSteps) {
+            // Validate step 1
+            if (currentStep === 1) {
+                const fullName = document.getElementById('full-name').value.trim();
+                const birthday = document.getElementById('birthday').value;
+                const grade = document.getElementById('grade').value;
+
+                if (!fullName) {
+                    showToast('Please enter your full name!', '#FF6B6B');
+                    document.getElementById('full-name').focus();
+                    return;
+                }
+                if (!birthday) {
+                    showToast('Please select your birthday!', '#FF6B6B');
+                    return;
+                }
+                if (!grade) {
+                    showToast('Please select your grade!', '#FF6B6B');
+                    return;
+                }
+            }
+            goToStep(currentStep + 1);
+        }
+    }
+
+    // ============================================
+    // CONDITION SELECTION
+    // ============================================
+
+    function toggleCondition(el) {
+        const checkbox = el.querySelector('input[type="checkbox"]');
+        checkbox.checked = !checkbox.checked;
+        el.classList.toggle('selected', checkbox.checked);
+
+        // If "None" is selected, uncheck others
+        if (checkbox.value === 'none' && checkbox.checked) {
+            document.querySelectorAll('.condition-option').forEach(opt => {
+                const cb = opt.querySelector('input[type="checkbox"]');
+                if (cb.value !== 'none') {
+                    cb.checked = false;
+                    opt.classList.remove('selected');
+                }
+            });
+        } else if (checkbox.checked) {
+            // If another is selected, uncheck "None"
+            const noneOption = document.querySelector('.condition-option input[value="none"]');
+            if (noneOption) {
+                noneOption.checked = false;
+                noneOption.closest('.condition-option').classList.remove('selected');
+            }
+        }
+    }
+
+    // ============================================
+    // ACCESSIBILITY SELECTION
+    // ============================================
+
+    function selectAccessibility(el, group, value) {
+        const parent = el.closest('.form-group');
+        const items = parent.querySelectorAll('.accessibility-item');
+        items.forEach(item => item.classList.remove('selected'));
+        el.classList.add('selected');
+    }
+
+    // ============================================
+    // GENERATE UNIQUE CHILD CODE (FIXED!)
+    // ============================================
+
+    function generateChildCode() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        const prefix = 'NL';
+        let code = prefix + '-';
+        
+        // First 3 characters
+        for (let i = 0; i < 3; i++) {
+            code += chars[Math.floor(Math.random() * chars.length)];
+        }
+        code += '-';
+        
+        // Last 2 characters
+        for (let i = 0; i < 2; i++) {
+            code += chars[Math.floor(Math.random() * chars.length)];
+        }
+        
+        return code; // Format: NL-5A8-K2
+    }
+
+    function generateUniqueChildCode() {
+        let code = generateChildCode();
+        const existingCodes = JSON.parse(localStorage.getItem('neurolearn_child_codes') || '[]');
+        
+        while (existingCodes.includes(code)) {
+            code = generateChildCode();
+        }
+        
+        existingCodes.push(code);
+        localStorage.setItem('neurolearn_child_codes', JSON.stringify(existingCodes));
+        
+        return code;
+    }
+
+    function copyChildCode() {
+        const code = document.getElementById('child-code-display').textContent;
+        if (code && code !== '----') {
+            navigator.clipboard.writeText(code).then(() => {
+                showToast('📋 Child code copied!', '#4CAF7D');
+            }).catch(() => {
+                const input = document.createElement('input');
+                input.value = code;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                input.remove();
+                showToast('📋 Child code copied!', '#4CAF7D');
+            });
+        } else {
+            showToast('Generating code... please wait.', '#FF8C42');
+        }
+    }
+
+    // ============================================
+    // SAVE PROFILE (FIXED!)
+    // ============================================
+
+    async function saveProfile() {
+        const fullName = document.getElementById('full-name').value.trim();
+        const birthday = document.getElementById('birthday').value;
+        const grade = document.getElementById('grade').value;
+        const childCode = document.getElementById('child-code-display').textContent;
+
+        // Get selected conditions
+        const conditions = [];
+        document.querySelectorAll('.condition-option input[type="checkbox"]:checked').forEach(cb => {
+            if (cb.value !== 'none') conditions.push(cb.value);
+        });
+
+        // Get accessibility preferences
+        const fontSize = document.querySelectorAll('.accessibility-grid')[0]?.querySelector('.accessibility-item.selected .a-label')?.textContent || 'Medium';
+        const colorTheme = document.querySelectorAll('.accessibility-grid')[1]?.querySelector('.accessibility-item.selected .a-label')?.textContent || 'Standard';
+        const fontType = document.querySelectorAll('.accessibility-grid')[2]?.querySelector('.accessibility-item.selected .a-label')?.textContent || 'Nunito';
+        const ttsEnabled = document.getElementById('tts-toggle').checked;
+        const sttEnabled = document.getElementById('stt-toggle').checked;
+        const adaptivePacing = document.getElementById('adaptive-toggle').checked;
+
+        const profileData = {
+            fullName,
+            birthday,
+            grade,
+            childCode,
+            conditions,
+            accessibility: {
+                fontSize,
+                colorTheme,
+                fontType,
+                ttsEnabled,
+                sttEnabled,
+                adaptivePacing
+            }
+        };
+
+        console.log('📝 Profile Data:', profileData);
+
+        // Show saving state
+        const btn = document.getElementById('save-btn');
+        btn.textContent = '⏳ Saving...';
+        btn.disabled = true;
+
+        try {
+            // Save to localStorage
+            localStorage.setItem('neurolearn_profile', JSON.stringify(profileData));
+            localStorage.setItem('neurolearn_child_code', childCode);
+            localStorage.setItem('neurolearn_full_name', fullName);
+            localStorage.setItem('neurolearn_grade', grade);
+            localStorage.setItem('neurolearn_birthday', birthday);
+
+            // Get Supabase client properly
+            const supabaseClient = await waitForSupabase();
+            const userId = localStorage.getItem('neurolearn_user_id');
+
+            if (userId && supabaseClient) {
+                // Update the users table in Supabase
+                const { error } = await supabaseClient
+                    .from('users')
+                    .update({
+                        full_name: fullName,
+                        birthday: birthday,
+                        grade: grade,
+                        diagnosed_condition: conditions,
+                        child_code: childCode,
+                        font_size: fontSize,
+                        color_mode: colorTheme,
+                        text_to_speech: ttsEnabled,
+                        adaptive_pacing: adaptivePacing,
+                        updated_at: new Date()
+                    })
+                    .eq('id', userId);
+
+                if (error) {
+                    console.error('Error saving to Supabase:', error);
+                    showToast('Profile saved locally. Database sync pending.', '#FF8C42');
+                } else {
+                    console.log('✅ Profile saved to Supabase!');
+                    
+                    // Fetch the updated record to confirm child code
+                    const { data: updatedUser } = await supabaseClient
+                        .from('users')
+                        .select('child_code')
+                        .eq('id', userId)
+                        .single();
+                    
+                    if (updatedUser && updatedUser.child_code) {
+                        document.getElementById('child-code-display').textContent = updatedUser.child_code;
+                        localStorage.setItem('neurolearn_child_code', updatedUser.child_code);
+                    }
+                    
+                    showToast('🎉 Profile saved successfully!', '#4CAF7D');
+                }
+            } else {
+                showToast('Profile saved locally. Please login to sync.', '#FF8C42');
+            }
+
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
+
+        } catch (error) {
+            console.error('Error saving profile:', error);
+            showToast('Error saving profile. Please try again.', '#FF6B6B');
+            btn.textContent = '🎉 Complete Profile';
+            btn.disabled = false;
+        }
+    }
+
+    // ============================================
+    // INITIALIZE
+    // ============================================
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Generate unique child code
+        const uniqueCode = generateUniqueChildCode();
+        document.getElementById('child-code-display').textContent = uniqueCode;
+
+        // Load user info from localStorage
+        const displayName = localStorage.getItem('neurolearn_display_name') || '';
+        if (displayName) {
+            document.getElementById('full-name').value = displayName;
+        }
+
+        // Set default date (today)
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('birthday').max = today;
+
+        // Show first step
+        goToStep(1);
+
+        // Show welcome toast
+        showToast('👋 Let\'s set up your profile!', '#2E8C8C');
+    });
+</script>
+
+</body>
+</html>

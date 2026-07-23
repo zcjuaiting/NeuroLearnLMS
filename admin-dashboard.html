@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroLearn – Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* ============================================
+           ADMIN LAYOUT
+           ============================================ */
+        .admin-wrapper {
+            display: flex;
+            min-height: calc(100vh - 70px);
+            padding: 24px 32px;
+            gap: 24px;
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        /* ============================================
+           SIDEBAR
+           ============================================ */
+        .admin-sidebar {
+            width: 240px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .admin-sidebar .card { padding: 16px 18px; }
+
+        .sidebar-brand {
+            text-align: center;
+            padding: 20px 16px !important;
+        }
+        .sidebar-brand .brand-icon { font-size: 2.8rem; }
+        .sidebar-brand h2 {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.2rem;
+            color: var(--teal);
+            margin-top: 4px;
+        }
+        .sidebar-brand p {
+            font-size: 0.78rem;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        .admin-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 700;
+            font-size: 0.88rem;
+            color: var(--text-mid);
+            border: 1.5px solid transparent;
+            text-decoration: none;
+            background: transparent;
+            width: 100%;
+            font-family: 'Nunito', sans-serif;
+            text-align: left;
+        }
+        .admin-nav-item:hover {
+            background: rgba(110,198,245,0.15);
+            color: var(--teal);
+        }
+        .admin-nav-item.active {
+            background: linear-gradient(135deg, rgba(46,140,140,0.12), rgba(110,198,245,0.15));
+            color: var(--teal);
+            border-color: rgba(46,140,140,0.2);
+        }
+        .admin-nav-item .ni-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            background: rgba(110,198,245,0.2);
+            flex-shrink: 0;
+        }
+        .admin-nav-item.active .ni-icon {
+            background: linear-gradient(135deg, var(--teal), var(--sky-dark));
+            color: white;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 16px 18px !important;
+        }
+        .sidebar-footer .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+        }
+        .sidebar-footer .user-info .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #9B59B6, #6EC6F5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            border: 2px solid white;
+            flex-shrink: 0;
+        }
+        .sidebar-footer .user-info .name {
+            font-weight: 800;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+        }
+        .sidebar-footer .user-info .role {
+            font-size: 0.7rem;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        /* ============================================
+           MAIN CONTENT
+           ============================================ */
+        .admin-main {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .admin-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .admin-header h1 {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.6rem;
+            color: var(--text-dark);
+        }
+        .admin-header p {
+            color: var(--text-mid);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* ============================================
+           ADMIN PANELS
+           ============================================ */
+        .admin-panel {
+            display: none;
+            animation: slideUp 0.3s ease both;
+        }
+        .admin-panel.active {
+            display: block;
+        }
+
+        /* ============================================
+           STATS GRID
+           ============================================ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 14px;
+            margin-bottom: 4px;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: var(--radius-sm);
+            padding: 16px 14px;
+            text-align: center;
+            border: 1.5px solid rgba(255,255,255,0.85);
+            box-shadow: var(--shadow);
+        }
+        .stat-card .stat-icon { font-size: 1.6rem; }
+        .stat-card .stat-number {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.6rem;
+            color: var(--teal);
+            font-weight: 800;
+            margin-top: 4px;
+        }
+        .stat-card .stat-label {
+            font-size: 0.68rem;
+            color: var(--text-light);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        /* ============================================
+           TABLES
+           ============================================ */
+        .table-wrap {
+            overflow-x: auto;
+            margin-top: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        table th {
+            text-align: left;
+            padding: 10px 12px;
+            font-weight: 800;
+            color: var(--text-mid);
+            text-transform: uppercase;
+            font-size: 0.65rem;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid rgba(110,198,245,0.2);
+            white-space: nowrap;
+        }
+        table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid rgba(110,198,245,0.1);
+            color: var(--text-dark);
+            font-weight: 600;
+            vertical-align: middle;
+        }
+        table tr:hover td {
+            background: rgba(110,198,245,0.05);
+        }
+
+        /* ============================================
+           BADGES
+           ============================================ */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.68rem;
+            font-weight: 800;
+        }
+        .badge.green { background: rgba(76,175,125,0.15); color: var(--green-dark); }
+        .badge.teal { background: rgba(46,140,140,0.15); color: var(--teal); }
+        .badge.blue { background: rgba(58,158,214,0.15); color: var(--sky-dark); }
+        .badge.orange { background: rgba(255,140,66,0.15); color: var(--orange); }
+        .badge.beginner { background: rgba(76,175,125,0.15); color: var(--green-dark); }
+        .badge.intermediate { background: rgba(255,140,66,0.15); color: var(--orange); }
+        .badge.advanced { background: rgba(155,89,182,0.15); color: var(--purple); }
+
+        /* ============================================
+           RECENT ACTIVITY
+           ============================================ */
+        .recent-activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .recent-upload-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            background: rgba(110,198,245,0.05);
+            border-bottom: 1px solid rgba(110,198,245,0.08);
+        }
+        .recent-upload-item:last-child { border-bottom: none; }
+        .recent-upload-item .ru-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            background: rgba(76,175,125,0.15);
+            flex-shrink: 0;
+        }
+        .recent-upload-item .ru-info h4 {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+        .recent-upload-item .ru-info p {
+            font-size: 0.72rem;
+            color: var(--text-light);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* ============================================
+           LESSONS LIST
+           ============================================ */
+        .lessons-list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        /* ============================================
+           CONNECTION STATUS
+           ============================================ */
+        .conn-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 30px;
+            background: rgba(110,198,245,0.1);
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-mid);
+        }
+        .conn-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--red);
+            transition: all 0.3s;
+        }
+        .conn-dot.connected {
+            background: var(--green);
+            box-shadow: 0 0 8px rgba(76,175,125,0.5);
+        }
+
+        /* ============================================
+           LOGOUT BUTTON
+           ============================================ */
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: 2px solid var(--red);
+            background: transparent;
+            color: var(--red);
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .logout-btn:hover {
+            background: var(--red);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(255,107,107,0.3);
+        }
+
+        /* ============================================
+           BUTTONS
+           ============================================ */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 18px;
+            border-radius: var(--radius-sm);
+            border: none;
+            font-family: 'Baloo 2', cursive;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+            text-decoration: none;
+        }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-teal {
+            background: linear-gradient(135deg, var(--teal), var(--sky-dark));
+            color: white;
+            box-shadow: 0 4px 14px rgba(46,140,140,0.3);
+        }
+        .btn-teal:hover { box-shadow: 0 8px 22px rgba(46,140,140,0.4); }
+        .btn-ghost {
+            background: rgba(110,198,245,0.15);
+            color: var(--teal);
+            border: 2px solid rgba(110,198,245,0.4);
+        }
+        .btn-ghost:hover { background: rgba(110,198,245,0.28); }
+        .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+        .btn-block { width: 100%; justify-content: center; }
+
+        /* ============================================
+           SETTINGS GRID
+           ============================================ */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .settings-grid .setting-item {
+            padding: 16px;
+            background: rgba(110,198,245,0.05);
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(110,198,245,0.1);
+        }
+        .settings-grid .setting-item h4 {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1rem;
+            color: var(--teal);
+            margin-bottom: 12px;
+        }
+
+        /* ============================================
+           TOP NAV TABS - FIXED
+           ============================================ */
+        .topnav .nav-tab {
+            cursor: pointer;
+        }
+        .topnav .nav-tab:hover {
+            color: var(--teal);
+        }
+        .topnav .nav-tab.active {
+            background: var(--teal);
+            color: white;
+            box-shadow: 0 3px 10px rgba(46,140,140,0.3);
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 992px) {
+            .admin-wrapper { flex-direction: column; padding: 16px; }
+            .admin-sidebar {
+                width: 100%;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            .admin-sidebar .card { flex: 1; min-width: 120px; }
+            .admin-sidebar .sidebar-brand { flex: 0 0 100%; }
+            .sidebar-footer { display: none; }
+            .admin-nav-item { padding: 8px 12px; font-size: 0.8rem; }
+        }
+        @media (max-width: 640px) {
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .settings-grid { grid-template-columns: 1fr; }
+            .admin-header h1 { font-size: 1.2rem; }
+            .admin-wrapper { padding: 12px; }
+            table { font-size: 0.78rem; }
+            table th, table td { padding: 6px 8px; }
+            .topnav { flex-wrap: wrap; height: auto; padding: 10px 16px; gap: 8px; }
+            .nav-center { flex-wrap: wrap; }
+        }
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .admin-sidebar .card { min-width: 80px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- TOP NAVIGATION WITH FIXED TABS              -->
+<!-- ============================================ -->
+<nav class="topnav">
+    <a class="nav-logo" href="admin-dashboard.html">NeuroLearn</a>
+    <div class="nav-center">
+        <a class="nav-tab active" data-panel="dashboard" onclick="switchAdminPanel('dashboard', this)">🏠 Dashboard</a>
+        <a class="nav-tab" data-panel="students" onclick="switchAdminPanel('students', this)">👨‍🎓 Students</a>
+        <a class="nav-tab" data-panel="parents" onclick="switchAdminPanel('parents', this)">👩 Parents</a>
+        <a class="nav-tab" data-panel="lessons" onclick="switchAdminPanel('lessons', this)">📚 Lessons</a>
+        <a class="nav-tab" data-panel="settings" onclick="switchAdminPanel('settings', this)">⚙️ Settings</a>
+    </div>
+    <div class="nav-right">
+        <div class="conn-status">
+            <span class="conn-dot" id="conn-indicator"></span>
+            <span id="conn-text">Checking...</span>
+        </div>
+        <a class="avatar-btn" href="admin-dashboard.html">
+            <div class="avatar-circle" style="background:linear-gradient(135deg, #9B59B6, #6EC6F5);">🔧</div>
+            <span id="admin-name-display">Admin</span>
+        </a>
+        <button class="logout-btn" onclick="handleLogout()">🚪 Logout</button>
+    </div>
+</nav>
+
+<!-- ============================================ -->
+<!-- ADMIN DASHBOARD CONTENT                      -->
+<!-- ============================================ -->
+<div class="admin-wrapper">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="admin-sidebar">
+        <div class="card sidebar-brand">
+            <div class="brand-icon">🔧</div>
+            <h2>Admin Panel</h2>
+            <p>NeuroLearn Management</p>
+        </div>
+
+        <button class="admin-nav-item active" data-panel="dashboard" onclick="switchAdminPanel('dashboard', this)">
+            <span class="ni-icon">📊</span> Dashboard
+        </button>
+        <button class="admin-nav-item" data-panel="students" onclick="switchAdminPanel('students', this)">
+            <span class="ni-icon">👨‍🎓</span> Students
+        </button>
+        <button class="admin-nav-item" data-panel="parents" onclick="switchAdminPanel('parents', this)">
+            <span class="ni-icon">👩</span> Parents
+        </button>
+        <button class="admin-nav-item" data-panel="lessons" onclick="switchAdminPanel('lessons', this)">
+            <span class="ni-icon">📚</span> Lessons
+        </button>
+        <button class="admin-nav-item" data-panel="settings" onclick="switchAdminPanel('settings', this)">
+            <span class="ni-icon">⚙️</span> Settings
+        </button>
+
+        <div class="card sidebar-footer">
+            <div class="user-info">
+                <div class="avatar">🔧</div>
+                <div>
+                    <div class="name" id="admin-name-sidebar">Admin</div>
+                    <div class="role">Administrator</div>
+                </div>
+            </div>
+            <button class="btn btn-ghost btn-sm btn-block" onclick="handleLogout()">🚪 Logout</button>
+        </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="admin-main">
+
+        <!-- ========================================== -->
+        <!-- PANEL: DASHBOARD                           -->
+        <!-- ========================================== -->
+        <div id="panel-dashboard" class="admin-panel active">
+            <div class="admin-header">
+                <div>
+                    <h1>📊 Dashboard</h1>
+                    <p>Overview of NeuroLearn platform activity</p>
+                </div>
+                <button class="btn btn-teal btn-sm" onclick="refreshAdminData()">🔄 Refresh</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">👨‍🎓</div>
+                    <div class="stat-number" id="stat-total-students">0</div>
+                    <div class="stat-label">Total Students</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">👩</div>
+                    <div class="stat-number" id="stat-total-parents">0</div>
+                    <div class="stat-label">Total Parents</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📚</div>
+                    <div class="stat-number" id="stat-total-lessons">0</div>
+                    <div class="stat-label">Total Lessons</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-number" id="stat-completed-lessons">0</div>
+                    <div class="stat-label">Completed Lessons</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-number" id="stat-avg-score">0%</div>
+                    <div class="stat-label">Average Score</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-number" id="stat-daily-xp">0 XP</div>
+                    <div class="stat-label">Today's XP</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+                    <h3 style="font-family:'Baloo 2',cursive;font-size:1.1rem;color:var(--text-dark);">🕐 Recent Activity</h3>
+                </div>
+                <div class="recent-activity-list" id="recent-activity-list">
+                    <p style="color:var(--text-light);font-size:0.85rem;font-weight:600;text-align:center;padding:20px;">Loading...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- PANEL: STUDENTS                           -->
+        <!-- ========================================== -->
+        <div id="panel-students" class="admin-panel">
+            <div class="admin-header">
+                <div>
+                    <h1>👨‍🎓 Students</h1>
+                    <p>Manage all student accounts</p>
+                </div>
+                <button class="btn btn-teal btn-sm" onclick="adminLoadStudents()">🔄 Refresh</button>
+            </div>
+            <div class="card">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Email</th>
+                                <th>Level</th>
+                                <th>XP</th>
+                                <th>Adaptive</th>
+                                <th>TTS</th>
+                                <th>Progress</th>
+                            </tr>
+                        </thead>
+                        <tbody id="students-table-body">
+                            <tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text-light);">Loading students...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- PANEL: PARENTS                            -->
+        <!-- ========================================== -->
+        <div id="panel-parents" class="admin-panel">
+            <div class="admin-header">
+                <div>
+                    <h1>👩 Parents</h1>
+                    <p>Manage all parent accounts</p>
+                </div>
+                <button class="btn btn-teal btn-sm" onclick="adminLoadParents()">🔄 Refresh</button>
+            </div>
+            <div class="card">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Parent</th><th>Email</th><th>Linked Learners</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody id="parents-table-body">
+                            <tr><td colspan="4" style="text-align:center;padding:30px;color:var(--text-light);">Loading parents...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- PANEL: LESSONS                            -->
+        <!-- ========================================== -->
+        <div id="panel-lessons" class="admin-panel">
+            <div class="admin-header">
+                <div>
+                    <h1>📚 Lessons</h1>
+                    <p>View all available lessons</p>
+                </div>
+                <button class="btn btn-teal btn-sm" onclick="adminLoadLessons()">🔄 Refresh</button>
+            </div>
+            <div class="card">
+                <div class="lessons-list-container" id="lessons-list-container">
+                    <p style="color:var(--text-light);font-size:0.85rem;font-weight:600;text-align:center;padding:20px;">Loading lessons...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- PANEL: SETTINGS                           -->
+        <!-- ========================================== -->
+        <div id="panel-settings" class="admin-panel">
+            <div class="admin-header">
+                <div>
+                    <h1>⚙️ Settings</h1>
+                    <p>Admin settings and system information</p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <h4>🔌 Connection Status</h4>
+                        <div style="display:flex;align-items:center;gap:12px;padding:12px;background:rgba(110,198,245,0.08);border-radius:var(--radius-sm);">
+                            <span class="conn-dot" id="settings-conn-dot" style="width:14px;height:14px;"></span>
+                            <span id="settings-conn-text" style="font-weight:700;">Checking...</span>
+                        </div>
+                    </div>
+                    <div class="setting-item">
+                        <h4>💾 Storage</h4>
+                        <div>
+                            <div style="display:flex;justify-content:space-between;font-size:0.8rem;font-weight:700;color:var(--text-light);">
+                                <span id="storage-used-display">0 GB</span>
+                                <span>1 GB</span>
+                            </div>
+                            <div class="progress-bar" style="height:8px;margin-top:4px;">
+                                <div class="progress-fill blue" id="storage-bar" style="width:0%;"></div>
+                            </div>
+                            <div style="font-size:0.7rem;color:var(--text-light);font-weight:600;margin-top:4px;" id="storage-detail">0 GB of 1 GB</div>
+                        </div>
+                    </div>
+                </div>
+                <hr style="border:none;border-top:1px solid rgba(110,198,245,0.2);margin:20px 0;">
+                <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                    <button class="btn btn-teal btn-sm" onclick="refreshAdminData()">🔄 Refresh All Data</button>
+                    <button class="btn btn-ghost btn-sm" onclick="showToast('Cache cleared!', '#4CAF7D')">🗑️ Clear Cache</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast"></div>
+
+<!-- ============================================ -->
+<!-- SCRIPTS                                      -->
+<!-- ============================================ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="script.js"></script>
+
+<script>
+    // ============================================
+    // HELPER: Wait for Supabase
+    // ============================================
+    function waitForSupabase() {
+        return new Promise((resolve) => {
+            if (typeof supabase !== 'undefined' && supabase && supabase.auth) {
+                resolve(supabase);
+                return;
+            }
+            if (typeof window.supabaseClient !== 'undefined' && window.supabaseClient && window.supabaseClient.auth) {
+                resolve(window.supabaseClient);
+                return;
+            }
+            setTimeout(() => waitForSupabase().then(resolve), 500);
+        });
+    }
+
+    // ============================================
+    // TOAST NOTIFICATION
+    // ============================================
+    function showToast(msg, color) {
+        const t = document.getElementById('toast');
+        if (!t) return;
+        t.textContent = msg;
+        t.style.background = color || '#2E8C8C';
+        t.style.color = '#FFFFFF';
+        t.classList.add('show');
+        clearTimeout(window._toastTimer);
+        window._toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // ============================================
+    // ESCAPE HTML
+    // ============================================
+    function escapeHtml(str) {
+        if (!str) return '';
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    // ============================================
+    // SET TEXT/HTML CONTENT
+    // ============================================
+    function adminSetText(id, text) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = (text === null || text === undefined) ? '0' : String(text);
+    }
+
+    function adminSetHTML(id, html) {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = html;
+    }
+
+    // ============================================
+    // ⭐ CHECK ADMIN ACCESS ⭐
+    // ============================================
+    async function checkAdminAccess() {
+        try {
+            const supabaseClient = await waitForSupabase();
+            if (!supabaseClient || !supabaseClient.auth) {
+                showToast('Supabase not available. Please refresh.', '#FF6B6B');
+                setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+                return false;
+            }
+
+            const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+            if (userError || !user) {
+                showToast('Please login first.', '#FF6B6B');
+                setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+                return false;
+            }
+
+            const { data: userData, error: roleError } = await supabaseClient
+                .from('users')
+                .select('role, display_name')
+                .eq('id', user.id)
+                .single();
+
+            if (roleError || !userData) {
+                showToast('User record not found. Please contact support.', '#FF6B6B');
+                setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+                return false;
+            }
+
+            const role = (userData.role || '').toLowerCase();
+            console.log('🔵 Admin check - User role:', role);
+
+            if (role !== 'admin') {
+                showToast('Access denied. Admin privileges required.', '#FF6B6B');
+                if (role === 'student') {
+                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
+                } else if (role === 'parent') {
+                    setTimeout(() => { window.location.href = 'parent-dashboard.html'; }, 1500);
+                } else {
+                    setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+                }
+                return false;
+            }
+
+            const displayName = userData.display_name || 'Admin';
+            localStorage.setItem('neurolearn_display_name', displayName);
+            localStorage.setItem('neurolearn_user_role', 'admin');
+            
+            document.getElementById('admin-name-display').textContent = displayName;
+            document.getElementById('admin-name-sidebar').textContent = displayName;
+
+            console.log('✅ Admin access granted for:', displayName);
+            return true;
+
+        } catch (error) {
+            console.error('Admin check error:', error);
+            showToast('Error verifying access. Please try again.', '#FF6B6B');
+            setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+            return false;
+        }
+    }
+
+    // ============================================
+    // ⭐ LOGOUT FUNCTION ⭐
+    // ============================================
+    async function handleLogout() {
+        try {
+            const supabaseClient = await waitForSupabase();
+            if (supabaseClient && supabaseClient.auth) {
+                await supabaseClient.auth.signOut();
+            }
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
+        
+        localStorage.removeItem('neurolearn_display_name');
+        localStorage.removeItem('neurolearn_user_email');
+        localStorage.removeItem('neurolearn_user_id');
+        localStorage.removeItem('neurolearn_user_role');
+        localStorage.removeItem('neurolearn_level');
+        localStorage.removeItem('neurolearn_xp');
+        localStorage.removeItem('neurolearn_full_name');
+        localStorage.removeItem('neurolearn_birthday');
+        localStorage.removeItem('neurolearn_grade');
+        localStorage.removeItem('neurolearn_child_code');
+        localStorage.removeItem('neurolearn_linked_child_id');
+        localStorage.removeItem('neurolearn_linked_child_name');
+        
+        showToast('Logged out successfully 👋', '#FF8C42');
+        setTimeout(() => { window.location.href = 'index.html'; }, 800);
+    }
+
+    // ============================================
+    // ADMIN CONNECTION CHECK
+    // ============================================
+    async function adminCheckConnection() {
+        try {
+            const client = await waitForSupabase();
+            const indicator = document.getElementById('conn-indicator');
+            const text = document.getElementById('conn-text');
+            const settingsDot = document.getElementById('settings-conn-dot');
+            const settingsText = document.getElementById('settings-conn-text');
+
+            if (client && client.auth) {
+                const { data: { session } } = await client.auth.getSession();
+                if (session) {
+                    if (indicator) { indicator.className = 'conn-dot connected'; }
+                    if (text) text.textContent = 'Connected';
+                    if (settingsDot) { settingsDot.className = 'conn-dot connected'; }
+                    if (settingsText) settingsText.textContent = 'Connected to Supabase';
+                    return client;
+                }
+            }
+            
+            if (indicator) { indicator.className = 'conn-dot'; }
+            if (text) text.textContent = 'Disconnected';
+            if (settingsDot) { settingsDot.className = 'conn-dot'; }
+            if (settingsText) settingsText.textContent = 'Disconnected';
+            return null;
+        } catch (e) {
+            const indicator = document.getElementById('conn-indicator');
+            const text = document.getElementById('conn-text');
+            if (indicator) { indicator.className = 'conn-dot'; }
+            if (text) text.textContent = 'Disconnected';
+            return null;
+        }
+    }
+
+    // ============================================
+    // LOAD ADMIN DASHBOARD
+    // ============================================
+    async function adminLoadDashboard() {
+        const client = await adminCheckConnection();
+        if (!client) {
+            ['stat-total-students','stat-total-parents','stat-total-lessons',
+             'stat-completed-lessons','stat-avg-score','stat-daily-xp'].forEach(id => adminSetText(id, '—'));
+            return;
+        }
+
+        try {
+            const { count: studentCount } = await client
+                .from('users')
+                .select('*', { count: 'exact', head: true })
+                .eq('role', 'student');
+            adminSetText('stat-total-students', studentCount || 0);
+
+            const { count: parentCount } = await client
+                .from('users')
+                .select('*', { count: 'exact', head: true })
+                .eq('role', 'parent');
+            adminSetText('stat-total-parents', parentCount || 0);
+
+            const { count: lessonCount } = await client
+                .from('lessons')
+                .select('*', { count: 'exact', head: true });
+            adminSetText('stat-total-lessons', lessonCount || 0);
+
+            const { count: completedCount } = await client
+                .from('user_progress')
+                .select('*', { count: 'exact', head: true })
+                .eq('status', 'completed');
+            adminSetText('stat-completed-lessons', completedCount || 0);
+
+            const { data: scoreData } = await client
+                .from('user_progress')
+                .select('score')
+                .not('score', 'is', null);
+            let avgScore = 0;
+            if (scoreData && scoreData.length > 0) {
+                const total = scoreData.reduce((sum, row) => sum + (row.score || 0), 0);
+                avgScore = Math.round(total / scoreData.length);
+            }
+            adminSetText('stat-avg-score', avgScore > 0 ? avgScore + '%' : '0%');
+
+            const today = new Date().toISOString().slice(0, 10);
+            const { data: dailyData } = await client
+                .from('daily_stats')
+                .select('xp_earned')
+                .eq('date', today);
+            let dailyXP = 0;
+            if (dailyData && dailyData.length > 0) {
+                dailyXP = dailyData.reduce((sum, row) => sum + (row.xp_earned || 0), 0);
+            }
+            adminSetText('stat-daily-xp', dailyXP > 0 ? dailyXP + ' XP' : '0 XP');
+
+            const lCount = parseInt(document.getElementById('stat-total-lessons')?.textContent || '0');
+            const storageEl = document.getElementById('storage-used-display');
+            const storageBar = document.getElementById('storage-bar');
+            const storageDetail = document.getElementById('storage-detail');
+            if (storageEl) storageEl.textContent = (lCount * 0.05).toFixed(2) + ' GB';
+            if (storageBar) storageBar.style.width = Math.min(100, lCount * 5) + '%';
+            if (storageDetail) storageDetail.textContent = (lCount * 0.05).toFixed(2) + ' GB of 1 GB';
+
+            await adminLoadRecentActivity();
+
+        } catch (e) {
+            console.error('adminLoadDashboard error:', e);
+        }
+    }
+
+    // ============================================
+    // LOAD STUDENTS
+    // ============================================
+    async function adminLoadStudents() {
+        const client = await adminCheckConnection();
+        if (!client) {
+            adminSetHTML('students-table-body', '<tr><td colspan="7" style="text-align:center;padding:30px;">No data available.</td></tr>');
+            return;
+        }
+
+        try {
+            const { data: students } = await client
+                .from('users')
+                .select('id, display_name, email, level, xp, adaptive_pacing, text_to_speech')
+                .eq('role', 'student');
+
+            if (!students || students.length === 0) {
+                adminSetHTML('students-table-body', '<tr><td colspan="7" style="text-align:center;padding:30px;">No students found.</td></tr>');
+                return;
+            }
+
+            const rows = await Promise.all(students.map(async (s) => {
+                let lessonName = '—';
+                let progressPct = 0;
+                try {
+                    const { data: prog } = await client
+                        .from('user_progress')
+                        .select('lesson_id, progress_percentage, lessons(title)')
+                        .eq('user_id', s.id)
+                        .order('last_accessed', { ascending: false })
+                        .limit(1)
+                        .maybeSingle();
+                    if (prog) {
+                        progressPct = prog.progress_percentage || 0;
+                        if (prog.lessons?.title) lessonName = prog.lessons.title;
+                    }
+                } catch (e) {}
+
+                return `
+                    <tr>
+                        <td data-label="Student"><strong>${escapeHtml(s.display_name || '—')}</strong></td>
+                        <td data-label="Email">${escapeHtml(s.email || '—')}</td>
+                        <td data-label="Level">${s.level || 0}</td>
+                        <td data-label="XP">${s.xp || 0} XP</td>
+                        <td data-label="Adaptive"><span class="badge ${s.adaptive_pacing ? 'green' : 'teal'}">${s.adaptive_pacing ? 'On' : 'Off'}</span></td>
+                        <td data-label="TTS"><span class="badge ${s.text_to_speech ? 'green' : 'teal'}">${s.text_to_speech ? 'On' : 'Off'}</span></td>
+                        <td data-label="Progress">${escapeHtml(lessonName)} (${progressPct}%)</td>
+                    </tr>
+                `;
+            }));
+
+            adminSetHTML('students-table-body', rows.join(''));
+        } catch (e) {
+            console.error('adminLoadStudents error:', e);
+            adminSetHTML('students-table-body', '<tr><td colspan="7" style="text-align:center;padding:30px;">Error loading data.</td></tr>');
+        }
+    }
+
+    // ============================================
+    // LOAD PARENTS
+    // ============================================
+    async function adminLoadParents() {
+        const client = await adminCheckConnection();
+        if (!client) {
+            adminSetHTML('parents-table-body', '<tr><td colspan="4" style="text-align:center;padding:30px;">No data available.</td></tr>');
+            return;
+        }
+
+        try {
+            const { data: parents } = await client
+                .from('users')
+                .select('id, display_name, email')
+                .eq('role', 'parent');
+
+            if (!parents || parents.length === 0) {
+                adminSetHTML('parents-table-body', '<tr><td colspan="4" style="text-align:center;padding:30px;">No parents found.</td></tr>');
+                return;
+            }
+
+            const rows = await Promise.all(parents.map(async (p) => {
+                let linkedCount = 0;
+                try {
+                    const { count } = await client
+                        .from('users')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('parent_id', p.id);
+                    linkedCount = count || 0;
+                } catch (e) {}
+
+                return `
+                    <tr>
+                        <td data-label="Parent"><strong>${escapeHtml(p.display_name || '—')}</strong></td>
+                        <td data-label="Email">${escapeHtml(p.email || '—')}</td>
+                        <td data-label="Linked Learners"><span class="badge teal">${linkedCount} learner${linkedCount !== 1 ? 's' : ''}</span></td>
+                        <td data-label="Actions"><button class="btn btn-ghost btn-sm" onclick="showToast('View parent: ${escapeHtml(p.display_name || '')}', '#2E8C8C')">👁 View</button></td>
+                    </tr>
+                `;
+            }));
+
+            adminSetHTML('parents-table-body', rows.join(''));
+        } catch (e) {
+            console.error('adminLoadParents error:', e);
+            adminSetHTML('parents-table-body', '<tr><td colspan="4" style="text-align:center;padding:30px;">Error loading data.</td></tr>');
+        }
+    }
+
+    // ============================================
+    // LOAD LESSONS
+    // ============================================
+    async function adminLoadLessons() {
+        const client = await adminCheckConnection();
+        if (!client) {
+            adminSetHTML('lessons-list-container', '<p style="text-align:center;padding:20px;">No data available.</p>');
+            return;
+        }
+
+        try {
+            const { data: lessons } = await client
+                .from('lessons')
+                .select('id, title, subject, difficulty, description, lesson_key');
+
+            if (!lessons || lessons.length === 0) {
+                adminSetHTML('lessons-list-container', '<p style="text-align:center;padding:20px;">No lessons found.</p>');
+                return;
+            }
+
+            const html = lessons.map(lesson => {
+                const diffClass = lesson.difficulty === 'beginner' ? 'beginner' : 
+                                 lesson.difficulty === 'intermediate' ? 'intermediate' : 'advanced';
+                return `
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(110,198,245,0.1);flex-wrap:wrap;gap:8px;">
+                        <div>
+                            <strong style="font-size:0.92rem;color:var(--text-dark);">${escapeHtml(lesson.title)}</strong>
+                            <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap;">
+                                <span class="badge blue">${escapeHtml(lesson.subject || '—')}</span>
+                                <span class="badge ${diffClass}">${escapeHtml(lesson.difficulty || '—')}</span>
+                                <span class="badge teal">${escapeHtml(lesson.lesson_key || '—')}</span>
+                            </div>
+                            ${lesson.description ? '<p style="font-size:0.82rem;color:var(--text-light);margin-top:4px;">' + escapeHtml(lesson.description) + '</p>' : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            adminSetHTML('lessons-list-container', html);
+        } catch (e) {
+            console.error('adminLoadLessons error:', e);
+            adminSetHTML('lessons-list-container', '<p style="text-align:center;padding:20px;">Error loading data.</p>');
+        }
+    }
+
+    // ============================================
+    // LOAD RECENT ACTIVITY
+    // ============================================
+    async function adminLoadRecentActivity() {
+        const client = await adminCheckConnection();
+        if (!client) {
+            adminSetHTML('recent-activity-list', '<p style="text-align:center;padding:20px;">No data available.</p>');
+            return;
+        }
+
+        try {
+            const { data: activities } = await client
+                .from('user_progress')
+                .select('id, score, completed_at, user_id, lesson_id, users(display_name), lessons(title)')
+                .eq('status', 'completed')
+                .not('completed_at', 'is', null)
+                .order('completed_at', { ascending: false })
+                .limit(10);
+
+            if (!activities || activities.length === 0) {
+                adminSetHTML('recent-activity-list', '<p style="text-align:center;padding:20px;">No recent activity.</p>');
+                return;
+            }
+
+            const html = activities.map(a => {
+                const studentName = a.users?.display_name || '—';
+                const lessonTitle = a.lessons?.title || '—';
+                const date = a.completed_at ? new Date(a.completed_at).toLocaleDateString() : '—';
+                return `
+                    <div class="recent-upload-item">
+                        <div class="ru-icon">✅</div>
+                        <div class="ru-info">
+                            <h4>${escapeHtml(studentName)} completed "${escapeHtml(lessonTitle)}"</h4>
+                            <p>${date} · Score: ${a.score || 0}%</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            adminSetHTML('recent-activity-list', html);
+        } catch (e) {
+            console.error('adminLoadRecentActivity error:', e);
+            adminSetHTML('recent-activity-list', '<p style="text-align:center;padding:20px;">Error loading data.</p>');
+        }
+    }
+
+    // ============================================
+    // ⭐ SWITCH ADMIN PANELS - FIXED ⭐
+    // ============================================
+    function switchAdminPanel(panel, btn) {
+        console.log('🔵 Switching to panel:', panel);
+        
+        // Hide all panels
+        document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+        
+        // Show selected panel
+        const target = document.getElementById('panel-' + panel);
+        if (target) {
+            target.classList.add('active');
+            console.log('✅ Panel activated:', panel);
+        } else {
+            console.warn('⚠️ Panel not found:', panel);
+        }
+        
+        // Update sidebar nav buttons
+        document.querySelectorAll('.admin-nav-item').forEach(b => b.classList.remove('active'));
+        if (btn) {
+            btn.classList.add('active');
+        } else {
+            // If no btn provided (top nav click), find matching sidebar button
+            const sidebarBtn = document.querySelector(`.admin-nav-item[data-panel="${panel}"]`);
+            if (sidebarBtn) sidebarBtn.classList.add('active');
+        }
+
+        // Update top nav tabs
+        document.querySelectorAll('.topnav .nav-tab').forEach(tab => {
+            tab.classList.remove('active');
+            if (tab.dataset.panel === panel) {
+                tab.classList.add('active');
+            }
+        });
+
+        // Load data for the panel
+        if (panel === 'dashboard') {
+            adminLoadDashboard();
+        } else if (panel === 'students') {
+            adminLoadStudents();
+        } else if (panel === 'parents') {
+            adminLoadParents();
+        } else if (panel === 'lessons') {
+            adminLoadLessons();
+        }
+    }
+
+    // ============================================
+    // REFRESH ALL DATA
+    // ============================================
+    async function refreshAdminData() {
+        showToast('🔄 Refreshing data...', '#FF8C42');
+        await adminLoadDashboard();
+        await adminLoadStudents();
+        await adminLoadParents();
+        await adminLoadLessons();
+        showToast('✅ Data refreshed!', '#4CAF7D');
+    }
+
+    // ============================================
+    // ⭐ INITIALIZE ADMIN PAGE ⭐
+    // ============================================
+    document.addEventListener('DOMContentLoaded', async function() {
+        const isAdmin = await checkAdminAccess();
+        if (!isAdmin) return;
+
+        await adminLoadDashboard();
+        await adminLoadStudents();
+        await adminLoadParents();
+        await adminLoadLessons();
+
+        const displayName = localStorage.getItem('neurolearn_display_name') || 'Admin';
+        showToast(`Welcome, ${displayName}! 🔧`, '#4CAF7D');
+
+        if (typeof setActiveNav === 'function') setActiveNav();
+    });
+
+    // ============================================
+    // EXPOSE GLOBALLY
+    // ============================================
+    window.switchAdminPanel = switchAdminPanel;
+    window.adminLoadDashboard = adminLoadDashboard;
+    window.adminLoadStudents = adminLoadStudents;
+    window.adminLoadParents = adminLoadParents;
+    window.adminLoadLessons = adminLoadLessons;
+    window.adminLoadRecentActivity = adminLoadRecentActivity;
+    window.refreshAdminData = refreshAdminData;
+    window.handleLogout = handleLogout;
+    window.showToast = showToast;
+</script>
+
+</body>
+</html>

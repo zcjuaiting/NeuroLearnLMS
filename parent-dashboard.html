@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroLearn – Parent Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .report-layout {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 24px;
+            padding: 32px 40px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+        .report-main {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+        .report-aside {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* ---- Header Card ---- */
+        .report-header-card {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            padding: 28px 32px;
+            flex-wrap: wrap;
+        }
+        .report-header-card .rh-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--orange), var(--yellow));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            border: 3px solid white;
+            flex-shrink: 0;
+        }
+        .report-header-card .rh-info h2 {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.4rem;
+            color: var(--text-dark);
+        }
+        .report-header-card .rh-info p {
+            font-size: 0.85rem;
+            color: var(--text-mid);
+            font-weight: 600;
+        }
+        .rh-meta {
+            margin-left: auto;
+            text-align: right;
+        }
+        .rh-meta .period {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .rh-meta .date {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1rem;
+            color: var(--teal);
+        }
+
+        /* ---- Summary Stats ---- */
+        .summary-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+        .stat-pill {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(110, 198, 245, 0.12);
+            border: 1.5px solid rgba(110, 198, 245, 0.25);
+            border-radius: 14px;
+            padding: 14px 18px;
+            text-align: center;
+            min-width: 80px;
+        }
+        .stat-pill .val {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.6rem;
+            color: var(--teal);
+            line-height: 1;
+        }
+        .stat-pill .lbl {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-light);
+            margin-top: 3px;
+        }
+
+        /* ---- Subject Breakdown ---- */
+        .subject-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .breakdown-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 18px;
+            background: rgba(110, 198, 245, 0.07);
+            border: 1.5px solid rgba(110, 198, 245, 0.18);
+            border-radius: var(--radius-sm);
+            flex-wrap: wrap;
+        }
+        .br-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+        .br-icon.math {
+            background: linear-gradient(135deg, #B3E5FC, #81D4FA);
+        }
+        .br-icon.science {
+            background: linear-gradient(135deg, #C8E6C9, #A5D6A7);
+        }
+        .br-icon.reading {
+            background: linear-gradient(135deg, #FFE0B2, #FFCC80);
+        }
+        .br-icon.history {
+            background: linear-gradient(135deg, #E1BEE7, #CE93D8);
+        }
+        .br-info {
+            flex: 1;
+            min-width: 100px;
+        }
+        .br-info h4 {
+            font-weight: 800;
+            font-size: 0.92rem;
+            color: var(--text-dark);
+        }
+        .br-info p {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+        .br-stats {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .br-score {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.15rem;
+            color: var(--teal);
+            font-weight: 700;
+        }
+        .br-trend {
+            padding: 3px 9px;
+            border-radius: 10px;
+            font-size: 0.78rem;
+            font-weight: 800;
+        }
+        .br-trend.up {
+            background: rgba(76, 175, 125, 0.15);
+            color: var(--green-dark);
+        }
+        .br-trend.down {
+            background: rgba(255, 107, 107, 0.12);
+            color: var(--red);
+        }
+        .br-trend.same {
+            background: rgba(110, 198, 245, 0.15);
+            color: var(--sky-dark);
+        }
+
+        /* ---- Narrative Block ---- */
+        .narrative-block {
+            padding: 24px 28px;
+        }
+        .narrative-block h3 {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.05rem;
+            color: var(--teal);
+            margin-bottom: 10px;
+        }
+        .narrative-para {
+            font-size: 0.92rem;
+            color: var(--text-dark);
+            line-height: 1.7;
+            font-weight: 600;
+        }
+        .highlight-span {
+            background: linear-gradient(135deg, rgba(110, 198, 245, 0.2), rgba(76, 175, 125, 0.15));
+            padding: 1px 6px;
+            border-radius: 6px;
+            font-weight: 800;
+            color: var(--teal);
+        }
+
+        /* ---- Right Panel ---- */
+        .mini-ring {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 20px;
+            text-align: center;
+        }
+        .mini-ring svg {
+            transform: rotate(-90deg);
+        }
+        .ring-label {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.5rem;
+            color: var(--teal);
+            text-align: center;
+            margin-top: -8px;
+        }
+        .ring-label small {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-light);
+            font-weight: 700;
+        }
+
+        /* ---- Recommendations ---- */
+        .rec-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .rec-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px;
+            border-radius: 12px;
+            background: rgba(110, 198, 245, 0.08);
+            border: 1.5px solid rgba(110, 198, 245, 0.18);
+        }
+        .rec-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+        .rec-dot.green {
+            background: var(--green);
+        }
+        .rec-dot.orange {
+            background: var(--orange);
+        }
+        .rec-dot.blue {
+            background: var(--sky-dark);
+        }
+        .rec-info h4 {
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+        .rec-info p {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        /* ---- Period Toggle ---- */
+        .period-toggle {
+            display: flex;
+            gap: 6px;
+            background: rgba(110, 198, 245, 0.15);
+            padding: 5px;
+            border-radius: 12px;
+            border: 1.5px solid rgba(110, 198, 245, 0.25);
+        }
+        .period-btn {
+            padding: 6px 16px;
+            border-radius: 9px;
+            border: none;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 700;
+            font-size: 0.82rem;
+            cursor: pointer;
+            color: var(--text-mid);
+            background: transparent;
+            transition: all 0.2s;
+        }
+        .period-btn.active {
+            background: var(--teal);
+            color: white;
+            box-shadow: 0 2px 8px rgba(46, 140, 140, 0.3);
+        }
+
+        /* ---- Bar Chart ---- */
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            height: 120px;
+            margin-top: 20px;
+        }
+        .bar-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+        }
+        .bar-fill {
+            width: 100%;
+            border-radius: 10px 10px 0 0;
+            transition: height 0.8s ease;
+            min-height: 4px;
+        }
+        .b-val {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+        .b-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+
+        /* ---- Empty State ---- */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .empty-state .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+        }
+        .empty-state h3 {
+            font-family: 'Baloo 2', cursive;
+            font-size: 1.4rem;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+        .empty-state p {
+            color: var(--text-mid);
+            font-size: 0.95rem;
+            font-weight: 600;
+            max-width: 400px;
+            margin: 0 auto 20px;
+        }
+        .empty-state .empty-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* ---- Buttons ---- */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 22px;
+            border-radius: var(--radius-sm);
+            border: none;
+            font-family: 'Baloo 2', cursive;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+            text-decoration: none;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn-teal {
+            background: linear-gradient(135deg, var(--teal), var(--sky-dark));
+            color: white;
+            box-shadow: 0 4px 14px rgba(46, 140, 140, 0.3);
+        }
+        .btn-teal:hover {
+            box-shadow: 0 8px 22px rgba(46, 140, 140, 0.4);
+        }
+        .btn-orange {
+            background: linear-gradient(135deg, var(--yellow), var(--orange));
+            color: white;
+            box-shadow: 0 4px 14px rgba(255, 140, 66, 0.3);
+        }
+        .btn-orange:hover {
+            box-shadow: 0 8px 22px rgba(255, 140, 66, 0.4);
+        }
+        .btn-ghost {
+            background: rgba(110, 198, 245, 0.15);
+            color: var(--teal);
+            border: 2px solid rgba(110, 198, 245, 0.4);
+        }
+        .btn-ghost:hover {
+            background: rgba(110, 198, 245, 0.28);
+        }
+        .btn-sm {
+            padding: 7px 16px;
+            font-size: 0.85rem;
+        }
+
+        /* ---- Utilities ---- */
+        .flex {
+            display: flex;
+        }
+        .flex-col {
+            flex-direction: column;
+        }
+        .items-center {
+            align-items: center;
+        }
+        .justify-between {
+            justify-content: space-between;
+        }
+        .gap-8 {
+            gap: 8px;
+        }
+        .gap-12 {
+            gap: 12px;
+        }
+        .mt-8 {
+            margin-top: 8px;
+        }
+        .mt-12 {
+            margin-top: 12px;
+        }
+        .mt-16 {
+            margin-top: 16px;
+        }
+        .mb-8 {
+            margin-bottom: 8px;
+        }
+        .flex-center {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        /* ---- Responsive ---- */
+        @media (max-width: 1024px) {
+            .report-layout {
+                grid-template-columns: 1fr;
+            }
+            .report-aside {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+            }
+        }
+        @media (max-width: 768px) {
+            .report-layout {
+                padding: 20px;
+            }
+            .report-aside {
+                grid-template-columns: 1fr;
+            }
+            .summary-row {
+                grid-template-columns: 1fr 1fr;
+            }
+            .report-header-card {
+                flex-direction: column;
+                text-align: center;
+            }
+            .rh-meta {
+                margin-left: 0;
+                text-align: center;
+            }
+        }
+        @media (max-width: 480px) {
+            .summary-row {
+                grid-template-columns: 1fr;
+            }
+            .breakdown-row {
+                flex-direction: column;
+                text-align: center;
+            }
+            .br-stats {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============================================ -->
+<!-- TOP NAVIGATION - NO "Link Child" Tab        -->
+<!-- ============================================ -->
+<nav class="topnav">
+    <a class="nav-logo" href="parent-dashboard.html">NeuroLearn</a>
+    <div class="nav-center">
+        <a class="nav-tab active" href="parent-dashboard.html">🏠 Dashboard</a>
+        <a class="nav-tab" href="parent-profile.html">👤 Profile</a>
+    </div>
+    <div class="nav-right">
+        <button class="icon-btn" title="Notifications" onclick="showToast('Notifications coming soon!')">🔔</button>
+        <a class="avatar-btn" href="parent-profile.html">
+            <div class="avatar-circle parent">👩</div>
+            <span id="parent-name-display">Parent</span>
+        </a>
+    </div>
+</nav>
+
+<!-- ============================================ -->
+<!-- DASHBOARD CONTENT                           -->
+<!-- ============================================ -->
+<div class="report-layout">
+    <div class="report-main">
+
+        <!-- Header -->
+        <div class="card report-header-card">
+            <div class="rh-avatar">👩</div>
+            <div class="rh-info">
+                <h2 id="parent-name">Parent</h2>
+                <p id="linked-child-info">No child linked yet</p>
+            </div>
+            <div class="rh-meta">
+                <div class="period">Dashboard</div>
+                <div class="date" id="report-date">July 2026</div>
+                <button class="btn btn-ghost btn-sm mt-8" onclick="window.print()">🖨️ Print Report</button>
+            </div>
+        </div>
+
+        <!-- Period Toggle -->
+        <div class="flex-center">
+            <h2 style="font-family:'Baloo 2',cursive;font-size:1.4rem;color:var(--text-dark);">📊 Child's Progress</h2>
+            <div class="period-toggle">
+                <button class="period-btn" onclick="setPeriod(this, 'week')">Week</button>
+                <button class="period-btn active" onclick="setPeriod(this, 'month')">Month</button>
+                <button class="period-btn" onclick="setPeriod(this, 'all')">All Time</button>
+            </div>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="summary-row" id="summary-stats">
+            <div class="stat-pill">
+                <div class="val" id="stat-lessons">0</div>
+                <div class="lbl">Lessons Done</div>
+            </div>
+            <div class="stat-pill">
+                <div class="val" id="stat-avg">0%</div>
+                <div class="lbl">Avg Score</div>
+            </div>
+            <div class="stat-pill">
+                <div class="val" id="stat-time">0m</div>
+                <div class="lbl">Total Time</div>
+            </div>
+            <div class="stat-pill">
+                <div class="val" id="stat-streak">🔥0</div>
+                <div class="lbl">Day Streak</div>
+            </div>
+        </div>
+
+        <!-- Bar Chart -->
+        <div class="card">
+            <div class="card-title">📅 Daily Activity (This Week)</div>
+            <div class="bar-chart" id="bar-chart"></div>
+        </div>
+
+        <!-- Subject Breakdown -->
+        <div class="card">
+            <div class="card-title">📚 Subject Breakdown</div>
+            <div class="subject-breakdown" id="subject-breakdown">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Teacher's Note -->
+        <div class="card narrative-block">
+            <h3>📝 Progress Summary</h3>
+            <p class="narrative-para" id="teacher-note">
+                Loading report data...
+            </p>
+        </div>
+    </div>
+
+    <!-- ===== RIGHT SIDEBAR ===== -->
+    <aside class="report-aside">
+
+        <!-- Overall Score Ring -->
+        <div class="card mini-ring">
+            <div class="card-title">🎯 Overall Score</div>
+            <svg width="130" height="130" viewBox="0 0 130 130">
+                <circle cx="65" cy="65" r="54" fill="none" stroke="rgba(110,198,245,0.2)" stroke-width="13"/>
+                <circle id="overall-ring" cx="65" cy="65" r="54" fill="none" stroke="url(#rg)" stroke-width="13" stroke-dasharray="339" stroke-dashoffset="339" stroke-linecap="round"/>
+                <defs>
+                    <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#2E8C8C"/>
+                        <stop offset="100%" style="stop-color:#6EC6F5"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+            <div class="ring-label" id="overall-score">0%<small>Average Score</small></div>
+        </div>
+
+        <!-- Learner Quick View -->
+        <div class="card" id="learner-quick-card">
+            <div class="card-title">🧒 Learner Quick View</div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+                <div style="width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,var(--sky-light),var(--green-light));display:flex;align-items:center;justify-content:center;font-size:1.5rem;border:2px solid white;">🧒</div>
+                <div>
+                    <div style="font-weight:800;font-size:0.9rem;color:var(--text-dark);" id="learner-quick-name">No child linked</div>
+                    <div style="font-size:0.78rem;color:var(--text-light);font-weight:600;" id="learner-quick-level">--</div>
+                </div>
+            </div>
+            <table class="info-table">
+                <tr><td>Avg Session</td><td id="learner-avg-session">--</td></tr>
+                <tr><td>Lessons / Week</td><td id="learner-lessons-week">0</td></tr>
+                <tr><td>Best Subject</td><td id="learner-best-subject">--</td></tr>
+                <tr><td>Pacing</td><td><span class="badge green" id="learner-pacing">Normal</span></td></tr>
+            </table>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="card">
+            <div class="card-title">💡 Recommendations</div>
+            <div class="rec-list" id="recommendations">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex flex-col gap-12">
+            <a class="btn btn-teal" href="parent-profile.html" style="justify-content:center;">⚙️ Adjust Preferences</a>
+            <button class="btn btn-orange" onclick="showToast('Report emailed 📧')" style="justify-content:center;">📧 Email Report</button>
+        </div>
+
+    </aside>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast" id="toast"></div>
+
+<!-- ============================================ -->
+<!-- SCRIPTS                                      -->
+<!-- ============================================ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="script.js"></script>
+
+<script>
+    // ─────────────────────────────────────────────
+    //  HELPERS
+    // ─────────────────────────────────────────────
+
+    function waitForSupabase() {
+        return new Promise((resolve) => {
+            if (typeof supabase !== 'undefined' && supabase && supabase.auth) {
+                resolve(supabase);
+                return;
+            }
+            if (typeof window.supabaseClient !== 'undefined' && window.supabaseClient && window.supabaseClient.auth) {
+                resolve(window.supabaseClient);
+                return;
+            }
+            setTimeout(() => waitForSupabase().then(resolve), 500);
+        });
+    }
+
+    function showToast(msg, color) {
+        const t = document.getElementById('toast');
+        if (!t) return;
+        t.textContent = msg;
+        if (color) t.style.background = color;
+        else t.style.background = '#2E8C8C';
+        t.classList.add('show');
+        clearTimeout(window._toastTimer);
+        window._toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // ─────────────────────────────────────────────
+    //  GET LESSON PROGRESS FOR A CHILD
+    // ─────────────────────────────────────────────
+
+    async function getLessonProgressForChild(childId, lessonId) {
+        try {
+            const supabaseClient = await waitForSupabase();
+            if (!supabaseClient) return null;
+
+            const { data, error } = await supabaseClient
+                .from('user_progress')
+                .select('*')
+                .eq('user_id', childId)
+                .eq('lesson_id', lessonId)
+                .single();
+
+            if (error && error.code !== 'PGRST116') {
+                console.error('Error getting progress:', error);
+                return null;
+            }
+
+            return data;
+        } catch (error) {
+            console.error('Error:', error);
+            return null;
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    //  LOAD REPORT DATA
+    // ─────────────────────────────────────────────
+
+    async function loadReportData() {
+        try {
+            const supabaseClient = await waitForSupabase();
+            if (!supabaseClient) {
+                showToast('Supabase not available', '#FF6B6B');
+                return;
+            }
+
+            const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+            if (userError || !user) {
+                showToast('Please login first', '#FF6B6B');
+                return;
+            }
+
+            // Get parent info
+            const { data: parentData } = await supabaseClient
+                .from('users')
+                .select('display_name')
+                .eq('id', user.id)
+                .single();
+
+            const parentName = parentData?.display_name || 'Parent';
+            document.getElementById('parent-name').textContent = parentName;
+            document.getElementById('parent-name-display').textContent = parentName;
+
+            // Get linked child
+            const { data: childData } = await supabaseClient
+                .from('users')
+                .select('*')
+                .eq('parent_id', user.id)
+                .single();
+
+            // Set date
+            const now = new Date();
+            document.getElementById('report-date').textContent = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+            // If no child linked
+            if (!childData) {
+                document.getElementById('linked-child-info').textContent = 'No child linked yet';
+                document.getElementById('learner-quick-name').textContent = 'No child linked';
+                document.getElementById('learner-quick-level').textContent = '--';
+                document.getElementById('teacher-note').innerHTML = `
+                    <span class="highlight-span">Welcome to your Parent Dashboard!</span> 
+                    You haven't linked a child yet. 
+                    You can create a learner account for your child to start monitoring their progress.
+                `;
+                document.getElementById('subject-breakdown').innerHTML = `
+                    <div class="empty-state" style="padding:20px;">
+                        <div class="empty-icon">👨‍👩‍👦</div>
+                        <h3>No child linked yet</h3>
+                        <p>Create a learner account for your child to see their progress here.</p>
+                        <div class="empty-actions">
+                            <a class="btn btn-teal" href="create-child.html">✨ Create Child Account</a>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Child is linked
+            const childName = childData.display_name || childData.full_name || 'Learner';
+            document.getElementById('linked-child-info').textContent = `${childName} · ${childData.grade || 'Grade 3'}`;
+            document.getElementById('learner-quick-name').textContent = childName;
+            document.getElementById('learner-quick-level').textContent = `${childData.grade || 'Grade 3'} · Level ${childData.level || 1}`;
+
+            // Get lesson IDs
+            const { data: lessons } = await supabaseClient
+                .from('lessons')
+                .select('id, lesson_key, title, subject, exercises_count');
+
+            if (!lessons || lessons.length === 0) {
+                console.warn('No lessons found');
+                return;
+            }
+
+            // Map lesson keys to icons and colors
+            const lessonMeta = {
+                addition: { icon: '➕', subject: 'math', color: '#4CAF7D' },
+                subtraction: { icon: '➖', subject: 'math', color: '#3A9ED6' },
+                plant: { icon: '🌱', subject: 'science', color: '#4CAF7D' },
+                reading: { icon: '📖', subject: 'reading', color: '#FF8C42' },
+                ancient: { icon: '🏛️', subject: 'history', color: '#9B59B6' }
+            };
+
+            let totalCorrect = 0;
+            let totalAnswered = 0;
+            let totalQuestions = 0;
+            let completedLessons = 0;
+            let bestSubject = '--';
+            let bestScore = 0;
+            const lessonData = [];
+
+            for (const lesson of lessons) {
+                const progress = await getLessonProgressForChild(childData.id, lesson.id);
+                const score = progress ? Math.round((progress.correct_count || 0) / 5 * 100) : 0;
+                const pct = progress ? Math.min(progress.progress_percentage || 0, 100) : 0;
+                const meta = lessonMeta[lesson.lesson_key] || { icon: '📚', subject: 'other' };
+
+                let correctCount = progress?.correct_count || 0;
+                let answered = 0;
+                let completed = progress?.status === 'completed';
+
+                if (progress && progress.answers) {
+                    const answersData = typeof progress.answers === 'string' ? JSON.parse(progress.answers) : progress.answers;
+                    if (Array.isArray(answersData)) {
+                        answered = answersData.filter(a => a !== null).length;
+                    }
+                }
+
+                totalCorrect += correctCount;
+                totalAnswered += answered;
+                totalQuestions += parseInt(lesson.exercises_count) || 5;
+                if (completed) completedLessons++;
+
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestSubject = lesson.title;
+                }
+
+                lessonData.push({
+                    ...lesson,
+                    ...meta,
+                    score,
+                    pct,
+                    correctCount,
+                    answered,
+                    completed
+                });
+            }
+
+            // Update summary stats
+            const avgScore = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
+            document.getElementById('stat-lessons').textContent = completedLessons;
+            document.getElementById('stat-avg').textContent = avgScore + '%';
+            document.getElementById('stat-time').textContent = (completedLessons * 15) + 'm';
+            document.getElementById('stat-streak').textContent = '🔥' + (completedLessons > 0 ? completedLessons : 0);
+
+            // Update overall ring
+            const ring = document.getElementById('overall-ring');
+            const pct = totalQuestions > 0 ? Math.min(totalCorrect / totalQuestions, 1) : 0;
+            const offset = 339 - (339 * pct);
+            ring.style.strokeDashoffset = offset;
+            document.getElementById('overall-score').innerHTML = Math.round(pct * 100) + '%<small>Average Score</small>';
+
+            // Update learner quick view
+            document.getElementById('learner-avg-session').textContent = completedLessons > 0 ? '15 min' : '--';
+            document.getElementById('learner-lessons-week').textContent = completedLessons;
+            document.getElementById('learner-best-subject').textContent = bestSubject;
+
+            // Build subject breakdown
+            const breakdownContainer = document.getElementById('subject-breakdown');
+            breakdownContainer.innerHTML = '';
+
+            const subjectColors = {
+                math: 'math',
+                science: 'science',
+                reading: 'reading',
+                history: 'history'
+            };
+
+            lessonData.forEach(lesson => {
+                const row = document.createElement('div');
+                row.className = 'breakdown-row';
+                const trend = lesson.completed ? 'up' : 'same';
+                const trendSymbol = lesson.completed ? '↑' : '→';
+                const trendText = lesson.completed ? '+100%' : '0%';
+
+                row.innerHTML = `
+                    <div class="br-icon ${subjectColors[lesson.subject] || 'math'}">${lesson.icon}</div>
+                    <div class="br-info">
+                        <h4>${lesson.title}</h4>
+                        <p>${lesson.completed ? '✅ Completed' : '🔄 In Progress'} · ${lesson.correctCount}/5 correct</p>
+                    </div>
+                    <div class="br-stats">
+                        <div class="br-score">${lesson.score}%</div>
+                        <div class="br-trend ${trend}">${trendSymbol} ${trendText}</div>
+                    </div>
+                `;
+                breakdownContainer.appendChild(row);
+            });
+
+            // Update teacher's note
+            const note = document.getElementById('teacher-note');
+            if (completedLessons === 0) {
+                note.innerHTML = `
+                    <span class="highlight-span">Welcome to NeuroLearn!</span>
+                    ${childName} hasn't completed any lessons yet.
+                    Encourage them to start with <span class="highlight-span">Addition</span> or
+                    <span class="highlight-span">Subtraction</span> to begin their learning journey! 🚀
+                `;
+            } else if (completedLessons === 5) {
+                note.innerHTML = `
+                    <span class="highlight-span">Outstanding work!</span>
+                    ${childName} has completed <span class="highlight-span">all 5 lessons</span> with an average score of
+                    <span class="highlight-span">${avgScore}%</span>. This is a remarkable achievement!
+                    ${childName} is ready for more advanced challenges. 🌟
+                `;
+            } else {
+                note.innerHTML = `
+                    ${childName} has made <span class="highlight-span">great progress</span> by completing
+                    <span class="highlight-span">${completedLessons} out of 5 lessons</span> with an average score of
+                    <span class="highlight-span">${avgScore}%</span>. Keep up the momentum! 💪
+                `;
+            }
+
+            // Build recommendations
+            const recContainer = document.getElementById('recommendations');
+            recContainer.innerHTML = '';
+
+            const recs = [];
+            const incomplete = lessonData.filter(l => !l.completed);
+            if (incomplete.length > 0) {
+                recs.push({ dot: 'green', title: `Start ${incomplete[0].title}`, desc: `Complete ${incomplete[0].title} to build skills.` });
+            }
+            if (completedLessons === 5) {
+                recs.push({ dot: 'blue', title: '🎉 All Complete!', desc: 'All lessons mastered. Great job!' });
+            }
+            const lowScore = lessonData.filter(l => l.score > 0 && l.score < 60);
+            if (lowScore.length > 0 && recs.length < 2) {
+                recs.push({ dot: 'orange', title: `Review ${lowScore[0].title}`, desc: `Practice to improve score.` });
+            }
+            if (recs.length === 0) {
+                recs.push({ dot: 'green', title: '🏆 Great Progress!', desc: 'Continue learning to unlock more!' });
+            }
+
+            recs.slice(0, 3).forEach(rec => {
+                const item = document.createElement('div');
+                item.className = 'rec-item';
+                item.innerHTML = `
+                    <div class="rec-dot ${rec.dot}"></div>
+                    <div class="rec-info">
+                        <h4>${rec.title}</h4>
+                        <p>${rec.desc}</p>
+                    </div>
+                `;
+                recContainer.appendChild(item);
+            });
+
+            // Build bar chart
+            buildBarChart(lessonData);
+
+        } catch (error) {
+            console.error('Error loading report:', error);
+            showToast('Error loading data', '#FF6B6B');
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    //  BUILD BAR CHART
+    // ─────────────────────────────────────────────
+
+    function buildBarChart(lessonData) {
+        const el = document.getElementById('bar-chart');
+        if (!el) return;
+        el.innerHTML = '';
+
+        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+        const colors = ['#4CAF7D', '#3A9ED6', '#FF8C42', '#9B59B6', '#4CAF7D'];
+        const scores = lessonData.map(l => l.score);
+        const data = scores.every(s => s === 0) ? [0, 0, 0, 0, 0] : scores.slice(0, 5);
+        while (data.length < 5) data.push(0);
+
+        data.forEach((score, i) => {
+            const col = document.createElement('div');
+            col.className = 'bar-col';
+            const h = score > 0 ? Math.max(8, score * 1.1) : 8;
+            col.innerHTML = `
+                <div class="b-val">${score > 0 ? score + '%' : '—'}</div>
+                <div class="bar-fill" style="height:0px;background:${colors[i % colors.length]};border-radius:10px 10px 0 0;"></div>
+                <div class="b-label">${days[i % days.length]}</div>
+            `;
+            el.appendChild(col);
+            setTimeout(() => {
+                const fill = col.querySelector('.bar-fill');
+                if (fill) fill.style.height = h + 'px';
+            }, 200 + (i * 50));
+        });
+    }
+
+    // ─────────────────────────────────────────────
+    //  PERIOD TOGGLE
+    // ─────────────────────────────────────────────
+
+    function setPeriod(btn, period) {
+        document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        showToast(`Showing ${period} data 📊`, '#FF8C42');
+        loadReportData();
+    }
+
+    // ─────────────────────────────────────────────
+    //  INITIALIZE
+    // ─────────────────────────────────────────────
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadReportData();
+        if (typeof setActiveNav === 'function') setActiveNav();
+    });
+
+    // ─────────────────────────────────────────────
+    //  EXPOSE FUNCTIONS GLOBALLY
+    // ─────────────────────────────────────────────
+    window.loadReportData = loadReportData;
+    window.setPeriod = setPeriod;
+</script>
+
+</body>
+</html>
