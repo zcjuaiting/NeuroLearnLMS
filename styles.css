@@ -1219,3 +1219,212 @@ body::before {
     }
 }
 
+/* ============================================================
+   ACCESSIBILITY THEMES
+   ============================================================ */
+
+/* ---- High Contrast Mode ---- */
+body.high-contrast-mode {
+    --text-dark: #FFFFFF;
+    --text-mid: #E8E8E8;
+    --text-light: #B0B0B0;
+    --card-bg: rgba(20, 20, 40, 0.95);
+    --shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.6);
+    background: #0a0a1a;
+}
+
+body.high-contrast-mode .card,
+body.high-contrast-mode .auth-card,
+body.high-contrast-mode .settings-card,
+body.high-contrast-mode .onboarding-card {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+}
+
+body.high-contrast-mode .topnav {
+    background: rgba(10, 10, 30, 0.95) !important;
+    border-bottom-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+body.high-contrast-mode .topnav .nav-tab {
+    color: #E0E0E0 !important;
+}
+
+body.high-contrast-mode .topnav .nav-tab.active {
+    background: var(--teal) !important;
+    color: white !important;
+}
+
+body.high-contrast-mode .auth-card h2,
+body.high-contrast-mode .settings-header h2,
+body.high-contrast-mode .onboarding-header h2 {
+    color: #6EC6F5 !important;
+}
+
+body.high-contrast-mode .form-group label {
+    color: #E0E0E0 !important;
+}
+
+body.high-contrast-mode .form-group input,
+body.high-contrast-mode .form-group select {
+    background: rgba(255, 255, 255, 0.1) !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+body.high-contrast-mode .form-group input:focus,
+body.high-contrast-mode .form-group select:focus {
+    background: rgba(255, 255, 255, 0.2) !important;
+    border-color: #6EC6F5 !important;
+}
+
+body.high-contrast-mode .stat-item,
+body.high-contrast-mode .subject-row {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+body.high-contrast-mode .stat-item .stat-val,
+body.high-contrast-mode .subject-row .br-score {
+    color: #6EC6F5 !important;
+}
+
+body.high-contrast-mode .welcome-card h2 {
+    color: #6EC6F5 !important;
+}
+
+body.high-contrast-mode .level-badge {
+    background: linear-gradient(135deg, #FFD93D, #FF8C42) !important;
+}
+
+body.high-contrast-mode .xp-badge {
+    background: linear-gradient(135deg, #FFD93D, #FF8C42) !important;
+}
+
+body.high-contrast-mode .btn-ghost {
+    color: #6EC6F5 !important;
+    border-color: rgba(110, 198, 245, 0.5) !important;
+}
+
+body.high-contrast-mode .btn-ghost:hover {
+    background: rgba(110, 198, 245, 0.2) !important;
+}
+
+body.high-contrast-mode .lesson-card {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.high-contrast-mode .lesson-card h3 {
+    color: #ffffff !important;
+}
+
+body.high-contrast-mode .lesson-card p {
+    color: #B0B0B0 !important;
+}
+
+body.high-contrast-mode .option-item {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+body.high-contrast-mode .option-item .o-label {
+    color: #ffffff !important;
+}
+
+body.high-contrast-mode .option-item .o-desc {
+    color: #B0B0B0 !important;
+}
+
+body.high-contrast-mode .option-item.selected {
+    background: rgba(46, 140, 140, 0.3) !important;
+    border-color: #6EC6F5 !important;
+}
+
+body.high-contrast-mode .setting-group-title {
+    color: #ffffff !important;
+}
+
+body.high-contrast-mode .card-title {
+    color: #ffffff !important;
+}
+
+body.high-contrast-mode .info-table td {
+    color: #E0E0E0 !important;
+}
+
+body.high-contrast-mode .info-table td:first-child {
+    color: #B0B0B0 !important;
+}
+
+/* ---- Pastel Mode ---- */
+body.pastel-mode {
+    --text-dark: #4A4A6A;
+    --text-mid: #6A6A8A;
+    --text-light: #9A9ABA;
+    --card-bg: rgba(255, 240, 245, 0.95);
+    --shadow: 0 4px 24px rgba(180, 160, 180, 0.2);
+    --shadow-lg: 0 8px 40px rgba(180, 160, 180, 0.25);
+    --sky: #B8C8E8;
+    --sky-light: #D8E8F8;
+    --sky-dark: #8AA8C8;
+    --teal: #7A9A9A;
+    --green: #8ABA8A;
+    --orange: #D4A070;
+    --yellow: #E8D060;
+}
+
+body.pastel-mode .card,
+body.pastel-mode .auth-card,
+body.pastel-mode .settings-card,
+body.pastel-mode .onboarding-card {
+    background: rgba(255, 240, 245, 0.95) !important;
+    border-color: rgba(200, 180, 200, 0.3) !important;
+}
+
+body.pastel-mode .topnav {
+    background: rgba(255, 240, 245, 0.92) !important;
+    border-bottom-color: rgba(200, 180, 200, 0.2) !important;
+}
+
+body.pastel-mode .lesson-card {
+    background: rgba(255, 240, 245, 0.95) !important;
+    border-color: rgba(200, 180, 200, 0.2) !important;
+}
+
+body.pastel-mode .auth-card h2,
+body.pastel-mode .settings-header h2,
+body.pastel-mode .onboarding-header h2 {
+    color: #7A9A9A !important;
+}
+
+body.pastel-mode .stat-item,
+body.pastel-mode .subject-row {
+    background: rgba(200, 180, 200, 0.08) !important;
+    border-color: rgba(200, 180, 200, 0.2) !important;
+}
+
+body.pastel-mode .option-item {
+    background: rgba(255, 255, 255, 0.5) !important;
+    border-color: rgba(200, 180, 200, 0.2) !important;
+}
+
+body.pastel-mode .option-item.selected {
+    background: rgba(122, 154, 154, 0.15) !important;
+    border-color: #7A9A9A !important;
+}
+
+body.pastel-mode .btn-primary {
+    background: linear-gradient(135deg, #7A9A9A, #8AA8C8) !important;
+}
+
+body.pastel-mode .btn-teal {
+    background: linear-gradient(135deg, #7A9A9A, #8AA8C8) !important;
+}
+
+body.pastel-mode .btn-primary:hover,
+body.pastel-mode .btn-teal:hover {
+    box-shadow: 0 8px 22px rgba(122, 154, 154, 0.4) !important;
+}
