@@ -172,73 +172,47 @@
             background: #fff;
         }
 
-        .choice-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin: 24px 0 20px;
-        }
-        .choice-card {
+        /* ---- Single Action Card (Link Only) ---- */
+        .action-card {
             background: rgba(255,255,255,0.6);
             border: 2px solid rgba(110,198,245,0.2);
             border-radius: var(--radius);
-            padding: 32px 24px;
+            padding: 40px 32px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s;
             box-shadow: var(--shadow);
+            margin: 16px 0 20px;
         }
-        .choice-card:hover {
+        .action-card:hover {
             transform: translateY(-4px);
             box-shadow: var(--shadow-lg);
             border-color: var(--teal);
         }
-        .choice-card .choice-icon {
-            font-size: 3rem;
+        .action-card .action-icon {
+            font-size: 3.5rem;
             margin-bottom: 12px;
         }
-        .choice-card h3 {
+        .action-card h3 {
             font-family: 'Baloo 2', cursive;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             color: var(--text-dark);
             margin-bottom: 4px;
         }
-        .choice-card p {
-            font-size: 0.82rem;
+        .action-card p {
+            font-size: 0.9rem;
             color: var(--text-light);
             font-weight: 600;
         }
-        .choice-card .choice-badge {
+        .action-card .action-badge {
             display: inline-block;
-            margin-top: 10px;
-            padding: 4px 14px;
+            margin-top: 12px;
+            padding: 4px 16px;
             border-radius: 20px;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 700;
-        }
-        .choice-card .choice-badge.link {
             background: rgba(110,198,245,0.15);
             color: var(--sky-dark);
-        }
-        .choice-card .choice-badge.create {
-            background: rgba(76,175,125,0.15);
-            color: var(--green-dark);
-        }
-
-        .skip-link {
-            text-align: center;
-            margin-top: 16px;
-        }
-        .skip-link a {
-            color: var(--text-light);
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .skip-link a:hover {
-            color: var(--teal);
         }
 
         .link-section {
@@ -403,10 +377,10 @@
         @media (max-width: 640px) {
             .onboarding-card { padding: 32px 24px; }
             .form-row { grid-template-columns: 1fr; }
-            .choice-grid { grid-template-columns: 1fr; }
             .link-section .btn-row { flex-direction: column; }
             .step-label { font-size: 0.55rem; }
             .step-circle { width: 32px; height: 32px; font-size: 0.75rem; }
+            .action-card { padding: 28px 20px; }
         }
     </style>
 </head>
@@ -428,7 +402,7 @@
             <div class="step-line"></div>
             <div class="step-indicator">
                 <div class="step-circle">2</div>
-                <div class="step-label">Choose Action</div>
+                <div class="step-label">Link Learner</div>
             </div>
         </div>
 
@@ -489,34 +463,26 @@
             </button>
         </div>
 
-        <!-- ===== STEP 2: CHOOSE ACTION ===== -->
+        <!-- ===== STEP 2: LINK LEARNER ===== -->
         <div id="step-2" class="form-section" style="display:none;">
             <div class="onboarding-header" style="margin-bottom:24px;">
-                <div class="icon-big">👋</div>
-                <h2>Welcome to NeuroLearn!</h2>
-                <p>How would you like to begin?</p>
+                <div class="icon-big">🔗</div>
+                <h2>Link a Learner</h2>
+                <p>Enter the child code to connect with your learner</p>
             </div>
 
-            <div class="choice-grid" id="choice-grid">
-                <div class="choice-card" onclick="showLinkSection()">
-                    <div class="choice-icon">🔗</div>
-                    <h3>Link Existing Learner</h3>
-                    <p>Enter a child code to connect an existing learner profile.</p>
-                    <span class="choice-badge link">🔑 Child Code</span>
-                </div>
-
-                <div class="choice-card" onclick="CreateChild()">
-                    <div class="choice-icon">✨</div>
-                    <h3>Create Learner</h3>
-                    <p>Set up a learner profile for your child now.</p>
-                    <span class="choice-badge create">📝 New Profile</span>
-                </div>
+            <!-- Single Action Card -->
+            <div class="action-card" onclick="showLinkSection()">
+                <div class="action-icon">🔗</div>
+                <h3>Link Existing Learner</h3>
+                <p>Enter a child code to connect an existing learner profile.</p>
+                <span class="action-badge">🔑 Child Code</span>
             </div>
 
+            <!-- Link Section -->
             <div class="link-section" id="link-section">
                 <div class="form-group">
                     <label>Enter Child Code</label>
-                    <!-- ⭐ FORMAT: XX-XXX-XX (e.g., NL-285-BQ) -->
                     <input 
                         type="text" 
                         id="child-code-input" 
@@ -546,11 +512,6 @@
                     <span id="link-message-text"></span>
                 </div>
             </div>
-
-            <!-- SKIP LINK - Goes directly to dashboard -->
-            <div class="skip-link">
-                <a onclick="skipOnboarding()">⏭️ Skip for now — I'll do this later</a>
-            </div>
         </div>
 
     </div>
@@ -578,6 +539,20 @@
             }
             setTimeout(() => waitForSupabase().then(resolve), 500);
         });
+    }
+
+    // ============================================
+    // TOAST NOTIFICATION
+    // ============================================
+    function showToast(msg, color) {
+        const t = document.getElementById('toast');
+        if (!t) return;
+        t.textContent = msg;
+        t.style.background = color || '#2E8C8C';
+        t.style.color = '#FFFFFF';
+        t.classList.add('show');
+        clearTimeout(window._toastTimer);
+        window._toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
     }
 
     // ============================================
@@ -625,7 +600,6 @@
                 return;
             }
 
-            // Update user profile in Supabase
             const { error: updateError } = await supabaseClient
                 .from('users')
                 .update({
@@ -645,7 +619,6 @@
                 return;
             }
 
-            // Save to localStorage
             localStorage.setItem('neurolearn_display_name', displayName);
             localStorage.setItem('neurolearn_full_name', fullName);
             localStorage.setItem('parent_relationship', relationship);
@@ -654,9 +627,7 @@
             console.log('✅ Parent profile saved successfully!');
             showToast('✅ Profile saved!', '#4CAF7D');
 
-            // Go to step 2
-            //goToStep(2);
-            window.location.href = 'signup.html?role=child';
+            goToStep(2);
 
         } catch (error) {
             console.error('Error:', error);
@@ -705,8 +676,8 @@
 
     function showLinkSection() {
         document.getElementById('link-section').classList.add('active');
-        document.getElementById('choice-grid').style.opacity = '0.4';
-        document.getElementById('choice-grid').style.pointerEvents = 'none';
+        document.getElementById('action-card').style.opacity = '0.4';
+        document.getElementById('action-card').style.pointerEvents = 'none';
         document.getElementById('child-code-input').focus();
         document.getElementById('child-preview').classList.remove('show');
         document.getElementById('link-message').className = 'message-box';
@@ -715,46 +686,29 @@
 
     function hideLinkSection() {
         document.getElementById('link-section').classList.remove('active');
-        document.getElementById('choice-grid').style.opacity = '1';
-        document.getElementById('choice-grid').style.pointerEvents = 'auto';
+        document.getElementById('action-card').style.opacity = '1';
+        document.getElementById('action-card').style.pointerEvents = 'auto';
         document.getElementById('child-code-input').value = '';
         document.getElementById('child-preview').classList.remove('show');
         document.getElementById('link-message').className = 'message-box';
         document.getElementById('link-message').style.display = 'none';
     }
 
-    function goToCreateChild() {
-        window.location.href = 'create-child.html';
-    }
-
     // ============================================
-    // ⭐ SKIP ONBOARDING - GO TO DASHBOARD ⭐
-    // ============================================
-    function skipOnboarding() {
-        showToast('You can link a child later from your dashboard.', '#FF8C42');
-        setTimeout(() => {
-            window.location.href = 'parent-dashboard.html';
-        }, 1500);
-    }
-
-    // ============================================
-    // ⭐ FIXED: AUTO-FORMAT CHILD CODE - XX-XXX-XX
+    // AUTO-FORMAT CHILD CODE - XX-XXX-XX
     // ============================================
     document.addEventListener('DOMContentLoaded', function() {
         const input = document.getElementById('child-code-input');
         if (input) {
             input.addEventListener('input', function() {
-                // Remove any non-alphanumeric characters and convert to uppercase
                 let val = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
                 
-                // Format: XX-XXX-XX
                 if (val.length > 2) {
                     val = val.substring(0, 2) + '-' + val.substring(2);
                 }
                 if (val.length > 6) {
                     val = val.substring(0, 6) + '-' + val.substring(6);
                 }
-                // Max length: 2 + 1 + 3 + 1 + 2 = 9
                 if (val.length > 9) {
                     val = val.substring(0, 9);
                 }
@@ -766,7 +720,6 @@
             });
         }
 
-        // Pre-fill from localStorage if available
         const savedFullName = localStorage.getItem('neurolearn_full_name') || '';
         if (savedFullName) {
             document.getElementById('parent-fullname').value = savedFullName;
@@ -782,7 +735,6 @@
             document.getElementById('parent-relationship').value = savedRelationship;
         }
 
-        // If user already has profile data, skip to step 2
         if (savedFullName && savedDisplayName && savedRelationship) {
             goToStep(2);
         } else {
@@ -791,7 +743,7 @@
     });
 
     // ============================================
-    // ⭐ FIXED: LINK CHILD - XX-XXX-XX format
+    // LINK CHILD - Connected to Supabase
     // ============================================
     async function linkChild() {
         const childCode = document.getElementById('child-code-input').value.trim().toUpperCase();
@@ -809,7 +761,6 @@
             return;
         }
 
-        // ⭐ FIXED: Validate XX-XXX-XX format (e.g., NL-285-BQ)
         const codeRegex = /^[A-Z]{2}-[A-Z0-9]{3}-[A-Z0-9]{2}$/;
         if (!codeRegex.test(childCode)) {
             showToast('Invalid code format. Please use: XX-XXX-XX (e.g., NL-285-BQ)', '#FF6B6B');
@@ -836,7 +787,6 @@
                 return;
             }
 
-            // Find child with this code
             const { data: childData, error: childError } = await supabaseClient
                 .from('users')
                 .select('id, full_name, display_name, grade, child_code, parent_id, role')
@@ -883,7 +833,6 @@
                 return;
             }
 
-            // Show preview
             const childName = childData.full_name || childData.display_name || 'Learner';
             document.getElementById('preview-name').textContent = childName;
             document.getElementById('preview-grade').textContent = childData.grade || 'Grade 3';
@@ -897,7 +846,6 @@
                 return;
             }
 
-            // Update child with parent_id
             const { error: updateError } = await supabaseClient
                 .from('users')
                 .update({ 
@@ -914,7 +862,6 @@
                 return;
             }
 
-            // Success!
             msgText.textContent = `✅ Successfully linked to ${childName}!`;
             msgBox.className = 'message-box success';
             msgBox.style.display = 'block';
